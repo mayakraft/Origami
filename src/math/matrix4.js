@@ -334,12 +334,14 @@ export const makeLookAtMatrix4 = (position, target, up) => {
 	const zAxis = normalize3(subtract3(position, target));
 	const xAxis = normalize3(cross3(up, zAxis));
 	const yAxis = normalize3(cross3(zAxis, xAxis));
-	return [
-		xAxis[0], xAxis[1], xAxis[2], 0,
-		yAxis[0], yAxis[1], yAxis[2], 0,
-		zAxis[0], zAxis[1], zAxis[2], 0,
-		position[0], position[1], position[2], 1,
+	const m = [
+		xAxis[0], yAxis[0], zAxis[0], 0,
+		xAxis[1], yAxis[1], zAxis[1], 0,
+		xAxis[2], yAxis[2], zAxis[2], 0,
+		0, 0, 0, 1,
 	];
+	const t = makeMatrix4Translate(-position[0], -position[1], -position[2]);
+	return multiplyMatrices4(t, m);
 };
 
 /**

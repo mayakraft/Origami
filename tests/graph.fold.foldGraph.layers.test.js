@@ -4,6 +4,87 @@ import ear from "../src/index.js";
 
 const FOLD_ANGLE = 90;
 
+test("foldGraph, faceOrders, square folding", () => {
+  const graph = ear.graph.square();
+
+  let vertices_coordsFolded;
+
+	// 1.
+	// fold the square in half horizontally
+	const result1 = ear.graph.foldLine(
+		graph,
+		{ vector: [1, 0], origin: [0.5, 0.5] },
+		{ assignment: "M" },
+	);
+	expect(result1.faces.map).toMatchObject([[0, 1]]);
+	// mountain crease puts both faces faces away from each other
+	// face 1 is under face 0.
+	expect(graph.faceOrders).toMatchObject([[0, 1, -1]]);
+
+	// the stationary face is top face
+	vertices_coordsFolded = ear.graph.makeVerticesCoordsFlatFolded(graph, [0]);
+
+	// 2.
+	// into the 2:1 rectangle, fold a 45deg line \, from the top left
+	// corner to the center of the bottom line.
+	const result2 = ear.graph.foldLine(
+		graph,
+		{ vector: [-1, 1], origin: [0.5, 0.5] },
+		{ assignment: "V", vertices_coordsFolded },
+	);
+	expect(result2.faces.map).toMatchObject([[0, 1], [2, 3]]);
+	// the single [0, 1, -1] turns into four: [0, 2], [0, 3], [1, 2], [1, 3]
+	// all of which remain at a -1. additionally:
+	// [0, 1, 1] valley crease makes them face into each other.
+	// [2, 3, -1] mountain crease makes them face away from each other.
+	expect(graph.faceOrders).toMatchObject([
+		[0, 2, -1], [1, 2, -1], [0, 3, -1], [1, 3, -1], [0, 1, 1], [2, 3, -1],
+	]);
+
+	// the stationary face is small triangle face, the large flap swings downwards
+	vertices_coordsFolded = ear.graph.makeVerticesCoordsFlatFolded(graph, [0]);
+	// console.log(vertices_coordsFolded);
+  console.log(JSON.stringify(graph));
+
+	// 3.
+	// fold the other missing 45 degree line. the majority of the piece
+	// remains stationary, the triangle flap is folded
+	const result3 = ear.graph.foldLine(
+		graph,
+		{ vector: [-1, -1], origin: [0.5, 0.5] },
+		{ assignment: "M", vertices_coordsFolded },
+	);
+	expect(result3.faces.map).toMatchObject([[0], [2, 3], [4, 5], [1]]);
+
+	// A: [0, 2, -1] becomes [0, 4], [0, 5]
+	// B: [1, 2, -1] becomes [2, 4], [2, 5], [3, 4], [3, 5]
+	// C: [0, 3, -1] becomes [0, 1]
+	// D: [1, 3, -1] becomes [2, 1], [3, 1]
+	// E: [0, 1, 1] becomes [0, 2], [0, 3]
+	// F: [2, 3, -1] becomes [4, 1], [5, 1]
+	expect(graph.faceOrders).toMatchObject([
+		[0, 4, -1], // A
+		[2, 4, -1], // B
+		[0, 1, -1], // C
+		[2, 1, -1], // D
+		[0, 2, 1], // E
+		[4, 1, -1], // F
+		[3, 4, -1], // B
+		[3, 1, 1], // D -- sign flipped? is that correct?
+		[0, 3, 1], // E
+		[0, 5, -1], // A
+		[2, 5, -1], // B
+		[5, 1, 1], // F -- sign flipped? is that correct?
+		[3, 5, -1], // B
+		[2, 3, 1], // new
+		[4, 5, -1], // new
+  ]);
+  // the stationary face is small triangle face, the large flap swings downwards
+  // vertices_coordsFolded = ear.graph.makeVerticesCoordsFlatFolded(graph, [0]);
+  // console.log(vertices_coordsFolded);
+  // console.log(JSON.stringify(graph));
+});
+
 test("foldGraph, faceOrders, square folding, valley, valley", () => {
 	const graph = ear.graph.square();
 	ear.graph.foldGraph(

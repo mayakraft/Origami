@@ -68,9 +68,9 @@ const renderAxiomStepSVG = (graph, params, resultLines, arrows, name = "") => {
 
 test("axiom1Arrows, square A", () => {
 	const graph = ear.graph.square();
-	const polygon = ear.graph.boundaryPolygon(graph);
+	// const polygon = ear.graph.boundaryPolygon(graph);
 	const params = [[0, 0], [1, 1]];
-	const axiomResults = ear.axiom.axiom1InPolygon(polygon, ...params);
+	const axiomResults = ear.axiom.validAxiom1(graph, ...params);
 	const arrowResults = ear.diagram.axiom1Arrows(graph, ...params);
 	renderAxiomStepSVG(graph, params, axiomResults, arrowResults, "svg-axiom-square-1-A");
 	expect(arrowResults).toHaveLength(1);
@@ -82,9 +82,9 @@ test("axiom1Arrows, square A", () => {
 
 test("axiom1Arrows, square B", () => {
 	const graph = ear.graph.square();
-	const polygon = ear.graph.boundaryPolygon(graph);
+	// const polygon = ear.graph.boundaryPolygon(graph);
 	const params = [[0.45, 0.45], [0.55, 0.55]];
-	const axiomResults = ear.axiom.axiom1InPolygon(polygon, ...params);
+	const axiomResults = ear.axiom.validAxiom1(graph, ...params);
 	const arrowResults = ear.diagram.axiom1Arrows(graph, ...params);
 	renderAxiomStepSVG(graph, params, axiomResults, arrowResults, "svg-axiom-square-1-B");
 	expect(arrowResults).toHaveLength(1);
@@ -96,9 +96,9 @@ test("axiom1Arrows, square B", () => {
 
 test("axiom2Arrows, square A", () => {
 	const graph = ear.graph.square();
-	const polygon = ear.graph.boundaryPolygon(graph);
+	// const polygon = ear.graph.boundaryPolygon(graph);
 	const params = [[0, 0], [1, 1]];
-	const axiomResults = ear.axiom.axiom2InPolygon(polygon, ...params);
+	const axiomResults = ear.axiom.validAxiom2(graph, ...params);
 	const arrowResults = ear.diagram.axiom2Arrows(graph, ...params);
 	renderAxiomStepSVG(graph, params, axiomResults, arrowResults, "svg-axiom-square-2-A");
 	expect(arrowResults).toHaveLength(1);
@@ -110,9 +110,9 @@ test("axiom2Arrows, square A", () => {
 
 test("axiom2Arrows, square B", () => {
 	const graph = ear.graph.square();
-	const polygon = ear.graph.boundaryPolygon(graph);
+	// const polygon = ear.graph.boundaryPolygon(graph);
 	const params = [[0.45, 0.45], [0.55, 0.55]];
-	const axiomResults = ear.axiom.axiom2InPolygon(polygon, ...params);
+	const axiomResults = ear.axiom.validAxiom2(graph, ...params);
 	const arrowResults = ear.diagram.axiom2Arrows(graph, ...params);
 	renderAxiomStepSVG(graph, params, axiomResults, arrowResults, "svg-axiom-square-2-B");
 	expect(arrowResults).toHaveLength(1);
@@ -127,7 +127,7 @@ test("axiom2Arrows, square B", () => {
 // 	const graph = ear.graph.square();
 // 	const polygon = ear.graph.boundaryPolygon(graph);
 // 	const params = [{ vector: [1, 0], origin: [0, 0] }, { vector: [1, 1], origin: [0, 0] }];
-// 	const axiomResults = ear.axiom.axiom3InPolygon(polygon, ...params);
+// 	const axiomResults = ear.axiom.validAxiom3(graph, ...params);
 // 	const arrowResults = ear.diagram.axiom3Arrows(graph, ...params);
 // 	renderAxiomStepSVG(graph, params, axiomResults, arrowResults, "svg-axiom-square-3-A");
 // 	expect(arrowResults).toHaveLength(2);
@@ -140,9 +140,9 @@ test("axiom2Arrows, square B", () => {
 test("axiom3Arrows, square B", () => {
 	// input lines intersect in the middle, two axiom solutions
 	const graph = ear.graph.square();
-	const polygon = ear.graph.boundaryPolygon(graph);
+	// const polygon = ear.graph.boundaryPolygon(graph);
 	const params = [{ vector: [1, 0], origin: [0, 0.5] }, { vector: [1, 1], origin: [0, 0] }];
-	const axiomResults = ear.axiom.axiom3InPolygon(polygon, ...params);
+	const axiomResults = ear.axiom.validAxiom3(graph, ...params);
 	const arrowResults = ear.diagram.axiom3Arrows(graph, ...params);
 	renderAxiomStepSVG(graph, params, axiomResults, arrowResults, "svg-axiom-square-3-B");
 	expect(arrowResults).toHaveLength(2);
@@ -155,9 +155,9 @@ test("axiom3Arrows, square B", () => {
 test("axiom3Arrows, square C", () => {
 	// input lines are parallel
 	const graph = ear.graph.square();
-	const polygon = ear.graph.boundaryPolygon(graph);
+	// const polygon = ear.graph.boundaryPolygon(graph);
 	const params = [{ vector: [1, 1], origin: [0, 0] }, { vector: [1, 1], origin: [0, 0.5] }];
-	const axiomResults = ear.axiom.axiom3InPolygon(polygon, ...params);
+	const axiomResults = ear.axiom.validAxiom3(graph, ...params);
 	const arrowResults = ear.diagram.axiom3Arrows(graph, ...params);
 	renderAxiomStepSVG(graph, params, axiomResults, arrowResults, "svg-axiom-square-3-C");
 	expect(arrowResults).toHaveLength(1);
@@ -169,9 +169,9 @@ test("axiom3Arrows, square C", () => {
 
 test("axiom4Arrows, square", () => {
 	const graph = ear.graph.square();
-	const polygon = ear.graph.boundaryPolygon(graph);
+	// const polygon = ear.graph.boundaryPolygon(graph);
 	const params = [{ vector: [1, 1], origin: [0, 0] }, [0.5, 1]];
-	const axiomResults = ear.axiom.axiom4InPolygon(polygon, ...params);
+	const axiomResults = ear.axiom.validAxiom4(graph, ...params);
 	const arrowResults = ear.diagram.axiom4Arrows(graph, ...params);
 	renderAxiomStepSVG(graph, params, axiomResults, arrowResults, "svg-axiom-square-4");
 	expect(arrowResults).toHaveLength(1);
@@ -183,9 +183,9 @@ test("axiom4Arrows, square", () => {
 
 test("axiom5Arrows, square A", () => {
 	const graph = ear.graph.square();
-	const polygon = ear.graph.boundaryPolygon(graph);
+	// const polygon = ear.graph.boundaryPolygon(graph);
 	const params = [{ vector: [0, 1], origin: [0.5, 0.5] }, [0, 0], [1, 0]];
-	const axiomResults = ear.axiom.axiom5InPolygon(polygon, ...params);
+	const axiomResults = ear.axiom.validAxiom5(graph, ...params);
 	const arrowResults = ear.diagram.axiom5Arrows(graph, ...params);
 	renderAxiomStepSVG(graph, params, axiomResults, arrowResults, "svg-axiom-square-5-A");
 	// expect(arrowResults).toHaveLength(1);
@@ -197,9 +197,9 @@ test("axiom5Arrows, square A", () => {
 
 test("axiom5Arrows, square B", () => {
 	const graph = ear.graph.square();
-	const polygon = ear.graph.boundaryPolygon(graph);
+	// const polygon = ear.graph.boundaryPolygon(graph);
 	const params = [{ vector: [0, 1], origin: [0.5, 0.5] }, [0, 0.5], [0.6, 0.25]];
-	const axiomResults = ear.axiom.axiom5InPolygon(polygon, ...params);
+	const axiomResults = ear.axiom.validAxiom5(graph, ...params);
 	const arrowResults = ear.diagram.axiom5Arrows(graph, ...params);
 	renderAxiomStepSVG(graph, params, axiomResults, arrowResults, "svg-axiom-square-5-B");
 	expect(arrowResults).toHaveLength(2);
@@ -211,9 +211,9 @@ test("axiom5Arrows, square B", () => {
 
 test("axiom5Arrows, square C", () => {
 	const graph = ear.graph.square();
-	const polygon = ear.graph.boundaryPolygon(graph);
+	// const polygon = ear.graph.boundaryPolygon(graph);
 	const params = [{ vector: [0, 1], origin: [0.5, 0.5] }, [0, 0.5], [0.75, 0.25]];
-	const axiomResults = ear.axiom.axiom5InPolygon(polygon, ...params);
+	const axiomResults = ear.axiom.validAxiom5(graph, ...params);
 	const arrowResults = ear.diagram.axiom5Arrows(graph, ...params);
 	renderAxiomStepSVG(graph, params, axiomResults, arrowResults, "svg-axiom-square-5-C");
 	// expect(arrowResults).toHaveLength(0);
@@ -225,14 +225,14 @@ test("axiom5Arrows, square C", () => {
 
 test("axiom6Arrows, square", () => {
 	const graph = ear.graph.square();
-	const polygon = ear.graph.boundaryPolygon(graph);
+	// const polygon = ear.graph.boundaryPolygon(graph);
 	const params = [
 		{ vector: [0, 1], origin: [1, 0] },
 		{ vector: [1, 0], origin: [0, 1] },
 		[0.75, 0],
 		[0, 0.75],
 	];
-	const axiomResults = ear.axiom.axiom6InPolygon(polygon, ...params);
+	const axiomResults = ear.axiom.validAxiom6(graph, ...params);
 	const arrowResults = ear.diagram.axiom6Arrows(graph, ...params);
 	renderAxiomStepSVG(graph, params, axiomResults, arrowResults, "svg-axiom-square-6");
 	expect(arrowResults).toHaveLength(6);
@@ -244,13 +244,13 @@ test("axiom6Arrows, square", () => {
 
 test("axiom7Arrows, square A", () => {
 	const graph = ear.graph.square();
-	const polygon = ear.graph.boundaryPolygon(graph);
+	// const polygon = ear.graph.boundaryPolygon(graph);
 	const params = [
 		{ vector: [1, 0], origin: [0.5, 0.25] },
 		{ vector: [1, 1], origin: [0, 0] },
 		[0.5, 0.0],
 	];
-	const axiomResults = ear.axiom.axiom7InPolygon(polygon, ...params);
+	const axiomResults = ear.axiom.validAxiom7(graph, ...params);
 	const arrowResults = ear.diagram.axiom7Arrows(graph, ...params);
 	renderAxiomStepSVG(graph, params, axiomResults, arrowResults, "svg-axiom-square-7-A");
 	expect(arrowResults).toHaveLength(2);
@@ -265,13 +265,13 @@ test("axiom7Arrows, square A", () => {
 
 test("axiom7Arrows, square B", () => {
 	const graph = ear.graph.square();
-	const polygon = ear.graph.boundaryPolygon(graph);
+	// const polygon = ear.graph.boundaryPolygon(graph);
 	const params = [
 		{ vector: [1, 0], origin: [0.5, 0.5] },
 		{ vector: [1, 1], origin: [0, 0] },
 		[0.75, 0.0],
 	];
-	const axiomResults = ear.axiom.axiom7InPolygon(polygon, ...params);
+	const axiomResults = ear.axiom.validAxiom7(graph, ...params);
 	const arrowResults = ear.diagram.axiom7Arrows(graph, ...params);
 	renderAxiomStepSVG(graph, params, axiomResults, arrowResults, "svg-axiom-square-7-B");
 	// expect(arrowResults).toHaveLength(0);
@@ -279,20 +279,20 @@ test("axiom7Arrows, square B", () => {
 
 test("axiom1Arrows, non-convex", () => {
 	const graph = nonPlanarShape();
-	const polygon = ear.math.convexHull(graph.vertices_coords)
-		.map(i => graph.vertices_coords[i]);
+	// const polygon = ear.math.convexHull(graph.vertices_coords)
+	// 	.map(i => graph.vertices_coords[i]);
 	const params = [[0, 2], [3, 1]];
-	const axiomResults = ear.axiom.axiom1InPolygon(polygon, ...params);
+	const axiomResults = ear.axiom.validAxiom1(graph, ...params);
 	const arrowResults = ear.diagram.axiom1Arrows(graph, ...params);
 	renderAxiomStepSVG(graph, params, axiomResults, arrowResults, "svg-axiom-non-convex-1");
 });
 
 test("axiom2Arrows, non-convex", () => {
 	const graph = nonPlanarShape();
-	const polygon = ear.math.convexHull(graph.vertices_coords)
-		.map(i => graph.vertices_coords[i]);
+	// const polygon = ear.math.convexHull(graph.vertices_coords)
+	// 	.map(i => graph.vertices_coords[i]);
 	const params = [[0, 2], [3, 1]];
-	const axiomResults = ear.axiom.axiom2InPolygon(polygon, ...params);
+	const axiomResults = ear.axiom.validAxiom2(graph, ...params);
 	const arrowResults = ear.diagram.axiom2Arrows(graph, ...params);
 	renderAxiomStepSVG(graph, params, axiomResults, arrowResults, "svg-axiom-non-convex-2");
 });
@@ -302,56 +302,56 @@ test("axiom2Arrows, non-convex", () => {
 // 	const polygon = ear.math.convexHull(graph.vertices_coords)
 // 		.map(i => graph.vertices_coords[i]);
 // 	const params = [{ vector: [1, 0], origin: [0, 0] }, { vector: [1, 1], origin: [0, 0] }];
-// 	const axiomResults = ear.axiom.axiom3InPolygon(polygon, ...params);
+// 	const axiomResults = ear.axiom.validAxiom3(graph, ...params);
 // 	const arrowResults = ear.diagram.axiom3Arrows(graph, ...params);
 // 	renderAxiomStepSVG(graph, params, axiomResults, arrowResults, "svg-axiom-non-convex-3");
 // });
 
 test("axiom4Arrows, non-convex", () => {
 	const graph = nonPlanarShape();
-	const polygon = ear.math.convexHull(graph.vertices_coords)
-		.map(i => graph.vertices_coords[i]);
+	// const polygon = ear.math.convexHull(graph.vertices_coords)
+	// 	.map(i => graph.vertices_coords[i]);
 	const params = [{ vector: [1, 1], origin: [0, 0] }, [0.5, 1]];
-	const axiomResults = ear.axiom.axiom4InPolygon(polygon, ...params);
+	const axiomResults = ear.axiom.validAxiom4(graph, ...params);
 	const arrowResults = ear.diagram.axiom4Arrows(graph, ...params);
 	renderAxiomStepSVG(graph, params, axiomResults, arrowResults, "svg-axiom-non-convex-4");
 });
 
 test("axiom5Arrows, non-convex", () => {
 	const graph = nonPlanarShape();
-	const polygon = ear.math.convexHull(graph.vertices_coords)
-		.map(i => graph.vertices_coords[i]);
+	// const polygon = ear.math.convexHull(graph.vertices_coords)
+	// 	.map(i => graph.vertices_coords[i]);
 	const params = [{ vector: [0, 1], origin: [0.5, 0.5] }, [0, 0], [1, 0]];
-	const axiomResults = ear.axiom.axiom5InPolygon(polygon, ...params);
+	const axiomResults = ear.axiom.validAxiom5(graph, ...params);
 	const arrowResults = ear.diagram.axiom5Arrows(graph, ...params);
 	renderAxiomStepSVG(graph, params, axiomResults, arrowResults, "svg-axiom-non-convex-5");
 });
 
 test("axiom6Arrows, non-convex", () => {
 	const graph = nonPlanarShape();
-	const polygon = ear.math.convexHull(graph.vertices_coords)
-		.map(i => graph.vertices_coords[i]);
+	// const polygon = ear.math.convexHull(graph.vertices_coords)
+	// 	.map(i => graph.vertices_coords[i]);
 	const params = [
 		{ vector: [0, 1], origin: [1, 0] },
 		{ vector: [1, 0], origin: [0, 1] },
 		[0.75, 0],
 		[0, 0.75],
 	];
-	const axiomResults = ear.axiom.axiom6InPolygon(polygon, ...params);
+	const axiomResults = ear.axiom.validAxiom6(graph, ...params);
 	const arrowResults = ear.diagram.axiom6Arrows(graph, ...params);
 	renderAxiomStepSVG(graph, params, axiomResults, arrowResults, "svg-axiom-non-convex-6");
 });
 
 test("axiom7Arrows, non-convex", () => {
 	const graph = nonPlanarShape();
-	const polygon = ear.math.convexHull(graph.vertices_coords)
-		.map(i => graph.vertices_coords[i]);
+	// const polygon = ear.math.convexHull(graph.vertices_coords)
+	// 	.map(i => graph.vertices_coords[i]);
 	const params = [
 		{ vector: [1, 0], origin: [0.5, 0.5] },
 		{ vector: [1, 1], origin: [0, 0] },
 		[0.75, 0.25],
 	];
-	const axiomResults = ear.axiom.axiom7InPolygon(polygon, ...params);
+	const axiomResults = ear.axiom.validAxiom7(graph, ...params);
 	const arrowResults = ear.diagram.axiom7Arrows(graph, ...params);
 	renderAxiomStepSVG(graph, params, axiomResults, arrowResults, "svg-axiom-non-convex-7");
 });

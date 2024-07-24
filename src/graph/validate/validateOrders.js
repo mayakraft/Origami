@@ -22,7 +22,7 @@ const ordersTest = (orders, name = "orders") => {
 			pairHash[key] = true;
 			return isDuplicate;
 		})
-		.map(([a, b]) => `${name} duplicate orders found at indices ${a}, ${b}`);
+		.map(([a, b]) => `${name} duplicate orders found between faces ${a}-${b}`);
 	return sameFaceOrders.concat(duplicateOrders);
 };
 

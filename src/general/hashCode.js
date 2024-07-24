@@ -5,6 +5,13 @@
 /**
  * @description a javascript re-implementation of Java's .hashCode()
  * https://stackoverflow.com/questions/7616461/generate-a-hash-from-string-in-javascript
+ * @statistics 2020 Macbook Pro M1:
+ * 1.7ms: 100kb string
+ * 4.7ms: 500kb string
+ * 7.8ms: 1mb string
+ * 34ms: 5mb string
+ * 68ms: 10mb string
+ * 656ms: 100mb string
  * @param {string} string a string
  * @returns {number} a unique number
  */

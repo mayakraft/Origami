@@ -37,7 +37,7 @@ export const recalculatePointAlongEdge = (points, parameter) => {
  * @param {FOLD} graph a FOLD object, with edges_faces among other arrays
  * @param {object} assignment info about assignment
  * @param {boolean[]} faces_winding the winding direction for each face
- * @param {{ vertices?: { intersect: number[] } }} splitGraphResult
+ * @param {{ edges?: { new: number[] }, vertices?: { intersect: number[] } }} splitGraphResult
  * @returns {{ collinear: number[], reassigned: number[] }} a list
  * of edge indices which were reassigned
  */
@@ -47,16 +47,24 @@ export const reassignCollinearEdges = (
 	faces_winding,
 	splitGraphResult,
 ) => {
+	// edges which were created from the splitGraph method can be skipped,
+	// they have already been assigned and shouldn't be considered "collinear"
+	// anyway. "collinear" refers to preexisting collinear to the input line.
+  const newEdgeMap = invertFlatMap(splitGraphResult.edges.new);
+
 	// using the overlapped vertices, make a list of edges collinear to the line
 	// these (old) indices will match with the graph from its original state.
 	const verticesCollinear = splitGraphResult.vertices.intersect
 		.map(v => v !== undefined);
 
 	// these are new edge indices, relating to the graph after modification.
+	// skip the edges which were created in splitGraphResult.edges.new
+	// only keep the edges which existed before the split occurred.
 	const collinearEdges = edges_vertices
 		.map(verts => verticesCollinear[verts[0]] && verticesCollinear[verts[1]])
 		.map((collinear, e) => (collinear ? e : undefined))
-		.filter(a => a !== undefined);
+		.filter(a => a !== undefined)
+		.filter(e => newEdgeMap[e] === undefined);
 
 	// no assignments to reassign. quit
 	if (!edges_assignment && !edges_foldAngle) {
@@ -193,6 +201,7 @@ export const getInvalidFaceOrders = (
 	// - throw these relationships away
 	// - in the case of a flat-fold, we can calculate the new relationship
 	//   between the faces.
+	// if the fold was 3D (not flat folded) we definitely need to throw them away.
 	return faceOrders
 		.map(([a, b], i) => (
 			(newFacesLookup[a] !== undefined || newFacesLookup[b] !== undefined)
@@ -289,11 +298,16 @@ export const updateFaceOrders = (
 	// if 180deg "M" or "V": we can update these face orders to new orders
 	// based on the crease direction and face winding.
 	if (graph.faceOrders) {
+		// console.log("newEdges", newEdges);
+		// console.log("newFaces", newFaces);
 		const nowInvalidFaceOrders = getInvalidFaceOrders(
 			folded,
 			line,
 			newFaces,
 		);
+		// console.log("nowInvalidFaceOrders", nowInvalidFaceOrders);
+		// console.log("after makeNewFlatFoldFaceOrders");
+		// console.log(structuredClone(graph.faceOrders));
 
 		if (isFlatFolded) {
 			updateFlatFoldedInvalidFaceOrders(graph, nowInvalidFaceOrders, foldAngle, faces_winding);
@@ -302,5 +316,7 @@ export const updateFaceOrders = (
 			nowInvalidFaceOrders.forEach(i => { invalidOrderLookup[i] = true; });
 			graph.faceOrders = graph.faceOrders.filter((_, i) => !invalidOrderLookup[i]);
 		}
+		// console.log("end");
+		// console.log(structuredClone(graph.faceOrders));
 	}
 };
