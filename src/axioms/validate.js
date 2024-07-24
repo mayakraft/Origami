@@ -11,6 +11,7 @@ import {
 	rotate90,
   scale2,
   add2,
+  resize2,
 } from "../math/vector.js";
 import {
 	makeMatrix2Reflect,
@@ -40,6 +41,10 @@ import {
 import {
 	doRangesOverlap,
 } from "../math/range.js";
+import {
+  axiom3,
+} from "./axioms.js";
+import { convexHull } from "../math/convexHull.js";
 
 /**
  * @todo this needs to work with non convex polygons
@@ -112,17 +117,22 @@ export const validateAxiom2 = (graph, point1, point2) => [
 /**
  * @description Validate the input parameters to origami axiom 3 with
  * respect to a boundary polygon that represents the folding surface.
- * @param {[number, number][]} boundary an array of 2D points,
- * each point is an array of numbers
- * @param {VecLine2[]} solutions an array of solutions in vector-origin form
+ * @param {FOLD} graph a FOLD object, foldedForm or creasePattern
+ * @param {[VecLine2?, VecLine2?]} solutions to axiom3
  * @param {VecLine2} line1 the line parameter for axiom 3
  * @param {VecLine2} line2 the line parameter for axiom 3
  * @returns {boolean[]} array of booleans (true if valid) matching the solutions array
  */
-export const validateAxiom3 = (boundary, solutions, line1, line2) => {
+export const validateAxiom3 = (graph, solutions, line1, line2) => {
+	// bad code
+	// needs work
+  const vertices_coords2D = graph.vertices_coords.map(resize2);
+  const polygon = convexHull(vertices_coords2D)
+  	.map(v => vertices_coords2D[v]);
+
 	const segments = [line1, line2]
 		.map(line => clipLineConvexPolygon(
-			boundary,
+			polygon,
 			line,
 			include,
 			includeL,
@@ -146,7 +156,7 @@ export const validateAxiom3 = (boundary, solutions, line1, line2) => {
 	const results_clip = solutions.map(line => (line === undefined
 		? undefined
 		: clipLineConvexPolygon(
-			boundary,
+			polygon,
 			line,
 			include,
 			includeL,
@@ -282,30 +292,33 @@ export const validateAxiom4 = (graph, line, point) => {
 /**
  * @description Validate the input parameters to origami axiom 5 with
  * respect to a boundary polygon that represents the folding surface.
- * @param {[number, number][]} boundary an array of 2D points,
- * each point is an array of numbers
+ * @param {FOLD} graph a FOLD object, foldedForm or creasePattern
  * @param {VecLine2[]} solutions an array of solutions in vector-origin form
  * @param {VecLine2} line the line parameter for axiom 5
  * @param {[number, number]} point1 the point parameter for axiom 5
  * @param {[number, number]} point2 the point parameter for axiom 5
  * @returns {boolean[]} array of booleans (true if valid) matching the solutions array
  */
-export const validateAxiom5 = (boundary, solutions, line, point1, point2) => {
+export const validateAxiom5 = (graph, solutions, line, point1, point2) => {
+	// todo
+	const vertices_coords2D = graph.vertices_coords.map(resize2);
+  const polygon = convexHull(vertices_coords2D)
+  	.map(v => vertices_coords2D[v]);
+
 	if (solutions.length === 0) { return []; }
 	const testParamPoints = [point1, point2]
-		.map(point => overlapConvexPolygonPoint(boundary, point, include).overlap)
+		.map(point => overlapConvexPolygonPoint(polygon, point, include).overlap)
 		.reduce((a, b) => a && b, true);
 	const testReflections = solutions
 		.map(foldLine => reflectPoint(foldLine, point2))
-		.map(point => overlapConvexPolygonPoint(boundary, point, include).overlap);
+		.map(point => overlapConvexPolygonPoint(polygon, point, include).overlap);
 	return testReflections.map(ref => ref && testParamPoints);
 };
 
 /**
  * @description Validate the input parameters to origami axiom 6 with
  * respect to a boundary polygon that represents the folding surface.
- * @param {[number, number][]} boundary an array of 2D points,
- * each point is an array of numbers
+ * @param {FOLD} graph a FOLD object, foldedForm or creasePattern
  * @param {VecLine2[]} solutions an array of solutions in vector-origin form
  * @param {VecLine2} line1 the line parameter for axiom 6
  * @param {VecLine2} line2 the line parameter for axiom 6
@@ -313,46 +326,55 @@ export const validateAxiom5 = (boundary, solutions, line, point1, point2) => {
  * @param {[number, number]} point2 the point parameter for axiom 6
  * @returns {boolean[]} array of booleans (true if valid) matching the solutions array
  */
-export const validateAxiom6 = function (boundary, solutions, line1, line2, point1, point2) {
+export const validateAxiom6 = function (graph, solutions, line1, line2, point1, point2) {
+	// todo
+	const vertices_coords2D = graph.vertices_coords.map(resize2);
+  const polygon = convexHull(vertices_coords2D)
+  	.map(v => vertices_coords2D[v]);
+
 	if (solutions.length === 0) { return []; }
 	const testParamPoints = [point1, point2]
-		.map(point => overlapConvexPolygonPoint(boundary, point, include).overlap)
+		.map(point => overlapConvexPolygonPoint(polygon, point, include).overlap)
 		.reduce((a, b) => a && b, true);
 	if (!testParamPoints) { return solutions.map(() => false); }
 	const testReflect0 = solutions
 		.map(foldLine => reflectPoint(foldLine, point1))
-		.map(point => overlapConvexPolygonPoint(boundary, point, include).overlap);
+		.map(point => overlapConvexPolygonPoint(polygon, point, include).overlap);
 	const testReflect1 = solutions
 		.map(foldLine => reflectPoint(foldLine, point2))
-		.map(point => overlapConvexPolygonPoint(boundary, point, include).overlap);
+		.map(point => overlapConvexPolygonPoint(polygon, point, include).overlap);
 	return solutions.map((_, i) => testReflect0[i] && testReflect1[i]);
 };
 
 /**
  * @description Validate the input parameters to origami axiom 7 with
  * respect to a boundary polygon that represents the folding surface.
- * @param {[number, number][]} boundary an array of 2D points,
- * each point is an array of numbers
+ * @param {FOLD} graph a FOLD object, foldedForm or creasePattern
  * @param {VecLine2[]} solutions an array of solutions in vector-origin form
  * @param {VecLine2} line1 the line parameter for axiom 7
  * @param {VecLine2} line2 the line parameter for axiom 7
  * @param {[number, number]} point the point parameter for axiom 7
  * @returns {boolean[]} true if the parameters/solutions are valid
  */
-export const validateAxiom7 = (boundary, solutions, line1, line2, point) => {
-	// check if the point parameter is inside the polygon
+export const validateAxiom7 = (graph, solutions, line1, line2, point) => {
+	// todo
+	const vertices_coords2D = graph.vertices_coords.map(resize2);
+  const polygon = convexHull(vertices_coords2D)
+  	.map(v => vertices_coords2D[v]);
+
+  // check if the point parameter is inside the polygon
 	const paramPointTest = overlapConvexPolygonPoint(
-		boundary,
+		polygon,
 		point,
 		include,
 	).overlap;
 	// check if the reflected point on the fold line is inside the polygon
 	if (!solutions.length) { return [false]; }
 	const reflected = reflectPoint(solutions[0], point);
-	const reflectTest = overlapConvexPolygonPoint(boundary, reflected, include).overlap;
+	const reflectTest = overlapConvexPolygonPoint(polygon, reflected, include).overlap;
 	// check if the line to fold onto itself is somewhere inside the polygon
 	const paramLineTest = (
-		intersectPolygonLine(boundary, line2, includeL).length >= 2
+		intersectPolygonLine(polygon, line2, includeL).length >= 2
 	);
 	// same test we do for axiom 4
 	const intersect = intersectLineLine(
@@ -362,7 +384,7 @@ export const validateAxiom7 = (boundary, solutions, line1, line2, point) => {
 		includeL,
 	).point;
 	const intersectInsideTest = intersect
-		? overlapConvexPolygonPoint(boundary, intersect, include).overlap
+		? overlapConvexPolygonPoint(polygon, intersect, include).overlap
 		: false;
 	return [paramPointTest && reflectTest && paramLineTest && intersectInsideTest];
 };
