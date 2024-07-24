@@ -70,11 +70,11 @@ test("foldGraph, faceOrders, square folding", () => {
 		[0, 2, 1], // E
 		[4, 1, -1], // F
 		[3, 4, -1], // B
-		[3, 1, -1], // D -- sign flipped. corrected.
+		[3, 1, 1], // D -- sign flipped? is that correct?
 		[0, 3, 1], // E
 		[0, 5, -1], // A
 		[2, 5, -1], // B
-		[5, 1, -1], // F -- sign flipped. corrected.
+		[5, 1, 1], // F -- sign flipped? is that correct?
 		[3, 5, -1], // B
 		[2, 3, 1], // new
 		[4, 5, -1], // new

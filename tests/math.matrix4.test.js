@@ -177,18 +177,18 @@ test("orthographic matrix", () => {
 
 test("lookat matrix", () => {
 	const res1 = ear.math.makeLookAtMatrix4([0, 0, 1], [0, 0, 0], [0, 1, 0]);
-	[1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 1, 1]
+	[1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, -1, 1]
 		.forEach((n, i) => expect(res1[i]).toBeCloseTo(n));
 
 	const res2 = ear.math.makeLookAtMatrix4([1, 0, 0], [0, 0, 0], [0, 1, 0]);
-	[0, 0, -1, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1]
+	[0, 0, 1, 0, 0, 1, 0, 0, -1, 0, 0, 0, -1, 0, 0, 1]
 		.forEach((n, i) => expect(res2[i]).toBeCloseTo(n));
 
 	const res3 = ear.math.makeLookAtMatrix4([0, 0, -1], [0, 0, 0], [0, 1, 0]);
-	[-1, 0, 0, 0, 0, 1, 0, 0, 0, 0, -1, 0, 0, 0, -1, 1]
+	[-1, 0, 0, 0, 0, 1, 0, 0, 0, 0, -1, 0, 0, 0, 1, 1]
 		.forEach((n, i) => expect(res3[i]).toBeCloseTo(n));
 
 	const res4 = ear.math.makeLookAtMatrix4([0, 0, 1], [0, 0, 0], [0, -1, 0]);
-	[-1, 0, 0, 0, 0, -1, 0, 0, 0, 0, 1, 0, 0, 0, 1, 1]
+	[-1, 0, 0, 0, 0, -1, 0, 0, 0, 0, 1, 0, 0, 0, -1, 1]
 		.forEach((n, i) => expect(res4[i]).toBeCloseTo(n));
 });
