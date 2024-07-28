@@ -4,13 +4,17 @@ import ear from "../src/index.js";
 
 const FOLD_ANGLE = 90;
 
-test("foldGraph, faceOrders, square folding", () => {
+test("foldGraph, faceOrders, square folding 01", () => {
   const graph = ear.graph.square();
 
   let vertices_coordsFolded;
 
 	// 1.
 	// fold the square in half horizontally
+	//    0
+	// ________  mountain crease
+	//
+	//    1
 	const result1 = ear.graph.foldLine(
 		graph,
 		{ vector: [1, 0], origin: [0.5, 0.5] },
@@ -27,6 +31,11 @@ test("foldGraph, faceOrders, square folding", () => {
 	// 2.
 	// into the 2:1 rectangle, fold a 45deg line \, from the top left
 	// corner to the center of the bottom line.
+	// 0\  1
+	// __\____ all mountain except the top \ is valley
+	//   /
+	// 3/  2
+	// 0 is the stationary face, the larger flap swings downwards
 	const result2 = ear.graph.foldLine(
 		graph,
 		{ vector: [-1, 1], origin: [0.5, 0.5] },
@@ -34,21 +43,41 @@ test("foldGraph, faceOrders, square folding", () => {
 	);
 	expect(result2.faces.map).toMatchObject([[0, 1], [2, 3]]);
 	// the single [0, 1, -1] turns into four: [0, 2], [0, 3], [1, 2], [1, 3]
+	// but 0-2 and 1-3 do not overlap each other.
 	// all of which remain at a -1. additionally:
 	// [0, 1, 1] valley crease makes them face into each other.
 	// [2, 3, -1] mountain crease makes them face away from each other.
 	expect(graph.faceOrders).toMatchObject([
-		[0, 2, -1], [1, 2, -1], [0, 3, -1], [1, 3, -1], [0, 1, 1], [2, 3, -1],
+		[1, 2, -1], // tested 1 is behind 2's normal
+		[0, 3, -1], // tested 0 is behind 3's normal
+		[0, 1, 1], // neighbors 0 and 1 face each other
+		[2, 3, -1], // neighbors 2 and 3 face away from each other
+		// [0, 2, -1], // the algorithm does not know about this one
+		// [1, 3, -1], // the algorithm does not know about this one
 	]);
 
-	// the stationary face is small triangle face, the large flap swings downwards
+	// run the layer solver
 	vertices_coordsFolded = ear.graph.makeVerticesCoordsFlatFolded(graph, [0]);
-	// console.log(vertices_coordsFolded);
-  console.log(JSON.stringify(graph));
+	graph.faceOrders = ear
+		.layer({ ...graph, vertices_coords: vertices_coordsFolded })
+		.faceOrders();
+
+	expect(graph.faceOrders).toMatchObject([
+		[1, 2, -1],
+		[0, 3, -1],
+		[0, 1, 1],
+		[2, 3, -1],
+		[0, 2, -1], // found by the layer solver
+		[1, 3, -1], // found by the layer sover
+	]);
 
 	// 3.
 	// fold the other missing 45 degree line. the majority of the piece
 	// remains stationary, the triangle flap is folded
+	// 0\2 /3
+	// __\/__ all mountain except the top two \ / are valley
+	//   /\
+	// 1/4 \5
 	const result3 = ear.graph.foldLine(
 		graph,
 		{ vector: [-1, -1], origin: [0.5, 0.5] },
@@ -62,31 +91,157 @@ test("foldGraph, faceOrders, square folding", () => {
 	// D: [1, 3, -1] becomes [2, 1], [3, 1]
 	// E: [0, 1, 1] becomes [0, 2], [0, 3]
 	// F: [2, 3, -1] becomes [4, 1], [5, 1]
+
+	// facing each other: 0-2, 2-3
+	// facing away: 0-1, 1-4, 4-5, 3-5
 	expect(graph.faceOrders).toMatchObject([
-		[0, 4, -1], // A
-		[2, 4, -1], // B
-		[0, 1, -1], // C
-		[2, 1, -1], // D
-		[0, 2, 1], // E
-		[4, 1, -1], // F
-		[3, 4, -1], // B
-		[3, 1, 1], // D -- sign flipped? is that correct?
-		[0, 3, 1], // E
-		[0, 5, -1], // A
-		[2, 5, -1], // B
-		[5, 1, 1], // F -- sign flipped? is that correct?
-		[3, 5, -1], // B
-		[2, 3, 1], // new
-		[4, 5, -1], // new
-  ]);
-  // the stationary face is small triangle face, the large flap swings downwards
-  // vertices_coordsFolded = ear.graph.makeVerticesCoordsFlatFolded(graph, [0]);
-  // console.log(vertices_coordsFolded);
-  // console.log(JSON.stringify(graph));
+		[2, 4, -1], // B -- tested 2 is behind 4
+		[0, 1, -1], // C -- M neighbors
+		[0, 2, 1], // E -- V neighbors
+		[4, 1, -1], // F -- M neighbors
+		[0, 4, -1], // A -- tested 0 is behind 4
+		[2, 1, -1], // D -- tested 2 is behind 1
+		[3, 5, -1], // B -- M neighbors
+		[2, 3, 1], // new V neighbors
+		[4, 5, -1], // new M neighbors
+		// [3, 4, -1], // not found by the fold algorithm
+		// [2, 5, -1], // not found by the fold algorithm
+	]);
+
+	// run the layer solver
+	vertices_coordsFolded = ear.graph.makeVerticesCoordsFlatFolded(graph, [0]);
+	graph.faceOrders = ear
+		.layer({ ...graph, vertices_coords: vertices_coordsFolded })
+		.faceOrders();
+
+	expect(graph.faceOrders).toMatchObject([
+		[2, 4, -1],
+		[0, 1, -1],
+		[0, 2, 1],
+		[1, 4, -1],
+		[0, 4, -1],
+		[1, 2, 1],
+		[3, 5, -1],
+		[2, 3, 1],
+		[4, 5, -1],
+		[3, 4, -1], // found by the layer solver algorithm
+		[2, 5, -1], // found by the layer solver algorithm
+		// and for completeness, these are formed somewhere in the foldGraph
+		// algorithm, but are correctly identified as not overlapping and removed.
+		// [3, 1, 1], // D -- !! 1 and 3 do not overlap
+		// [0, 3, 1], // E -- !! 0 and 3 do not overlap
+		// [0, 5, -1], // A -- !! 0 and 5 do not overlap
+		// [5, 1, 1], // F -- !! 1 and 5 do not overlap
+	]);
+});
+
+test("foldGraph, faceOrders, square folding 02 with layer solver", () => {
+	const graph = ear.graph.square();
+	let vertices_coordsFolded;
+
+	// 1.
+	// fold the square in half diagonally, flat crease
+	//  0    /
+	//     /    flat
+	//   /
+	// /    1
+	const result1 = ear.graph.foldLine(
+		graph,
+		{ vector: [1, 1], origin: [0, 0] },
+		{ assignment: "F" },
+	);
+	expect(result1.faces.map).toMatchObject([[0, 1]]);
+	expect(graph.faceOrders).toMatchObject(undefined);
+	vertices_coordsFolded = ear.graph.makeVerticesCoordsFlatFolded(graph, [0]);
+
+	// 2.
+	// add horizontal valley
+	//  1     / 2
+	// _____/_____  horizontal valley
+	// 0  /    3
+	//  /
+	const result2 = ear.graph.foldLine(
+		graph,
+		{ vector: [1, 0], origin: [0.5, 0.5] },
+		{ assignment: "V", vertices_coordsFolded },
+	);
+	expect(result2.faces.map).toMatchObject([[0, 1], [2, 3]]);
+	// 0 turns into 0 and 1
+	// 1 turns into 2 and 2
+	// small triangle faces: [0, 1], [2, 3]
+	// then [1, 3] should also overlap.
+	// all faces face each other (1)
+	expect(graph.faceOrders).toMatchObject([
+		[0, 1, 1],
+		[2, 3, 1],
+		// [1, 3, 1], // the algorithm will not know about this one
+	]);
+
+	// run the layer solver
+	vertices_coordsFolded = ear.graph.makeVerticesCoordsFlatFolded(graph, [0]);
+	graph.faceOrders = ear
+		.layer({ ...graph, vertices_coords: vertices_coordsFolded })
+		.faceOrders();
+
+	expect(graph.faceOrders).toMatchObject([
+		[0, 1, 1],
+		[2, 3, 1],
+		[1, 3, 1], // the layer solver algorithm just added this
+	]);
+
+	// 3.
+	// fold a 45 degree line, this reassigns one of the flats
+	// 3\4 /1
+	// __\/__ all valley except the top \ is mountain, top / is flat
+	//   /
+	// 0/  2
+	const result3 = ear.graph.foldLine(
+		graph,
+		{ vector: [-1, -1], origin: [0.5, 0.5] },
+		{ assignment: "V", vertices_coordsFolded },
+	);
+	expect(result3.faces.map).toMatchObject([[0], [3, 4], [1], [2]]);
+
+	// face 1 becomes 3 and 4
+	// [0, 1, 1] turns into [0, 3], [0, 4] BUT 0-4 do not overlap
+	// [2, 3, 1] turns into [1, 2].
+	// [1, 3, 1] turns into [3, 2], [4, 2] BUT 3-2 do not overlap
+	// new crease makes new relationships between
+	// 0-2, 3-4 (neighbors) and 2-3, 0-4 (not neighbors)
+
+	// facing each other: 0-2, 2-3
+	// facing away: 0-1, 1-4, 4-5, 3-5
+	expect(graph.faceOrders).toMatchObject([
+		[0, 3, 1], // horizontal crease.
+		[1, 2, 1], // horizontal crease.
+		[4, 2, 1], // horizontal crease.
+		[3, 4, -1], // new crease. M
+		[2, 0, 1], // new crease. V
+		// [2, 3, -1], // the fold algorithm will not know about this one
+		// [0, 4, -1], // the fold algorithm will not know about this one
+	]);
+
+	// run the layer solver
+	vertices_coordsFolded = ear.graph.makeVerticesCoordsFlatFolded(graph, [0]);
+	graph.faceOrders = ear
+		.layer({ ...graph, vertices_coords: vertices_coordsFolded })
+		.faceOrders();
+
+	expect(graph.faceOrders).toMatchObject([
+		[0, 3, 1], // horizontal crease.
+		[1, 2, 1], // horizontal crease.
+		[2, 4, 1], // horizontal crease.
+		[3, 4, -1], // new crease. M
+		[0, 2, 1], // new crease. V
+		[2, 3, -1], // discovered by the layer solver
+		[0, 4, -1], // discovered by the layer solver
+	]);
 });
 
 test("foldGraph, faceOrders, square folding, valley, valley", () => {
 	const graph = ear.graph.square();
+	let vertices_coordsFolded;
+
 	ear.graph.foldGraph(
 		graph,
 		{ vector: [3, 1], origin: [0.5, 0.5] },
@@ -123,7 +278,27 @@ test("foldGraph, faceOrders, square folding, valley, valley", () => {
 	// - 0-1 (true winding) valley 1.
 	// - 2-3 (false winding) valley -1.
 	expect(graph.faceOrders).toMatchObject([
-		[0, 2, -1], [1, 2, 1], [0, 3, 1], [1, 3, -1], [0, 1, 1], [2, 3, -1],
+		[1, 2, 1],
+		[0, 3, 1],
+		[0, 1, 1],
+		[2, 3, -1],
+		// [0, 2, -1], // not yet found by this fold algorithm
+		// [1, 3, -1], // not yet found by this fold algorithm
+	]);
+
+	// run the layer solver
+	vertices_coordsFolded = ear.graph.makeVerticesCoordsFlatFolded(graph, [0]);
+	graph.faceOrders = ear
+		.layer({ ...graph, vertices_coords: vertices_coordsFolded })
+		.faceOrders();
+
+	expect(graph.faceOrders).toMatchObject([
+		[1, 2, 1],
+		[0, 3, 1],
+		[0, 1, 1],
+		[2, 3, -1],
+		[0, 2, -1], // found by the layer solver
+		[1, 3, -1], // found by the layer solver
 	]);
 
 	ear.graph.foldGraph(
@@ -132,14 +307,37 @@ test("foldGraph, faceOrders, square folding, valley, valley", () => {
 		ear.math.includeL,
 		{ assignment: "V" },
 	);
-	// console.log(JSON.stringify(graph.faceOrders));
-	// did not check this yet.
 	expect(graph.faceOrders).toMatchObject([
-		[0, 4, -1], [2, 4, -1], [0, 6, 1], [2, 6, -1], [0, 2, 1], [4, 6, 1],
-		[1, 4, -1], [1, 6, 1], [1, 2, 1], [3, 4, 1], [3, 6, 1], [0, 3, 1],
-		[1, 3, 1], [0, 5, -1], [2, 5, 1], [5, 6, -1], [1, 5, -1], [3, 5, -1],
-		[0, 7, 1], [2, 7, 1], [4, 7, -1], [1, 7, 1], [3, 7, -1], [5, 7, 1],
-		[0, 1, -1], [2, 3, 1], [4, 5, -1], [6, 7, 1],
+		[0, 4, -1],
+		[2, 6, -1],
+		[1, 6, 1],
+		[1, 2, 1],
+		[3, 4, 1],
+		[0, 3, 1],
+		[2, 5, 1],
+		[5, 6, -1],
+		[1, 5, -1],
+		[0, 7, 1],
+		[4, 7, -1],
+		[3, 7, -1],
+		[0, 1, -1],
+		[2, 3, 1],
+		[4, 5, -1],
+		[6, 7, 1],
+	]);
+
+	// run the layer solver
+	vertices_coordsFolded = ear.graph.makeVerticesCoordsFlatFolded(graph, [0]);
+	graph.faceOrders = ear
+		.layer({ ...graph, vertices_coords: vertices_coordsFolded })
+		.faceOrders();
+
+	expect(graph.faceOrders).toMatchObject([
+		[0, 4, -1], [2, 6, -1], [1, 6, 1], [1, 2, 1], [3, 4, 1], [0, 3, 1],
+		[2, 5, 1], [5, 6, -1], [1, 5, -1], [0, 7, 1], [4, 7, -1], [3, 7, -1],
+		[0, 1, -1], [2, 3, 1], [4, 5, -1], [6, 7, 1], [1, 4, -1], [3, 6, 1],
+		[0, 6, 1], [0, 2, 1], [2, 4, -1], [4, 6, 1], [1, 3, 1], [3, 5, -1],
+		[0, 5, -1], [1, 7, 1], [2, 7, 1], [5, 7, 1],
 	]);
 });
 
@@ -180,8 +378,19 @@ test("foldGraph, faceOrders, square folding, valley, mountain", () => {
 	// two new orders:
 	// - 0-1 (true winding) mountain -1.
 	// - 2-3 (false winding) mountain 1.
+
 	expect(graph.faceOrders).toMatchObject([
-		[0, 2, 1], [1, 2, 1], [0, 3, 1], [1, 3, 1], [0, 1, -1], [2, 3, 1],
+		[1, 2, 1], [0, 3, 1], [0, 1, -1], [2, 3, 1],
+	]);
+
+	// run the layer solver
+	const vertices_coordsFolded = ear.graph.makeVerticesCoordsFlatFolded(graph, [0]);
+	graph.faceOrders = ear
+		.layer({ ...graph, vertices_coords: vertices_coordsFolded })
+		.faceOrders();
+
+	expect(graph.faceOrders).toMatchObject([
+		[1, 2, 1], [0, 3, 1], [0, 1, -1], [2, 3, 1], [0, 2, 1], [1, 3, 1],
 	]);
 });
 
@@ -431,7 +640,17 @@ test("foldGraph, faceOrders, panels", () => {
 	// finally,
 	// then [0, 1, 1], [2, 3, -1] get calculated and added at the end
 	expect(graph.faceOrders).toMatchObject([
-		[0, 2, 1], [1, 2, -1], [0, 3, -1], [1, 3, 1], [0, 1, 1], [2, 3, -1]
+		[0, 2, 1], [1, 3, 1], [0, 1, 1], [2, 3, -1], // [1, 2, -1], [0, 3, -1],
+	]);
+
+	// run the layer solver
+	const vertices_coordsFolded = ear.graph.makeVerticesCoordsFlatFolded(graph, [0]);
+	graph.faceOrders = ear
+		.layer({ ...graph, vertices_coords: vertices_coordsFolded })
+		.faceOrders();
+
+	expect(graph.faceOrders).toMatchObject([
+		[0, 2, 1], [1, 3, 1], [0, 1, 1], [2, 3, -1], [1, 2, -1], [0, 3, -1],
 	]);
 
 	fs.writeFileSync(

@@ -292,6 +292,9 @@ test("makeSolverConstraintsFlat, kabuto", () => {
 	const folded = ear.graph.getFramesByClassName(fold, "foldedForm")[0];
 	ear.graph.populate(folded);
 
+	// remove existing solution from FOLD file
+	delete folded.faceOrders;
+
 	const {
 		constraints,
 		facePairs,
@@ -323,6 +326,9 @@ test("makeSolverConstraintsFlat, crane", () => {
 	const folded = ear.graph.getFramesByClassName(fold, "foldedForm")[0];
 	ear.graph.populate(folded);
 
+	// remove existing solution from FOLD file
+	delete folded.faceOrders;
+
 	const epsilon = 1e-4;
 
 	const {
@@ -351,6 +357,9 @@ test("makeSolverConstraintsFlat, flapping bird", () => {
 	const fold = JSON.parse(foldfile);
 	const folded = ear.graph.getFramesByClassName(fold, "foldedForm")[0];
 	ear.graph.populate(folded);
+
+	// remove existing solution from FOLD file
+	delete folded.faceOrders;
 
 	expect(ear.graph.getEdgesEdgesCollinearOverlap(folded).flat().length).toBe(114);
 	expect(ear.graph.getEdgesFacesOverlap(folded).flat().length).toBe(110);

@@ -413,7 +413,9 @@ const updateFacesFaces = (
 };
 
 /**
- * @description
+ * @description Every faceOrder in which our oldFace appears, replace
+ * it with two new faceOrders where the oldFace is replaced with
+ * one of each of the two newFaces.
  * @param {FOLD} graph a FOLD graph
  * @param {number} oldFace
  * @param {number[]} newFaces
@@ -621,6 +623,12 @@ export const splitFaceWithEdge = (
  * the face with either one or two new face(s).
  * New edges will be added to the end of the arrays, so all old edge
  * indices will still relate. Face indices will be more heavily modified.
+ * Probably the most controversial part of this method is that this method
+ * will update faceOrders to replace the old face with two new orders each
+ * with one of the new faces WITHOUT doing any geometric testing to ensure
+ * that both of the two new faces overlap the face they declare to overlap.
+ * It's incumbent upon the user to test the faceOrders after all splitting
+ * has been complete to ensure that the orders are correct (see foldGraph()).
  * @param {FOLD} graph a FOLD object, modified in place, must contain
  * vertices_coords, edges_vertices, and faces_vertices to work.
  * @param {number} face index of face to split

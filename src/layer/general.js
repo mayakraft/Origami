@@ -117,7 +117,7 @@ const signedLayerSolverValue = { 0: 0, 1: 1, 2: -1 };
  * with the stacking-axis which was used in the layer solver.
  * @returns {[number, number, number][]} faceOrders array
  */
-export const solverSolutionToFaceOrders = (facePairOrders, faces_winding) => {
+export const solverOrdersToFaceOrders = (facePairOrders, faces_winding) => {
 	// convert the space-separated face pair keys into arrays of two integers
 	const keys = Object.keys(facePairOrders);
 	const faceOrdersPairs = keys
@@ -138,6 +138,46 @@ export const solverSolutionToFaceOrders = (facePairOrders, faces_winding) => {
 
 	/** @type {[number, number, number][]} */
 	return faceOrdersPairs.map(([a, b], i) => [a, b, solutions[i]]);
+};
+
+/**
+ * @description Convert encodings of layer solutions between pairs of faces.
+ * Convert from the +1/-1 "faceOrders" official FOLD spec encoding, where:
+ * - +1: face A lies above face B, on the same side pointed by B's normal.
+ * - −1: face A lies below face B, on the opposite side pointed by B's normal.
+ * into the solver's 1, 2 encoding, where for faces "A B", a value of
+ * - 1: face A is above face B
+ * - 2: face A is below face B
+ * @param {[number, number, number][]} faceOrders
+ * @param {boolean[]} faces_winding for every face, is the face aligned
+ * with the stacking-axis which was used in the layer solver.
+ * @returns {{[key: string]: number}} an object of layer solution rules
+ */
+export const faceOrdersToSolverOrders = (faceOrders, faces_winding) => {
+	/** @type {{[key: string]: number}} */
+	const solverOrders = {};
+
+	// convert the value (1 or 2) into the faceOrder value (-1 or +1).
+	faceOrders.forEach(([f, g, order]) => {
+		if (order !== 1 && order !== -1) { return; }
+		// according to the FOLD spec, for order [f, g, s]:
+		// +1 indicates that face f lies above face g
+		// −1 indicates that face f lies below face g
+		// where "above" means on the side pointed to by g's normal vector,
+		// and "below" means on the side opposite g's normal vector.
+		const solution = faces_winding[g]
+			// convert a 1 into a 1, and a -1 into a 2
+			? ((1 - order) / 2) + 1
+			// convert a 1 into a 2, and a -1 into a 1
+			: ((order + 1) / 2) + 1;
+		const key = f < g ? `${f} ${g}` : `${g} ${f}`;
+		solverOrders[key] = f < g
+			? solution
+			// faces are in reversed order. swap 1 and 2
+			: 3 - solution;
+	});
+
+	return solverOrders;
 };
 
 /**

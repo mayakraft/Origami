@@ -32,7 +32,7 @@ import {
 	solver as solverOneDepth,
 } from "./solverOneDepth.js";
 import {
-	solverSolutionToFaceOrders,
+	solverOrdersToFaceOrders,
 } from "./general.js";
 
 /**
@@ -42,9 +42,9 @@ import {
  */
 const layerSolutionToFaceOrdersTree = ({ orders, branches }, faces_winding) => (
 	branches === undefined
-		? ({ orders: solverSolutionToFaceOrders(orders, faces_winding) })
+		? ({ orders: solverOrdersToFaceOrders(orders, faces_winding) })
 		: ({
-			orders: solverSolutionToFaceOrders(orders, faces_winding),
+			orders: solverOrdersToFaceOrders(orders, faces_winding),
 			branches: branches
 				.map(inner => inner
 					.map(b => layerSolutionToFaceOrdersTree(b, faces_winding))),
@@ -67,7 +67,8 @@ const layerSolutionToFaceOrdersTree = ({ orders, branches }, faces_winding) => (
  */
 export const solveLayerOrders = ({
 	vertices_coords, edges_vertices, edges_faces, edges_assignment,
-	edges_foldAngle, faces_vertices, faces_edges, faces_faces, edges_vector,
+	edges_foldAngle, faces_vertices, faces_edges, faces_faces, faceOrders,
+	edges_vector,
 }, epsilon) => {
 	// todo: need some sort of decision to be able to handle graphs which
 	// have variations of populated/absent edges_assignment and foldAngle
@@ -125,6 +126,7 @@ export const solveLayerOrders = ({
 		faces_vertices,
 		faces_edges,
 		faces_faces,
+		faceOrders,
 		edges_vector,
 	}, epsilon);
 
@@ -144,7 +146,7 @@ export const solveLayerOrders = ({
  */
 export const solveLayerOrdersSingleBranches = ({
 	vertices_coords, edges_vertices, edges_faces, edges_assignment,
-	faces_vertices, faces_edges, edges_vector,
+	faces_vertices, faces_edges, faceOrders, edges_vector,
 }, epsilon) => {
 	// necessary conditions for the layer solver to work
 	if (!vertices_coords || !edges_vertices || !faces_vertices) {
@@ -179,6 +181,7 @@ export const solveLayerOrdersSingleBranches = ({
 		edges_assignment,
 		faces_vertices,
 		faces_edges,
+		faceOrders,
 		edges_vector,
 	}, epsilon);
 
@@ -210,7 +213,7 @@ export const solveLayerOrdersSingleBranches = ({
  */
 export const solveLayerOrders3D = ({
 	vertices_coords, edges_vertices, edges_faces, edges_assignment,
-	edges_foldAngle, faces_vertices, faces_edges, faces_faces,
+	edges_foldAngle, faces_vertices, faces_edges, faces_faces, faceOrders,
 }, epsilon) => {
 	// todo: need some sort of decision to be able to handle graphs which
 	// have variations of populated/absent edges_assignment and foldAngle
@@ -267,6 +270,7 @@ export const solveLayerOrders3D = ({
 		faces_vertices,
 		faces_edges,
 		faces_faces,
+		faceOrders,
 	}, epsilon);
 
 	// include faces_winding along with the solver result

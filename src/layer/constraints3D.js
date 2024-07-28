@@ -30,6 +30,7 @@ import {
 	solveFlatAdjacentEdges,
 } from "./initialSolutionsFlat.js";
 import {
+	faceOrdersToSolverOrders,
 	mergeWithoutOverwrite,
 } from "./general.js";
 
@@ -66,7 +67,7 @@ import {
  */
 export const makeSolverConstraints3D = ({
 	vertices_coords, edges_vertices, edges_faces, edges_assignment, edges_foldAngle,
-	faces_vertices, faces_edges, faces_faces,
+	faces_vertices, faces_edges, faces_faces, faceOrders,
 }, epsilon = EPSILON) => {
 	const {
 		// planes_transform,
@@ -190,9 +191,17 @@ export const makeSolverConstraints3D = ({
 		throw new Error(Messages.noLayerSolution, { cause: error });
 	}
 
+
+	// if the FOLD object contains a subset of pre-solved faceOrders,
+	// convert them into solver form and use them as the initial condition.
+	const preExistingOrders = faceOrders
+		? faceOrdersToSolverOrders(faceOrders, faces_winding)
+		: {};
+
 	let orders;
 	try {
 		orders = mergeWithoutOverwrite([
+			preExistingOrders,
 			orders3D,
 			adjacentOrders,
 			orders3DEdgeFace,

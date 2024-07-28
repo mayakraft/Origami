@@ -12,5 +12,6 @@ export default {
 	window: "window not set; if using node/deno include package @xmldom/xmldom and set ear.window = xmldom",
 	nonConvexTriangulation: "non-convex triangulation requires vertices_coords",
 	backendStylesheet: "svgToFold found <style> in <svg>. rendering will be incomplete unless run in a major browser.",
-	noLayerSolution: "LayerSolver bad input. no solution possible",
+	noLayerSolution: "layer solver, no solution, or conflict with existing faceOrders",
+	noLayerSolutionFaceOrders: "layer solver conflict with existing faceOrders",
 };

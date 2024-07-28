@@ -129,6 +129,10 @@ test("2D layer solver, kabuto", () => {
 	const foldfile = fs.readFileSync("./tests/files/fold/kabuto.fold", "utf-8");
 	const fold = JSON.parse(foldfile);
 	const folded = ear.graph.getFramesByClassName(fold, "foldedForm")[0];
+
+	// remove existing solution from FOLD file
+	delete folded.faceOrders;
+
 	const solution = ear.layer(folded);
 	expect(solution.structure()).toMatchObject([
 		[[[[], []]], []],

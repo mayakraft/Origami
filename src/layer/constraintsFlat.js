@@ -1,6 +1,7 @@
 /**
  * Rabbit Ear (c) Kraft
  */
+import Messages from "../environment/messages.js";
 import {
 	EPSILON,
 } from "../math/constant.js";
@@ -23,6 +24,8 @@ import {
 	tacoTypeNames,
 	emptyCategoryObject,
 	constraintToFacePairsStrings,
+	faceOrdersToSolverOrders,
+	mergeWithoutOverwrite,
 } from "./general.js";
 import {
 	makeTacosAndTortillas,
@@ -99,7 +102,7 @@ export const makeConstraintsLookup = (constraints) => {
  */
 export const makeSolverConstraintsFlat = ({
 	vertices_coords, edges_vertices, edges_faces, edges_assignment,
-	faces_vertices, faces_edges, faces_center,
+	faces_vertices, faces_edges, faceOrders, faces_center,
 }, epsilon = EPSILON) => {
 	// create a polygon (array of points) for every face. ensure that
 	// every polygon has the same winding (reverse if necessary).
@@ -148,12 +151,25 @@ export const makeSolverConstraintsFlat = ({
 		transitivity,
 	});
 
+	// if the FOLD object contains a subset of pre-solved faceOrders,
+	// convert them into solver form and use them as the initial condition.
+	const preExistingOrders = faceOrders
+		? faceOrdersToSolverOrders(faceOrders, faces_winding)
+		: {};
+
 	// before we run the solver, solve all of the conditions that we can.
 	// at this point, this means adjacent faces with an M or V edge between them.
-	const orders = solveFlatAdjacentEdges({
+	const flatAdjacentOrders = solveFlatAdjacentEdges({
 		edges_faces,
 		edges_assignment,
 	}, faces_winding);
+
+	let orders;
+	try {
+		orders = mergeWithoutOverwrite([preExistingOrders, flatAdjacentOrders]);
+	} catch (error) {
+		throw new Error(Messages.noLayerSolution, { cause: error });
+	}
 
 	return {
 		constraints: {
