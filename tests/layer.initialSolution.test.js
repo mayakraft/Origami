@@ -9,8 +9,8 @@ test("solveFlatAdjacentEdges, different axes", () => {
 			graph,
 			ear.graph.makeFacesWinding(graph),
 		));
-	const solverSolutionToFaceOrders = (graph) => (
-		ear.layer.solverSolutionToFaceOrders(
+	const solverOrdersToFaceOrders = (graph) => (
+		ear.layer.solverOrdersToFaceOrders(
 			ear.layer.solveFlatAdjacentEdges(
 				graph,
 				ear.graph.makeFacesWinding(graph),
@@ -42,14 +42,14 @@ test("solveFlatAdjacentEdges, different axes", () => {
 	// in plane [0, 0, 1], face 0 is below face 1
 	expect(solveFlatAdjacentEdges(graphXYUp)).toMatchObject({ "0 1": 2 });
 	// face 0 is above face 1's normal
-	expect(solverSolutionToFaceOrders(graphXYUp)).toMatchObject([[0, 1, 1]]);
+	expect(solverOrdersToFaceOrders(graphXYUp)).toMatchObject([[0, 1, 1]]);
 
 	// face 0 is flipped, plane normal will be [0, 0, -1]
 	expect(ear.graph.makeFacesWinding(graphXYDown)).toMatchObject([false, true]);
 	// in plane [0, 0, -1], face 0 is above face 1
 	expect(solveFlatAdjacentEdges(graphXYDown)).toMatchObject({ "0 1": 1 });
 	// face 0 is above face 1's normal
-	expect(solverSolutionToFaceOrders(graphXYDown)).toMatchObject([[0, 1, 1]]);
+	expect(solverOrdersToFaceOrders(graphXYDown)).toMatchObject([[0, 1, 1]]);
 });
 
 test("solveFlatAdjacentEdges, four panel square", () => {

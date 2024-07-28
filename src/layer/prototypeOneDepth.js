@@ -3,7 +3,7 @@
  */
 import { invertFlatMap } from "../graph/maps.js";
 import { topologicalSort } from "../graph/directedGraph.js";
-import { solverSolutionToFaceOrders } from "./general.js";
+import { solverOrdersToFaceOrders } from "./general.js";
 
 const makePermutations = (counts) => {
 	const totalLength = counts.reduce((a, b) => a * b, 1);
@@ -36,7 +36,7 @@ export const LayerPrototype = {
 	 * @returns {number[][]} a faceOrders ordering
 	 */
 	faceOrders: function (...indices) {
-		return solverSolutionToFaceOrders(
+		return solverOrdersToFaceOrders(
 			this.compile(...indices),
 			this.faces_winding,
 		);

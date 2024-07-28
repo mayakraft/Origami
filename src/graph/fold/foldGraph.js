@@ -156,7 +156,10 @@ export const foldGraph = (
 	// vertices_coords from the crease pattern and folded form now differ
 	// in length, the folded form contain additional vertices_coords at the end,
 	// however, during the parts that do overlap, the vertices match 1:1.
-	// (albeit, folded and cp coordinates are different, of course)
+	// (albeit, folded and cp coordinates are different, of course).
+	// note: in the case of a fold operation with a "M" or "V", this list does
+	// not contain the folded vertices coords that includes that new fold line.
+	// Imagine our new fold line having an "F" assignment.
 	const vertices_coordsFoldedNew = clone(graph.vertices_coords);
 
 	// reassign the crease pattern's vertices back onto the graph. it's likely
@@ -251,6 +254,23 @@ export const foldGraph = (
 		splitGraphResult,
 	);
 
+	// splitGraph just indiscriminately created new faceOrders from old ones.
+	// (this happens inside splitFace() inside of splitGraphWithLineAndPoints())
+	// The pattern goes: for every face A that is split into faces B and C,
+	// all faceOrders rules involving face A are replaced with two rules where
+	// A is replaced by B and C.
+	// For example, if face A is replaced by faces B and C,
+	// faceOrders rule [A, N, _] is replaced by rules [B, N, _] and [C, N, _].
+	// Keep in mind, this is before the assignment has been applied to the
+	// new crease line (before the vertices have been folded over it), the new
+	// crease assignment should be thought of as "F" flat for now.
+	// This now needs to be cleaned up in one very important way:
+	// - Of the pair B and C, only one now overlaps with N. we have to
+	// identify which this is and remove the other one.
+	// Additionally:
+	// - Now, in the special case where the new crease assignment is "V" or "M"
+	// and it's a flat fold, not 3D, we can create new faceOrders between
+	// the new neighbors that were formed by the split crease.
 	updateFaceOrders(
 		graph,
 		{ ...graph, vertices_coords: vertices_coordsFoldedNew },

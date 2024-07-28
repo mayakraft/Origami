@@ -8,4 +8,6 @@ test("constraintToFacePairs", () => {});
 
 test("constraintToFacePairsStrings", () => {});
 
-test("solverSolutionToFaceOrders", () => {});
+test("solverOrdersToFaceOrders", () => {});
+
+test("faceOrdersToSolverOrders", () => {});
