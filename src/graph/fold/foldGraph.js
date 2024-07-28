@@ -276,7 +276,6 @@ export const foldGraph = (
 		{ ...graph, vertices_coords: vertices_coordsFoldedNew },
 		{ vector, origin },
 		foldAngle,
-		faces_winding,
 		[...splitGraphResult.edges.new, ...reassigned],
 		newFaces,
 	);

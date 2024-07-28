@@ -1,18 +1,12 @@
 /**
  * Rabbit Ear (c) Kraft
  */
-// import {
-	// EPSILON,
-// } from "../../math/constant.js";
 import {
 	epsilonEqual,
 } from "../../math/compare.js";
 import {
 	pointsToLine2,
 } from "../../math/convert.js";
-// import {
-// 	overlapConvexPolygons,
-// } from "../../math/overlap.js";
 import {
 	scale2,
 	cross2,
@@ -27,9 +21,6 @@ import {
 import {
 	invertFlatMap,
 } from "../maps.js";
-// import {
-// 	makeVerticesCoordsFlatFolded,
-// } from "../vertices/folded.js";
 
 /**
  * @param {[number, number][]} points the points which make up the edge
@@ -236,98 +227,6 @@ export const getInvalidFaceOrders = (
 };
 
 /**
- * @description Given a graph with vertices in foldedForm which has just
- * been split by a cutting line, in the special case where this is a flat-fold
- * in 2D, update the faceOrders to match the state after the fold.
- * Note: the vertices_coords in the folded state refers to the folded state of
- * the graph before the split, so, everything is folded except the new crease
- * line.
- * @param {FOLD} graph a FOLD object
- * @param {number[]} invalidFaceOrders
- * @param {number} foldAngle
- * @param {boolean[]} faces_winding calculated on new vertices in folded form
- * @returns {undefined}
- */
-// export const updateFlatFoldedInvalidFaceOrders = (
-// 	{ faceOrders },
-// 	invalidFaceOrders,
-// 	foldAngle,
-// 	faces_winding,
-// ) => {
-// 	// valley fold:
-// 	// if B's winding is true, A is in front of B, if false A is behind B
-// 	// mountain fold:
-// 	// if B's winding is true, A is behind B, if false A is in front of B
-// 	// "true" and "false" keys here are B's winding.
-// 	const valley = { true: 1, false: -1 };
-// 	const mountain = { true: -1, false: 1 };
-// 	invalidFaceOrders.forEach(i => {
-// 		// face b's normal decides the order.
-// 		const [a, b] = faceOrders[i];
-// 		/** @type {number} */
-// 		const newOrder = foldAngle > 0
-// 			? valley[faces_winding[b]]
-// 			: mountain[faces_winding[b]];
-// 		faceOrders[i] = [a, b, newOrder];
-// 	});
-// };
-
-/**
- * @description
- * @param {FOLD} graph, the graph
- * @param {number[][]} vertices_coords newly folded vertices that are folded
- * after the inclusion of the new edges and new fold angles.
- * @param {number[]} nowInvalidFaceOrders
- * @param {boolean[]} faces_winding
- * @returns {boolean[]} object with all bad faceOrders indices as keys
- */
-// export const getNonOverlappingFaceOrders = (
-// 	{ faces_vertices, faceOrders },
-// 	vertices_coords,
-// 	nowInvalidFaceOrders,
-// 	faces_winding,
-// 	epsilon = EPSILON,
-// ) => {
-// 	// get a hash set of all faces involved in these faceOrders
-// 	// todo: this can be smaller, only contain the ones made in the last operation.
-// 	const allFacesInvolved = [];
-// 	nowInvalidFaceOrders
-// 		.map(i => faceOrders[i])
-// 		.map(([a, b]) => [a, b]
-// 			.forEach(f => { allFacesInvolved[f] = true; }));
-// 	// this only contains a subset of all faces
-// 	const vertices_coords2 = vertices_coords.map(resize2);
-// 	const facesPolygon = allFacesInvolved
-// 		.map((_, f) => faces_vertices[f]
-// 			.map(v => vertices_coords2[v]));
-// 	// ensure proper winding
-// 	facesPolygon
-// 		.map((_, f) => f)
-// 		.filter(f => !faces_winding[f])
-// 		.forEach(f => facesPolygon[f].reverse());
-// 	// the indices will be indices of faceOrders which do not overlap
-// 	const nonOverlappingOrders = [];
-// 	nowInvalidFaceOrders.forEach(i => {
-// 		const [f0, f1] = faceOrders[i];
-// 		const [polyA, polyB] = [f0, f1].map(f => facesPolygon[f]);
-// 		const overlap = overlapConvexPolygons(polyA, polyB, epsilon);
-// 		// console.log("testing", f0, f1, overlap);
-// 		if (!overlap) { nonOverlappingOrders[i] = true; }
-// 	});
-// 	return nonOverlappingOrders;
-// 	// const invalidOrderFacesOverlap = nowInvalidFaceOrders
-// 	// 	.map(i => faceOrders[i])
-// 	// 	.map(([a, b]) => [a, b]
-// 	// 		.map(f => faces_vertices[f].map(v => vertices_coords[v])))
-// 	// 	.map(([polyA, polyB]) => overlapConvexPolygons(polyA, polyB, epsilon))
-// 	// 	.map((overlaps, i) => overlaps ? undefined : nowInvalidFaceOrders[i])
-// 	// 	.filter(a => a !== undefined);
-// 	// const badMap = {};
-// 	// invalidOrderFacesOverlap.forEach(i => { badMap[i] = true; });
-// 	// return badMap;
-// };
-
-/**
  * @description This method accompanies foldGraph() and accomplishes two things:
  * Due to many faces being split by a common line, many new faceOrders have
  * been updated/correct to include pairs of faces which don't even overlap.
@@ -339,7 +238,6 @@ export const getInvalidFaceOrders = (
  * @param {FOLD} folded the same graph with folded vertices_coords
  * @param {VecLine2} line
  * @param {number} foldAngle
- * @param {boolean[]} faces_winding
  * @param {number[]} newEdges
  * @param {number[]} newFaces
  * @returns {undefined}
@@ -349,7 +247,6 @@ export const updateFaceOrders = (
 	folded,
 	line,
 	foldAngle,
-	faces_winding,
 	newEdges,
 	newFaces,
 ) => {
@@ -370,51 +267,25 @@ export const updateFaceOrders = (
 	if (isFlatFolded) {
 		const newFaceOrders = makeNewFlatFoldFaceOrders(graph, newEdges);
 		graph.faceOrders = graph.faceOrders.concat(newFaceOrders);
-		// console.log("newFaceOrders", newFaceOrders);
 	}
 
 	// from this point on we are only operating on the graph's faceOrders,
 	// if the model is only a 3D model with no faceOrders, exit now.
 	if (!graph.faceOrders) { return; }
 
-	// console.log("newEdges", newEdges);
-	// console.log("newFaces", newFaces);
-
 	// the splitGraph operation created many new faceOrders out of the old ones,
 	// for every old face's orders, each old face became two new faces, so
 	// every one of the old face's orders was replaced with two, referencing the
 	// new indices.
 	// This generates a bunch of relationships between faces which no longer
-	// overlap, we will identify these as "nowInvalidFaceOrders" and do one
-	// of two things with these:
-	// if 3D or "F": we have to delete these faceOrders
-	// if 180deg "M" or "V": we can update these face orders to new orders
-	// based on the crease direction and face winding.
+	// overlap, we will identify these as "nowInvalidFaceOrders" and
+	// delete these faceOrders
+	const invalidOrderLookup = {};
 	const nowInvalidFaceOrders = getInvalidFaceOrders(
 		folded,
 		line,
 		newFaces,
 	);
-
-	const invalidOrderLookup = {};
 	nowInvalidFaceOrders.forEach(i => { invalidOrderLookup[i] = true; });
 	graph.faceOrders = graph.faceOrders.filter((_, i) => !invalidOrderLookup[i]);
-
-	// if (isFlatFolded) {
-	// 	updateFlatFoldedInvalidFaceOrders(graph, nowInvalidFaceOrders, foldAngle, faces_winding);
-	// 	// need to re fold all vertices now. the current "folded" vertices does not
-	// 	// include the new edge otherwise all vertices are folded. but we need those
-	// 	// new faces to be in their new folded state. this just got way more complex.
-	// 	const vertices_coordsNewlyFolded = makeVerticesCoordsFlatFolded(graph);
-	// 	const badOrders = getNonOverlappingFaceOrders(graph, vertices_coordsNewlyFolded, nowInvalidFaceOrders, faces_winding);
-	// 	// console.log("badOrders", badOrders);
-	// 	graph.faceOrders = graph.faceOrders.filter((_, i) => !badOrders[i]);
-	// } else {
-	// 	const invalidOrderLookup = {};
-	// 	nowInvalidFaceOrders.forEach(i => { invalidOrderLookup[i] = true; });
-	// 	graph.faceOrders = graph.faceOrders.filter((_, i) => !invalidOrderLookup[i]);
-	// }
-
-	// console.log("end");
-	// console.log(structuredClone(graph.faceOrders));
 };

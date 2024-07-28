@@ -85,6 +85,7 @@ const makeRandomFold = (graph, vertices_coordsFolded) => {
 
 test("random sequence", () => {
 	const LOOPS = 6;
+
 	const graph = ear.graph.square();
 	let vertices_coordsFolded = ear.graph.makeVerticesCoordsFlatFolded(graph);
 	const file_frames = [];

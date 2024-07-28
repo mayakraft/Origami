@@ -212,6 +212,10 @@ test("layer Kabuto", () => {
 	const foldfile = fs.readFileSync("./tests/files/fold/kabuto.fold", "utf-8");
 	const fold = JSON.parse(foldfile);
 	const folded = ear.graph.getFramesByClassName(fold, "foldedForm")[0];
+
+	// remove existing solution from FOLD file
+	delete folded.faceOrders;
+
 	const solution = ear.layer.solveLayerOrders(folded);
 
 	const expectedJSON = fs.readFileSync(
@@ -244,6 +248,10 @@ test("layer crane", () => {
 	const foldfile = fs.readFileSync("./tests/files/fold/crane.fold", "utf-8");
 	const fold = JSON.parse(foldfile);
 	const folded = ear.graph.getFramesByClassName(fold, "foldedForm")[0];
+
+	// remove existing solution from FOLD file
+	delete folded.faceOrders;
+
 	const solution = ear.layer.solveLayerOrders(folded);
 
 	const expectedJSON = fs.readFileSync(
