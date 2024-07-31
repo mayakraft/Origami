@@ -4,15 +4,21 @@
 import { setWindow } from "./environment/window.js";
 import axiom from "./axioms/index.js";
 import convert from "./convert/index.js";
+import diagram from "./diagrams/index.js";
 import general from "./general/index.js";
 import graph from "./graph/index.js";
+import layer from "./layer/index.js";
 import math from "./math/index.js";
 import singleVertex from "./singleVertex/index.js";
 import svg from "./svg/index.js";
+import text from "./text/index.js";
 import webgl from "./webgl/index.js";
-import layer from "./layer/index.js";
-import diagram from "./diagrams/index.js";
+// the SVG library is uniquely independent, to bind it to Rabbit Ear,
+// something which is not required for it to be functional, we have
+// to expose this method which we immediately call below.
 import svgLink from "./svg/environment/lib.js";
+// for typescript types, allows the user to import types
+// by typing this command: `import { type FOLD } from "rabbit-ear/types.js"`
 import * as placeholder from "./types.js";
 
 /**
@@ -28,6 +34,7 @@ const ear = {
 	math,
 	singleVertex,
 	svg,
+	text,
 	webgl,
 	...placeholder,
 };
