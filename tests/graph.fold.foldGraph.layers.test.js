@@ -118,8 +118,6 @@ test("foldGraph, faceOrders, square folding 00", () => {
 		.layer({ ...graph, vertices_coords: vertices_coordsFolded })
 		.faceOrders();
 
-	// console.log(JSON.stringify(graph.faceOrders));
-
 	// 5.
 	// diagonal line
 	// \4 |\11|
