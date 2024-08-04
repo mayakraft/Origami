@@ -66,7 +66,7 @@ export const perpendicularBalancedSegment = (polygon, line, point) => {
 
 	// compare the two lengths from the origin of our new line to both
 	// ends of the segment clipped in the polygon, return the shortest.
-	const clip = clipLineConvexPolygon(polygon, { vector, origin });
+	const clip = clipLineConvexPolygon(polygon, line);
 	if (!clip) {
 		return undefined;
 	}

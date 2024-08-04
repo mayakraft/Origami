@@ -107,6 +107,7 @@ const makeRandomFold = (graph, vertices_coordsFolded) => {
 		// foldAngle,
 		vertices_coordsFolded,
 	});
+
 	return { ...randomSolution, assignment };
 };
 
