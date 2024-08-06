@@ -1,6 +1,6 @@
 /* SVG (c) Kraft */
-import ArrowMethods from './methods.js';
-import init from './init.js';
+import ArrowMethods from "./methods.js";
+import init from "./init.js";
 
 /**
  * Rabbit Ear (c) Kraft

@@ -32,9 +32,9 @@ export const emptyCategoryObject = () => ({
  *   transitivity: (f: TransitivityConstraint) => [number, number][],
  * }}
  */
-export const constraintToFacePairs = ({
+export const constraintToFacePairs = {
 	// taco_taco (A,C) (B,D) (B,C) (A,D) (A,B) (C,D)
-	taco_taco: f => [
+	taco_taco: (f) => [
 		[f[0], f[2]],
 		[f[1], f[3]],
 		[f[1], f[2]],
@@ -43,12 +43,23 @@ export const constraintToFacePairs = ({
 		[f[2], f[3]],
 	],
 	// taco_tortilla (A,C) (A,B) (B,C)
-	taco_tortilla: f => [[f[0], f[2]], [f[0], f[1]], [f[1], f[2]]],
+	taco_tortilla: (f) => [
+		[f[0], f[2]],
+		[f[0], f[1]],
+		[f[1], f[2]],
+	],
 	// tortilla_tortilla (A,C) (B,D)
-	tortilla_tortilla: f => [[f[0], f[2]], [f[1], f[3]]],
+	tortilla_tortilla: (f) => [
+		[f[0], f[2]],
+		[f[1], f[3]],
+	],
 	// transitivity (A,B) (B,C) (C,A)
-	transitivity: f => [[f[0], f[1]], [f[1], f[2]], [f[2], f[0]]],
-});
+	transitivity: (f) => [
+		[f[0], f[1]],
+		[f[1], f[2]],
+		[f[2], f[0]],
+	],
+};
 
 /**
  * @description Given an array of a pair of integers, sort the smallest
@@ -56,9 +67,8 @@ export const constraintToFacePairs = ({
  * @param {[number, number]} pair a pair of face indices
  * @returns {string} a space-separated string encoding of the face pair
  */
-const sortedPairString = pair => (pair[0] < pair[1]
-	? `${pair[0]} ${pair[1]}`
-	: `${pair[1]} ${pair[0]}`);
+const sortedPairString = (pair) =>
+	pair[0] < pair[1] ? `${pair[0]} ${pair[1]}` : `${pair[1]} ${pair[0]}`;
 
 /**
  * @description Convert an array of faces which are involved in one
@@ -72,9 +82,9 @@ const sortedPairString = pair => (pair[0] < pair[1]
  *   transitivity: (f: TransitivityConstraint) => string[],
  * }}
  */
-export const constraintToFacePairsStrings = ({
+export const constraintToFacePairsStrings = {
 	// taco_taco (A,C) (B,D) (B,C) (A,D) (A,B) (C,D)
-	taco_taco: f => [
+	taco_taco: (f) => [
 		sortedPairString([f[0], f[2]]),
 		sortedPairString([f[1], f[3]]),
 		sortedPairString([f[1], f[2]]),
@@ -83,23 +93,23 @@ export const constraintToFacePairsStrings = ({
 		sortedPairString([f[2], f[3]]),
 	],
 	// taco_tortilla (A,C) (A,B) (B,C)
-	taco_tortilla: f => [
+	taco_tortilla: (f) => [
 		sortedPairString([f[0], f[2]]),
 		sortedPairString([f[0], f[1]]),
 		sortedPairString([f[1], f[2]]),
 	],
 	// tortilla_tortilla (A,C) (B,D)
-	tortilla_tortilla: f => [
+	tortilla_tortilla: (f) => [
 		sortedPairString([f[0], f[2]]),
 		sortedPairString([f[1], f[3]]),
 	],
 	// transitivity (A,B) (B,C) (C,A)
-	transitivity: f => [
+	transitivity: (f) => [
 		sortedPairString([f[0], f[1]]),
 		sortedPairString([f[1], f[2]]),
 		sortedPairString([f[2], f[0]]),
 	],
-});
+};
 
 const signedLayerSolverValue = { 0: 0, 1: 1, 2: -1 };
 
@@ -120,8 +130,9 @@ const signedLayerSolverValue = { 0: 0, 1: 1, 2: -1 };
 export const solverOrdersToFaceOrders = (facePairOrders, faces_winding) => {
 	// convert the space-separated face pair keys into arrays of two integers
 	const keys = Object.keys(facePairOrders);
-	const faceOrdersPairs = keys
-		.map(string => string.split(" ").map(n => parseInt(n, 10)));
+	const faceOrdersPairs = keys.map((string) =>
+		string.split(" ").map((n) => parseInt(n, 10)),
+	);
 
 	// convert the value (1 or 2) into the faceOrder value (-1 or +1).
 	const solutions = faceOrdersPairs.map((faces, i) => {
@@ -131,7 +142,7 @@ export const solverOrdersToFaceOrders = (facePairOrders, faces_winding) => {
 		// where "above" means on the side pointed to by g's normal vector,
 		// and "below" means on the side opposite g's normal vector.
 		const value = signedLayerSolverValue[facePairOrders[keys[i]]];
-		const side = (!faces_winding[faces[1]]) ? -value : value;
+		const side = !faces_winding[faces[1]] ? -value : value;
 		// const side = (((value === 1) ^ (faces_aligned[faces[1]])) * -2) + 1;
 		return side;
 	});
@@ -159,22 +170,25 @@ export const faceOrdersToSolverOrders = (faceOrders, faces_winding) => {
 
 	// convert the value (1 or 2) into the faceOrder value (-1 or +1).
 	faceOrders.forEach(([f, g, order]) => {
-		if (order !== 1 && order !== -1) { return; }
+		if (order !== 1 && order !== -1) {
+			return;
+		}
 		// according to the FOLD spec, for order [f, g, s]:
 		// +1 indicates that face f lies above face g
 		// −1 indicates that face f lies below face g
 		// where "above" means on the side pointed to by g's normal vector,
 		// and "below" means on the side opposite g's normal vector.
 		const solution = faces_winding[g]
-			// convert a 1 into a 1, and a -1 into a 2
-			? ((1 - order) / 2) + 1
-			// convert a 1 into a 2, and a -1 into a 1
-			: ((order + 1) / 2) + 1;
+			? // convert a 1 into a 1, and a -1 into a 2
+				(1 - order) / 2 + 1
+			: // convert a 1 into a 2, and a -1 into a 1
+				(order + 1) / 2 + 1;
 		const key = f < g ? `${f} ${g}` : `${g} ${f}`;
-		solverOrders[key] = f < g
-			? solution
-			// faces are in reversed order. swap 1 and 2
-			: 3 - solution;
+		solverOrders[key] =
+			f < g
+				? solution
+				: // faces are in reversed order. swap 1 and 2
+					3 - solution;
 	});
 
 	return solverOrders;
@@ -195,11 +209,15 @@ export const mergeWithoutOverwrite = (orders) => {
 	/** @type {{ [key: string]: number }} */
 	const result = {};
 	// iterate through the objects
-	orders.forEach(order => Object.keys(order).forEach(key => {
-		if (result[key] !== undefined && result[key] !== order[key]) {
-			throw new Error(`two competing results: ${result[key]}, ${order[key]}, for "${key}"`);
-		}
-		result[key] = order[key];
-	}));
+	orders.forEach((order) =>
+		Object.keys(order).forEach((key) => {
+			if (result[key] !== undefined && result[key] !== order[key]) {
+				throw new Error(
+					`two competing results: ${result[key]}, ${order[key]}, for "${key}"`,
+				);
+			}
+			result[key] = order[key];
+		}),
+	);
 	return result;
 };

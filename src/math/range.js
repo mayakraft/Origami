@@ -15,14 +15,8 @@ import { EPSILON } from "./constant.js";
 export const rangeUnion = (a, b) => {
 	const bSorted = b[0] <= b[1];
 	return a[0] <= a[1]
-		? [
-			Math.min(a[0], bSorted ? b[0] : b[1]),
-			Math.max(a[1], bSorted ? b[1] : b[0]),
-		]
-		: [
-			Math.min(a[1], bSorted ? b[0] : b[1]),
-			Math.max(a[0], bSorted ? b[1] : b[0]),
-		];
+		? [Math.min(a[0], bSorted ? b[0] : b[1]), Math.max(a[1], bSorted ? b[1] : b[0])]
+		: [Math.min(a[1], bSorted ? b[0] : b[1]), Math.max(a[0], bSorted ? b[1] : b[0])];
 };
 
 /**

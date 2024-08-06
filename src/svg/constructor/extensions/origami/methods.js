@@ -1,7 +1,7 @@
 /* SVG (c) Kraft */
-import TransformMethods from '../shared/transforms.js';
-import methods$1 from '../shared/urls.js';
-import * as dom from '../shared/dom.js';
+import TransformMethods from "../shared/transforms.js";
+import methods$1 from "../shared/urls.js";
+import * as dom from "../shared/dom.js";
 
 /**
  * Rabbit Ear (c) Kraft
@@ -30,9 +30,11 @@ import * as dom from '../shared/dom.js';
  */
 const getChildWithClass = (group, className) => {
 	const childNodes = group ? group.childNodes : undefined;
-	if (!childNodes) { return null; }
+	if (!childNodes) {
+		return null;
+	}
 	return Array.from(childNodes)
-		.filter(el => el.getAttribute("class") === className)
+		.filter((el) => el.getAttribute("class") === className)
 		.shift();
 };
 

@@ -1,23 +1,11 @@
 /**
  * Rabbit Ear (c) Kraft
  */
-import {
-	makePlanarFaces,
-} from "../make/faces.js";
-import {
-	arrayIntersection,
-} from "../../general/array.js";
-import {
-	makeEdgesFacesUnsorted,
-} from "../make/edgesFaces.js";
-import {
-	makeFacesEdgesFromVertices,
-} from "../make/facesEdges.js";
-import {
-	invertArrayMap,
-	invertFlatMap,
-	invertFlatToArrayMap,
-} from "../maps.js";
+import { makePlanarFaces } from "../make/faces.js";
+import { arrayIntersection } from "../../general/array.js";
+import { makeEdgesFacesUnsorted } from "../make/edgesFaces.js";
+import { makeFacesEdgesFromVertices } from "../make/facesEdges.js";
+import { invertArrayMap, invertFlatMap, invertFlatToArrayMap } from "../maps.js";
 
 // the face-matching algorithm should go like this:
 // prerequisite: vertex map
@@ -31,9 +19,7 @@ import {
 // call arrayIntersection, but inside the reduce, where the initial
 // value is []- in which case, don't perform an intersection just
 // return the second array (the current value).
-const callArrayIntersection = (a, b) => (!a.length
-	? b
-	: arrayIntersection(a, b));
+const callArrayIntersection = (a, b) => (!a.length ? b : arrayIntersection(a, b));
 
 /**
  * @param {FOLD} graph the input graph from the very start of the planarize()
@@ -46,7 +32,9 @@ const makeFaceBackmapOld = (
 	faces_edgesNew,
 	edgesBackmap,
 ) => {
-	if (!faces_vertices && !faces_edges) { return []; }
+	if (!faces_vertices && !faces_edges) {
+		return [];
+	}
 	if (!faces_edges) {
 		faces_edges = makeFacesEdgesFromVertices({ edges_vertices, faces_vertices });
 	}
@@ -58,25 +46,25 @@ const makeFaceBackmapOld = (
 	// edge indices with (a list of) the old edge indices. new edges map
 	// one-to-many to old edges, so this creates nested arrays.
 	// convert [4, 15, 0] into [[7], [1, 15], [10]]
-	const faces_backEdges = faces_edgesNew
-		.map(edges => edges
-			.filter(e => edgesBackmap[e] !== undefined)
-			.map(e => edgesBackmap[e]));
+	const faces_backEdges = faces_edgesNew.map((edges) =>
+		edges.filter((e) => edgesBackmap[e] !== undefined).map((e) => edgesBackmap[e]),
+	);
 
 	// for every face, a list of its old edges' adjacent faces. these are
 	// contenders for matching the new face to one of the old faces from this list
-	const faces_backEdges_faces = faces_backEdges
-		.map(backEdges => backEdges.map(edges => edges.flatMap(e => edges_faces[e])));
+	const faces_backEdges_faces = faces_backEdges.map((backEdges) =>
+		backEdges.map((edges) => edges.flatMap((e) => edges_faces[e])),
+	);
 
-	const faces_faceAppearanceCount = faces_backEdges_faces
-		.map(edgesFaces => invertFlatToArrayMap(edgesFaces.flat())
-			.map(el => el.length));
+	const faces_faceAppearanceCount = faces_backEdges_faces.map((edgesFaces) =>
+		invertFlatToArrayMap(edgesFaces.flat()).map((el) => el.length),
+	);
 
 	// get the appearance with the most appearances (last in the list)
 	const facesBackMap = faces_faceAppearanceCount
-		.map(indexCounts => invertFlatToArrayMap(indexCounts))
-		.map(faces => faces.pop())
-		.map(res => (res === undefined ? [] : res));
+		.map((indexCounts) => invertFlatToArrayMap(indexCounts))
+		.map((faces) => faces.pop())
+		.map((res) => (res === undefined ? [] : res));
 
 	// const faces_backFaces = faces_backEdges_faces
 	// 	.map(backEdges_faces => backEdges_faces
@@ -110,19 +98,16 @@ const makeFaceBackmapOld = (
  * }} new face information for the newGraph, and a map relating the new
  * faces to the old faces.
  */
-export const planarizeMakeFaces = (oldGraph, newGraph, { edges: { map: edgeNextMap } }) => {
+export const planarizeMakeFaces = (
+	oldGraph,
+	newGraph,
+	{ edges: { map: edgeNextMap } },
+) => {
 	// const vertexBackMap = invertArrayMap(vertexNextMap);
 	const edgeBackMap = invertArrayMap(edgeNextMap);
 
-	const {
-		faces_vertices,
-		faces_edges,
-	} = makePlanarFaces(newGraph);
-	const faceBackMap = makeFaceBackmapOld(
-		oldGraph,
-		faces_edges,
-		edgeBackMap,
-	);
+	const { faces_vertices, faces_edges } = makePlanarFaces(newGraph);
+	const faceBackMap = makeFaceBackmapOld(oldGraph, faces_edges, edgeBackMap);
 	return {
 		faces_vertices,
 		faces_edges,

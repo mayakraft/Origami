@@ -28,22 +28,10 @@ test("matrix 2 transform line", () => {
 });
 
 test("makeMatrix2Scale", () => {
-	testEqualVectors(
-		ear.math.makeMatrix2Scale(),
-		[1, 0, 0, 1, 0, 0],
-	);
-	testEqualVectors(
-		ear.math.makeMatrix2Scale([0.5, 0.5]),
-		[0.5, 0, 0, 0.5, 0, 0],
-	);
-	testEqualVectors(
-		ear.math.makeMatrix2UniformScale(),
-		[1, 0, 0, 1, 0, 0],
-	);
-	testEqualVectors(
-		ear.math.makeMatrix2UniformScale(0.5),
-		[0.5, 0, 0, 0.5, 0, 0],
-	);
+	testEqualVectors(ear.math.makeMatrix2Scale(), [1, 0, 0, 1, 0, 0]);
+	testEqualVectors(ear.math.makeMatrix2Scale([0.5, 0.5]), [0.5, 0, 0, 0.5, 0, 0]);
+	testEqualVectors(ear.math.makeMatrix2UniformScale(), [1, 0, 0, 1, 0, 0]);
+	testEqualVectors(ear.math.makeMatrix2UniformScale(0.5), [0.5, 0, 0, 0.5, 0, 0]);
 });
 
 test("matrix 2", () => {
@@ -56,27 +44,41 @@ test("matrix 2", () => {
 		ear.math.makeMatrix2Rotate(Math.PI / 4, [1, 1]),
 	);
 	testEqualVectors(
-		[Math.SQRT1_2, -Math.SQRT1_2, Math.SQRT1_2,
-			Math.SQRT1_2, -Math.SQRT1_2, Math.SQRT1_2],
-		ear.math.invertMatrix2([Math.SQRT1_2, Math.SQRT1_2, -Math.SQRT1_2, Math.SQRT1_2, 1, 0]),
+		[
+			Math.SQRT1_2,
+			-Math.SQRT1_2,
+			Math.SQRT1_2,
+			Math.SQRT1_2,
+			-Math.SQRT1_2,
+			Math.SQRT1_2,
+		],
+		ear.math.invertMatrix2([
+			Math.SQRT1_2,
+			Math.SQRT1_2,
+			-Math.SQRT1_2,
+			Math.SQRT1_2,
+			1,
+			0,
+		]),
 	);
 	testEqualVectors(
-		[Math.sqrt(4.5), Math.SQRT1_2, -Math.SQRT1_2, Math.sqrt(4.5), Math.sqrt(4.5), Math.SQRT1_2],
+		[
+			Math.sqrt(4.5),
+			Math.SQRT1_2,
+			-Math.SQRT1_2,
+			Math.sqrt(4.5),
+			Math.sqrt(4.5),
+			Math.SQRT1_2,
+		],
 		ear.math.multiplyMatrices2(
 			[Math.SQRT1_2, -Math.SQRT1_2, Math.SQRT1_2, Math.SQRT1_2, 0, 0],
 			[1, 2, -2, 1, 1, 2],
 		),
 	);
-	testEqualVectors(
-		[0, 3],
-		ear.math.multiplyMatrix2Vector2([2, 1, -1, 2, -1, 0], [1, 1]),
-	);
+	testEqualVectors([0, 3], ear.math.multiplyMatrix2Vector2([2, 1, -1, 2, -1, 0], [1, 1]));
 	testEqualVectors(
 		[-2, 3],
-		ear.math.multiplyMatrix2Vector2(
-			ear.math.makeMatrix2Scale([3, 3], [1, 0]),
-			[0, 1],
-		),
+		ear.math.multiplyMatrix2Vector2(ear.math.makeMatrix2Scale([3, 3], [1, 0]), [0, 1]),
 	);
 	testEqualVectors(
 		[-1, 2],

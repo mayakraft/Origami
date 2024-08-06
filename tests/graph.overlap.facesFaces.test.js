@@ -9,7 +9,7 @@ test("getFacesFacesOverlap strip weave", () => {
 	ear.graph.populate(folded);
 
 	const result = ear.graph.getFacesFacesOverlap(folded);
-	result.forEach(arr => arr.sort((a, b) => a - b));
+	result.forEach((arr) => arr.sort((a, b) => a - b));
 	expect(result).toMatchObject([
 		[1, 4],
 		[0, 2, 4],
@@ -28,7 +28,7 @@ test("getFacesFacesOverlap four panel square", () => {
 	ear.graph.populate(folded);
 
 	const result = ear.graph.getFacesFacesOverlap(folded);
-	result.forEach(arr => arr.sort((a, b) => a - b));
+	result.forEach((arr) => arr.sort((a, b) => a - b));
 	expect(result).toMatchObject([
 		[1, 2, 3],
 		[0, 2, 3],
@@ -48,7 +48,7 @@ test("getFacesFacesOverlap zig-zag panels", () => {
 	ear.graph.populate(folded);
 
 	const result = ear.graph.getFacesFacesOverlap(folded);
-	result.forEach(arr => arr.sort((a, b) => a - b));
+	result.forEach((arr) => arr.sort((a, b) => a - b));
 	expect(result).toMatchObject([
 		[1, 2, 3, 4],
 		[0, 2, 3, 4],
@@ -67,13 +67,28 @@ test("getFacesFacesOverlap bird base, faces-faces", () => {
 	ear.graph.populate(folded);
 
 	const result = ear.graph.getFacesFacesOverlap(folded);
-	result.forEach(arr => arr.sort((a, b) => a - b));
+	result.forEach((arr) => arr.sort((a, b) => a - b));
 	expect(result).toMatchObject([
-		[1,4,5,6,7,8,11],[0,4,5,6,7,8,11],[3,9,10,12,13,14,15],[2,9,10,12,13,14,15],
-		[0,1,5,6,7,8,11],[0,1,4,6,7,8,11],[0,1,4,5,7,8,11,16,19],[0,1,4,5,6,8,11,16,19],
-		[0,1,4,5,6,7,11],[2,3,10,12,13,14,15],[2,3,9,12,13,14,15],[0,1,4,5,6,7,8],
-		[2,3,9,10,13,14,15],[2,3,9,10,12,14,15],[2,3,9,10,12,13,15,17,18],
-		[2,3,9,10,12,13,14,17,18],[6,7,19],[14,15,18],[14,15,17],[6,7,16]
+		[1, 4, 5, 6, 7, 8, 11],
+		[0, 4, 5, 6, 7, 8, 11],
+		[3, 9, 10, 12, 13, 14, 15],
+		[2, 9, 10, 12, 13, 14, 15],
+		[0, 1, 5, 6, 7, 8, 11],
+		[0, 1, 4, 6, 7, 8, 11],
+		[0, 1, 4, 5, 7, 8, 11, 16, 19],
+		[0, 1, 4, 5, 6, 8, 11, 16, 19],
+		[0, 1, 4, 5, 6, 7, 11],
+		[2, 3, 10, 12, 13, 14, 15],
+		[2, 3, 9, 12, 13, 14, 15],
+		[0, 1, 4, 5, 6, 7, 8],
+		[2, 3, 9, 10, 13, 14, 15],
+		[2, 3, 9, 10, 12, 14, 15],
+		[2, 3, 9, 10, 12, 13, 15, 17, 18],
+		[2, 3, 9, 10, 12, 13, 14, 17, 18],
+		[6, 7, 19],
+		[14, 15, 18],
+		[14, 15, 17],
+		[6, 7, 16],
 	]);
 });
 
@@ -93,11 +108,14 @@ test("getFacesFacesOverlap kabuto", () => {
 	const folded = ear.graph.getFramesByClassName(fold, "foldedForm")[0];
 	ear.graph.populate(folded);
 
-	const expectedJSON = fs.readFileSync("./tests/files/json/kabuto-faces-faces-overlap.json", "utf-8");
+	const expectedJSON = fs.readFileSync(
+		"./tests/files/json/kabuto-faces-faces-overlap.json",
+		"utf-8",
+	);
 	const expected = JSON.parse(expectedJSON);
 
 	const result = ear.graph.getFacesFacesOverlap(folded);
-	result.forEach(arr => arr.sort((a, b) => a - b));
+	result.forEach((arr) => arr.sort((a, b) => a - b));
 	expect(result).toMatchObject(expected);
 });
 
@@ -107,11 +125,14 @@ test("getFacesFacesOverlap crane", () => {
 	const folded = ear.graph.getFramesByClassName(fold, "foldedForm")[0];
 	ear.graph.populate(folded);
 
-	const expectedJSON = fs.readFileSync("./tests/files/json/crane-faces-faces-overlap.json", "utf-8");
+	const expectedJSON = fs.readFileSync(
+		"./tests/files/json/crane-faces-faces-overlap.json",
+		"utf-8",
+	);
 	const expected = JSON.parse(expectedJSON);
 
 	const result = ear.graph.getFacesFacesOverlap(folded);
-	result.forEach(arr => arr.sort((a, b) => a - b));
+	result.forEach((arr) => arr.sort((a, b) => a - b));
 	expect(result).toMatchObject(expected);
 });
 
@@ -124,10 +145,13 @@ test("getFacesFacesOverlap Kraft bird", () => {
 	};
 	ear.graph.populate(folded);
 
-	const expectedJSON = fs.readFileSync("./tests/files/json/kraft-bird-faces-faces-overlap.json", "utf-8");
+	const expectedJSON = fs.readFileSync(
+		"./tests/files/json/kraft-bird-faces-faces-overlap.json",
+		"utf-8",
+	);
 	const expected = JSON.parse(expectedJSON);
 
 	const result = ear.graph.getFacesFacesOverlap(folded);
-	result.forEach(arr => arr.sort((a, b) => a - b));
+	result.forEach((arr) => arr.sort((a, b) => a - b));
 	expect(result).toMatchObject(expected);
 });

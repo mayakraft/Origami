@@ -13,9 +13,9 @@ const makePermutations = (counts) => {
 	}
 	maxPlace.push(1);
 	maxPlace.shift();
-	return Array.from(Array(totalLength))
-		.map((_, i) => counts
-			.map((c, j) => Math.floor(i / maxPlace[j]) % c));
+	return Array.from(Array(totalLength)).map((_, i) =>
+		counts.map((c, j) => Math.floor(i / maxPlace[j]) % c),
+	);
 };
 
 export const LayerPrototype = {
@@ -24,7 +24,7 @@ export const LayerPrototype = {
 	 * @returns {number[]} the total number of states in each branch.
 	 */
 	count: function () {
-		return this.branches.map(arr => arr.length);
+		return this.branches.map((arr) => arr.length);
 	},
 
 	/**
@@ -36,10 +36,7 @@ export const LayerPrototype = {
 	 * @returns {number[][]} a faceOrders ordering
 	 */
 	faceOrders: function (...indices) {
-		return solverOrdersToFaceOrders(
-			this.compile(...indices),
-			this.faces_winding,
-		);
+		return solverOrdersToFaceOrders(this.compile(...indices), this.faces_winding);
 	},
 
 	/**
@@ -87,10 +84,8 @@ export const LayerPrototype = {
 	directedPairs: function (...indices) {
 		const orders = this.compile(...indices);
 		return Object.keys(orders)
-			.map(pair => (orders[pair] === 1
-				? pair.split(" ")
-				: pair.split(" ").reverse()))
-			.map(pair => pair.map(n => parseInt(n, 10)))
+			.map((pair) => (orders[pair] === 1 ? pair.split(" ") : pair.split(" ").reverse()))
+			.map((pair) => pair.map((n) => parseInt(n, 10)))
 			.map(([a, b]) => [a, b]);
 	},
 
@@ -108,12 +103,10 @@ export const LayerPrototype = {
 	 *
 	 */
 	allSolutions: function () {
-		return makePermutations(this.count())
-			.map(count => this.compile(...count));
+		return makePermutations(this.count()).map((count) => this.compile(...count));
 	},
 
 	allFacesLayers: function () {
-		return makePermutations(this.count())
-			.map(count => this.facesLayer(...count));
+		return makePermutations(this.count()).map((count) => this.facesLayer(...count));
 	},
 };

@@ -1,27 +1,12 @@
 /**
  * Rabbit Ear (c) Kraft
  */
-import {
-	EPSILON,
-} from "../math/constant.js";
-import {
-	vecLineToUniqueLine,
-} from "../math/convert.js";
-import {
-	flip2,
-	resize2,
-} from "../math/vector.js";
-import {
-	multiplyMatrix2Line2,
-	makeMatrix2Reflect,
-} from "../math/matrix2.js";
-import {
-	clusterScalars,
-	clusterParallelVectors,
-} from "../general/cluster.js";
-import {
-	getEdgesLine,
-} from "./edges/lines.js";
+import { EPSILON } from "../math/constant.js";
+import { vecLineToUniqueLine } from "../math/convert.js";
+import { flip2, resize2 } from "../math/vector.js";
+import { multiplyMatrix2Line2, makeMatrix2Reflect } from "../math/matrix2.js";
+import { clusterScalars, clusterParallelVectors } from "../general/cluster.js";
+import { getEdgesLine } from "./edges/lines.js";
 
 /**
  * @description Convert a normal-distance line so that the distance
@@ -29,9 +14,8 @@ import {
  * @param {UniqueLine} line a line in normal-distance parameterization
  * @returns {UniqueLine} a line in normal-distance parameterization
  */
-const fixLineDirection = ({ normal, distance }) => (distance < 0
-	? ({ normal: flip2(normal), distance: -distance })
-	: ({ normal, distance }));
+const fixLineDirection = ({ normal, distance }) =>
+	distance < 0 ? { normal: flip2(normal), distance: -distance } : { normal, distance };
 
 /**
  * @description Discover the lines of symmetry in a 2D FOLD graph.
@@ -62,36 +46,41 @@ export const findSymmetryLines = (graph, epsilon = EPSILON) => {
 	// using reflection matrices, for every line, perform a reflection across
 	// this line for every other line in the list. every line will get reflected
 	// N-1 times. this is quite an expensive operation.
-	const linesMatrices = lines
-		.map(({ vector, origin }) => makeMatrix2Reflect(vector, origin));
-	const reflectionsLines = linesMatrices
-		.map(matrix => lines
-			.map(line => multiplyMatrix2Line2(matrix, line)));
+	const linesMatrices = lines.map(({ vector, origin }) =>
+		makeMatrix2Reflect(vector, origin),
+	);
+	const reflectionsLines = linesMatrices.map((matrix) =>
+		lines.map((line) => multiplyMatrix2Line2(matrix, line)),
+	);
 
 	// convert the reflected lines into normal-distance parameterization, and
 	// for every reflection group, superimpose (concat) our original list of
 	// lines that cover the non-transformed set of edges.
 	const reflectionsUniqueLines = reflectionsLines
-		.map(group => group.map(line => (line.vector[0] < 0
-			? ({ vector: flip2(line.vector), origin: line.origin })
-			: line)))
-		.map(group => group.map(vecLineToUniqueLine).map(fixLineDirection))
-		.map(group => group.concat(uniqueLines));
+		.map((group) =>
+			group.map((line) =>
+				line.vector[0] < 0 ? { vector: flip2(line.vector), origin: line.origin } : line,
+			),
+		)
+		.map((group) => group.map(vecLineToUniqueLine).map(fixLineDirection))
+		.map((group) => group.concat(uniqueLines));
 
 	// for every reflection set, we now also have in the set the original lines.
 	// being as resourceful as possible, compare all lines with each other and
 	// group similar lines together, resulting in clusters of 1 (no match) or 2. (i think)
 	// First, cluster lines by similar distance from origin.
-	const groupsClusters = reflectionsUniqueLines
-		.map(group => clusterScalars(group.map(el => el.distance)));
+	const groupsClusters = reflectionsUniqueLines.map((group) =>
+		clusterScalars(group.map((el) => el.distance)),
+	);
 
 	// Second, within each cluster, cluster again by similar (parallel) vectors.
 	// this creates a cluster where the indices are the indices of elements
 	// according to the first cluster variable's arrays, not the original data.
-	const groupsClusterClustersUnindexed = groupsClusters
-		.map((clusters, g) => clusters
-			.map(cluster => cluster.map(i => reflectionsUniqueLines[g][i].normal))
-			.map(cluster => clusterParallelVectors(cluster, epsilon)));
+	const groupsClusterClustersUnindexed = groupsClusters.map((clusters, g) =>
+		clusters
+			.map((cluster) => cluster.map((i) => reflectionsUniqueLines[g][i].normal))
+			.map((cluster) => clusterParallelVectors(cluster, epsilon)),
+	);
 
 	// fix the mismatch between indices. for every cluster cluster, pass in
 	// the index from the cluster cluster into the first cluster variable
@@ -99,11 +88,11 @@ export const findSymmetryLines = (graph, epsilon = EPSILON) => {
 	// this now contains, for every reflection line, all clusters of lines and
 	// their reflection lines, so, the reflection with the smaller number of
 	// clusters should be the best candidate.
-	const groupsClusterClusters = groupsClusterClustersUnindexed
-		.map((group, g) => group
-			.flatMap((clusters, c) => clusters
-				.map(cluster => cluster
-					.map(index => groupsClusters[g][c][index]))));
+	const groupsClusterClusters = groupsClusterClustersUnindexed.map((group, g) =>
+		group.flatMap((clusters, c) =>
+			clusters.map((cluster) => cluster.map((index) => groupsClusters[g][c][index])),
+		),
+	);
 
 	// create some kind of error heuristic, for each reflection group.
 	// todo: this could be better thought out.
@@ -116,14 +105,14 @@ export const findSymmetryLines = (graph, epsilon = EPSILON) => {
 	// 	.map(group => (group.length - lines.length) / lines.length);
 
 	const groupsError = groupsClusterClusters
-		.map(group => group.filter(clusters => clusters.length < 2))
+		.map((group) => group.filter((clusters) => clusters.length < 2))
 		.map((noMatchList, i) => noMatchList.length / reflectionsUniqueLines[i].length);
 
 	// return the data in sorted order, with the best matches for a
 	// reflection line in the beginning of the list.
 	return groupsError
 		.map((error, i) => ({ error, i }))
-		.map(el => ({ line: lines[el.i], error: el.error }))
+		.map((el) => ({ line: lines[el.i], error: el.error }))
 		.sort((a, b) => a.error - b.error);
 };
 
@@ -135,9 +124,8 @@ export const findSymmetryLines = (graph, epsilon = EPSILON) => {
  * @param {FOLD} graph a FOLD object with 2D vertices
  * @returns {VecLine2} symmetry lines
  */
-export const findSymmetryLine = (graph, epsilon = EPSILON) => (
-	(findSymmetryLines(graph, epsilon)[0] || {}).line
-);
+export const findSymmetryLine = (graph, epsilon = EPSILON) =>
+	(findSymmetryLines(graph, epsilon)[0] || {}).line;
 
 // const bucketVertices = ({ vertices_coords }) => {
 // 	const size = boundingBox({ vertices_coords }).span;

@@ -1,24 +1,11 @@
 /**
  * Rabbit Ear (c) Kraft
  */
-import {
-	EPSILON,
-} from "./constant.js";
-import {
-	epsilonCompare,
-} from "./compare.js";
-import {
-	threePointTurnDirection,
-} from "./radial.js";
-import {
-	normalize2,
-	distance2,
-	dot2,
-	subtract2,
-} from "./vector.js";
-import {
-	clusterScalars,
-} from "../general/cluster.js";
+import { EPSILON } from "./constant.js";
+import { epsilonCompare } from "./compare.js";
+import { threePointTurnDirection } from "./radial.js";
+import { normalize2, distance2, dot2, subtract2 } from "./vector.js";
+import { clusterScalars } from "../general/cluster.js";
 
 /**
  * @description mirror an array and join it at the end, except
@@ -44,9 +31,14 @@ const minimumCluster = (elements, comparison) => {
 	let smallSet = [0];
 	for (let i = 1; i < elements.length; i += 1) {
 		switch (comparison(elements[smallSet[0]], elements[i])) {
-		case 0: smallSet.push(i); break;
-		case 1: smallSet = [i]; break;
-		default: break;
+			case 0:
+				smallSet.push(i);
+				break;
+			case 1:
+				smallSet = [i];
+				break;
+			default:
+				break;
 		}
 	}
 	return smallSet;
@@ -64,7 +56,9 @@ const minimumCluster = (elements, comparison) => {
  * the smallest component values, or undefined if points is empty.
  */
 const smallestVector2 = (points, epsilon = EPSILON) => {
-	if (!points || !points.length) { return undefined; }
+	if (!points || !points.length) {
+		return undefined;
+	}
 	// find the set of all points that share the smallest X value
 	// const smallSet = smallestVectorSearch(points, 0, epsilonCompare, epsilon);
 	// compare each point's x axis only
@@ -73,7 +67,9 @@ const smallestVector2 = (points, epsilon = EPSILON) => {
 	// from this set, find the point with the smallest Y value
 	let sm = 0;
 	for (let i = 1; i < smallSet.length; i += 1) {
-		if (points[smallSet[i]][1] < points[smallSet[sm]][1]) { sm = i; }
+		if (points[smallSet[i]][1] < points[smallSet[sm]][1]) {
+			sm = i;
+		}
 	}
 	return smallSet[sm];
 };
@@ -94,26 +90,36 @@ const smallestVector2 = (points, epsilon = EPSILON) => {
  */
 export const convexHullRadialSortPoints = (points, epsilon = EPSILON) => {
 	const first = smallestVector2(points, epsilon);
-	if (first === undefined) { return []; }
+	if (first === undefined) {
+		return [];
+	}
 	const angles = points
-		.map(p => subtract2(p, points[first]))
-		.map(v => normalize2(v))
-		.map(vec => dot2([0, 1], vec));
-		// .map((p, i) => Math.atan2(unitVecs[i][1], unitVecs[i][0]));
+		.map((p) => subtract2(p, points[first]))
+		.map((v) => normalize2(v))
+		.map((vec) => dot2([0, 1], vec));
+	// .map((p, i) => Math.atan2(unitVecs[i][1], unitVecs[i][0]));
 	const rawOrder = angles
 		.map((a, i) => ({ a, i }))
 		.sort((a, b) => a.a - b.a)
-		.map(el => el.i)
-		.filter(i => i !== first);
+		.map((el) => el.i)
+		.filter((i) => i !== first);
 
 	// todo: can we use a cluster method that takes as input a pre-sorted list?
-	return [[first]]
-		.concat(clusterScalars(rawOrder.map(i => angles[i]), epsilon)
-			.map(arr => arr.map(i => rawOrder[i]))
-			.map(cluster => (cluster.length === 1 ? cluster : cluster
-				.map(i => ({ i, len: distance2(points[i], points[first]) }))
-				.sort((a, b) => a.len - b.len)
-				.map(el => el.i))));
+	return [[first]].concat(
+		clusterScalars(
+			rawOrder.map((i) => angles[i]),
+			epsilon,
+		)
+			.map((arr) => arr.map((i) => rawOrder[i]))
+			.map((cluster) =>
+				cluster.length === 1
+					? cluster
+					: cluster
+							.map((i) => ({ i, len: distance2(points[i], points[first]) }))
+							.sort((a, b) => a.len - b.len)
+							.map((el) => el.i),
+			),
+	);
 };
 
 /**
@@ -128,7 +134,9 @@ export const convexHullRadialSortPoints = (points, epsilon = EPSILON) => {
  * of points in your "points" array
  */
 export const convexHull = (points = [], includeCollinear = false, epsilon = EPSILON) => {
-	if (points.length < 2) { return []; }
+	if (points.length < 2) {
+		return [];
+	}
 	// if includeCollinear is true, we need to walk collinear points,
 	// problem is we don't know if we should be going towards or away from
 	// the origin point, so to work around that, make a mirror of all collinear
@@ -136,7 +144,7 @@ export const convexHull = (points = [], includeCollinear = false, epsilon = EPSI
 	// half of them will be ignored due to being rejected from the
 	// threePointTurnDirection call, and the correct half will be saved.
 	const order = convexHullRadialSortPoints(points, epsilon)
-		.map(arr => (arr.length === 1 ? arr : mirrorArray(arr)))
+		.map((arr) => (arr.length === 1 ? arr : mirrorArray(arr)))
 		.flat();
 	order.push(order[0]);
 	const stack = [order[0]];
@@ -145,8 +153,13 @@ export const convexHull = (points = [], includeCollinear = false, epsilon = EPSI
 	// setup our operation for each case, depending on includeCollinear
 	const funcs = {
 		"-1": () => stack.pop(),
-		1: (next) => { stack.push(next); i += 1; },
-		undefined: () => { i += 1; },
+		1: (next) => {
+			stack.push(next);
+			i += 1;
+		},
+		undefined: () => {
+			i += 1;
+		},
 	};
 	funcs[0] = includeCollinear ? funcs["1"] : funcs["-1"];
 	while (i < order.length) {
@@ -158,7 +171,7 @@ export const convexHull = (points = [], includeCollinear = false, epsilon = EPSI
 		const prev = stack[stack.length - 2];
 		const curr = stack[stack.length - 1];
 		const next = order[i];
-		const pts = [prev, curr, next].map(j => points[j]);
+		const pts = [prev, curr, next].map((j) => points[j]);
 		const turn = threePointTurnDirection(pts[0], pts[1], pts[2], epsilon);
 		funcs[turn](next);
 	}

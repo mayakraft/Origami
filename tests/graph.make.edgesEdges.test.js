@@ -2,7 +2,14 @@ import { expect, test } from "vitest";
 import ear from "../src/index.js";
 
 test("edges_edges square", () => {
-	const graph = { edges_vertices: [[0, 1], [1, 2], [2, 3], [3, 0]] };
+	const graph = {
+		edges_vertices: [
+			[0, 1],
+			[1, 2],
+			[2, 3],
+			[3, 0],
+		],
+	};
 	graph.vertices_edges = ear.graph.makeVerticesEdgesUnsorted(graph);
 	const result = ear.graph.makeEdgesEdges(graph);
 	expect(result[0]).toEqual(expect.arrayContaining([3, 1]));
@@ -12,7 +19,17 @@ test("edges_edges square", () => {
 });
 
 test("edges_edges line", () => {
-	const graph = { edges_vertices: [[0, 1], [1, 2], [2, 3], [3, 4], [4, 5], [5, 6], [6, 7]] };
+	const graph = {
+		edges_vertices: [
+			[0, 1],
+			[1, 2],
+			[2, 3],
+			[3, 4],
+			[4, 5],
+			[5, 6],
+			[6, 7],
+		],
+	};
 	graph.vertices_edges = ear.graph.makeVerticesEdgesUnsorted(graph);
 	const result = ear.graph.makeEdgesEdges(graph);
 	expect(result[0]).toEqual(expect.arrayContaining([1]));
@@ -25,7 +42,14 @@ test("edges_edges line", () => {
 });
 
 test("edges_edges, no edge adjacency", () => {
-	const graph = { edges_vertices: [[0, 1], [2, 3], [4, 5], [6, 7]] };
+	const graph = {
+		edges_vertices: [
+			[0, 1],
+			[2, 3],
+			[4, 5],
+			[6, 7],
+		],
+	};
 	graph.vertices_edges = ear.graph.makeVerticesEdgesUnsorted(graph);
 	const result = ear.graph.makeEdgesEdges(graph);
 	expect(result[0].length).toBe(0);
@@ -35,7 +59,13 @@ test("edges_edges, no edge adjacency", () => {
 });
 
 test("edges_edges, bad edge construction", () => {
-	const graph = { edges_vertices: [[0, 1, 2], [2, 3, 4], [4, 5, 6]] };
+	const graph = {
+		edges_vertices: [
+			[0, 1, 2],
+			[2, 3, 4],
+			[4, 5, 6],
+		],
+	};
 	graph.vertices_edges = ear.graph.makeVerticesEdgesUnsorted(graph);
 	const result = ear.graph.makeEdgesEdges(graph);
 	expect(result[0].length).toBe(0);
@@ -89,23 +119,25 @@ test("edges_edges, bad edge construction", () => {
 //   }
 // }));
 
-test("make edges_edges 5", () => new Promise(done => {
-	try {
-		const result = ear.graph.makeEdgesEdges();
-	} catch (error) {
-		expect(error).not.toBe(undefined);
-		done();
-	}
-}));
+test("make edges_edges 5", () =>
+	new Promise((done) => {
+		try {
+			const result = ear.graph.makeEdgesEdges();
+		} catch (error) {
+			expect(error).not.toBe(undefined);
+			done();
+		}
+	}));
 
-test("make edges_edges 6", () => new Promise(done => {
-	try {
-		const result = ear.graph.makeEdgesEdges({});
-	} catch (error) {
-		expect(error).not.toBe(undefined);
-		done();
-	}
-}));
+test("make edges_edges 6", () =>
+	new Promise((done) => {
+		try {
+			const result = ear.graph.makeEdgesEdges({});
+		} catch (error) {
+			expect(error).not.toBe(undefined);
+			done();
+		}
+	}));
 
 test("make edges_edges 7", () => {
 	const result = ear.graph.makeEdgesEdges({ edges_vertices: [] });

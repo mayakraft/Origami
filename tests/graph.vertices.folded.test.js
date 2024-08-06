@@ -2,8 +2,7 @@ import fs from "fs";
 import { expect, test } from "vitest";
 import ear from "../src/index.js";
 
-const arraysTest = (a, b) => a
-	.forEach((_, i) => expect(a[i]).toBeCloseTo(b[i]));
+const arraysTest = (a, b) => a.forEach((_, i) => expect(a[i]).toBeCloseTo(b[i]));
 
 test("fold a 3D model", () => {
 	const file = "bird-base-3d.fold";
@@ -46,11 +45,12 @@ test("fold in 3d", () => {
 	// which face, just assign each vertex to one of its face's matrices, and
 	// apply that transform.
 	const vertices_faces = ear.graph.makeVerticesFaces(cp);
-	const new_vertices_coords = cp.vertices_coords
-		.map((coords, i) => ear.math.multiplyMatrix3Vector3(
+	const new_vertices_coords = cp.vertices_coords.map((coords, i) =>
+		ear.math.multiplyMatrix3Vector3(
 			faces_matrix[vertices_faces[i][0]],
 			ear.math.resize(3, coords),
-		));
+		),
+	);
 
 	// modify the original graph, replace the vertices_coords with the new set.
 	cp.vertices_coords = new_vertices_coords;
@@ -92,9 +92,9 @@ test("fold a disjoint graph", () => {
 		[5, 0.5, 0],
 		[5, 0, 0],
 	];
-	vertices_coords
-		.forEach((coords, i) => coords
-			.forEach((n, j) => expect(n).toBeCloseTo(expected[i][j])));
+	vertices_coords.forEach((coords, i) =>
+		coords.forEach((n, j) => expect(n).toBeCloseTo(expected[i][j])),
+	);
 });
 
 test("two graphs joined at a single vertex, folded", () => {
@@ -110,9 +110,9 @@ test("two graphs joined at a single vertex, folded", () => {
 		[0, 0, 0],
 		[0, 2, 0],
 	];
-	expected
-		.forEach((coords, i) => coords
-			.forEach((_, j) => expect(vertices_coords[i][j]).toBeCloseTo(expected[i][j])));
+	expected.forEach((coords, i) =>
+		coords.forEach((_, j) => expect(vertices_coords[i][j]).toBeCloseTo(expected[i][j])),
+	);
 });
 
 test("two graphs joined at a single vertex, flat-folded", () => {
@@ -128,17 +128,46 @@ test("two graphs joined at a single vertex, flat-folded", () => {
 		[0, 0],
 		[0, 2],
 	];
-	expected
-		.forEach((coords, i) => coords
-			.forEach((_, j) => expect(vertices_coords[i][j]).toBeCloseTo(expected[i][j])));
+	expected.forEach((coords, i) =>
+		coords.forEach((_, j) => expect(vertices_coords[i][j]).toBeCloseTo(expected[i][j])),
+	);
 });
 
 const fourPanel = {
-	vertices_coords: [[0, 0], [1, 0], [2, 0], [3, 0], [4, 0], [4, 1], [3, 1], [2, 1], [1, 1], [0, 1]],
-	edges_vertices: [[0, 1], [1, 2], [2, 3], [3, 4], [4, 5], [5, 6],
-		[6, 7], [7, 8], [8, 9], [9, 0], [1, 8], [2, 7], [3, 6]],
+	vertices_coords: [
+		[0, 0],
+		[1, 0],
+		[2, 0],
+		[3, 0],
+		[4, 0],
+		[4, 1],
+		[3, 1],
+		[2, 1],
+		[1, 1],
+		[0, 1],
+	],
+	edges_vertices: [
+		[0, 1],
+		[1, 2],
+		[2, 3],
+		[3, 4],
+		[4, 5],
+		[5, 6],
+		[6, 7],
+		[7, 8],
+		[8, 9],
+		[9, 0],
+		[1, 8],
+		[2, 7],
+		[3, 6],
+	],
 	edges_foldAngle: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 90, 90, 90],
-	faces_vertices: [[0, 1, 8, 9], [1, 2, 7, 8], [2, 3, 6, 7], [3, 4, 5, 6]],
+	faces_vertices: [
+		[0, 1, 8, 9],
+		[1, 2, 7, 8],
+		[2, 3, 6, 7],
+		[3, 4, 5, 6],
+	],
 };
 
 test("folded vertices_coords", () => {

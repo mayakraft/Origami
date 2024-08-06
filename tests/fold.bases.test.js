@@ -58,8 +58,7 @@ test("polygon", () => {
 
 test("kite", () => {
 	const kite = ear.graph.kite();
-	Array.from(Array(6))
-		.forEach((_, i) => expect(kite.edges_assignment[i]).toBe("B"));
+	Array.from(Array(6)).forEach((_, i) => expect(kite.edges_assignment[i]).toBe("B"));
 	expect(kite.edges_assignment.includes("M")).toBe(false);
 	expect(kite.edges_assignment.includes("V")).toBe(true);
 	expect(kite.edges_assignment.includes("F")).toBe(true);
@@ -68,8 +67,7 @@ test("kite", () => {
 test("fish", () => {
 	const fish = ear.graph.fish();
 	expect(fish.vertices_coords.length).toBe(11);
-	Array.from(Array(8))
-		.forEach((_, i) => expect(fish.edges_assignment[i]).toBe("B"));
+	Array.from(Array(8)).forEach((_, i) => expect(fish.edges_assignment[i]).toBe("B"));
 	expect(fish.edges_assignment.includes("M")).toBe(true);
 	expect(fish.edges_assignment.includes("V")).toBe(true);
 	expect(fish.edges_assignment.includes("F")).toBe(true);
@@ -77,8 +75,7 @@ test("fish", () => {
 
 test("bird", () => {
 	const bird = ear.graph.bird();
-	Array.from(Array(8))
-		.forEach((_, i) => expect(bird.edges_assignment[i]).toBe("B"));
+	Array.from(Array(8)).forEach((_, i) => expect(bird.edges_assignment[i]).toBe("B"));
 	expect(bird.edges_assignment.includes("M")).toBe(true);
 	expect(bird.edges_assignment.includes("V")).toBe(true);
 	expect(bird.edges_assignment.includes("F")).toBe(true);

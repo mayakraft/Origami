@@ -1,9 +1,7 @@
 /**
  * Rabbit Ear (c) Kraft
  */
-import {
-	makeVerticesToEdge,
-} from "./lookup.js";
+import { makeVerticesToEdge } from "./lookup.js";
 
 /**
  * @description Make `vertices_edges` from `edges_vertices`, unsorted, which should
@@ -17,13 +15,14 @@ export const makeVerticesEdgesUnsorted = ({ edges_vertices }) => {
 	// iterate over edges_vertices and swap the index for each of the contents
 	// each edge (index 0: [3, 4]) will be converted into (index 3: [0], index 4: [0])
 	// repeat. append to each array.
-	edges_vertices.forEach((ev, i) => ev
-		.forEach((v) => {
+	edges_vertices.forEach((ev, i) =>
+		ev.forEach((v) => {
 			if (vertices_edges[v] === undefined) {
 				vertices_edges[v] = [];
 			}
 			vertices_edges[v].push(i);
-		}));
+		}),
+	);
 	return vertices_edges;
 };
 
@@ -36,7 +35,5 @@ export const makeVerticesEdgesUnsorted = ({ edges_vertices }) => {
  */
 export const makeVerticesEdges = ({ edges_vertices, vertices_vertices }) => {
 	const edge_map = makeVerticesToEdge({ edges_vertices });
-	return vertices_vertices
-		.map((verts, i) => verts
-			.map(v => edge_map[`${i} ${v}`]));
+	return vertices_vertices.map((verts, i) => verts.map((v) => edge_map[`${i} ${v}`]));
 };

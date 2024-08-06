@@ -1,8 +1,7 @@
 import { expect, test } from "vitest";
 import ear from "../src/index.js";
 
-const equalTest = (a, b) => expect(JSON.stringify(a))
-	.toBe(JSON.stringify(b));
+const equalTest = (a, b) => expect(JSON.stringify(a)).toBe(JSON.stringify(b));
 
 test("resize", () => {
 	const a = [1, 2, 3];

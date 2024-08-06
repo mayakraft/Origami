@@ -1,15 +1,8 @@
 /**
  * Rabbit Ear (c) Kraft
  */
-import {
-	EPSILON,
-} from "./constant.js";
-import {
-	include,
-	includeL,
-	includeS,
-	epsilonEqual,
-} from "./compare.js";
+import { EPSILON } from "./constant.js";
+import { include, includeL, includeS, epsilonEqual } from "./compare.js";
 import {
 	magnitude2,
 	normalize2,
@@ -20,9 +13,7 @@ import {
 	rotate90,
 	resize2,
 } from "./vector.js";
-import {
-	clusterSortedGeneric,
-} from "../general/cluster.js";
+import { clusterSortedGeneric } from "../general/cluster.js";
 
 /**
  * @description Find the intersection of two lines. Lines can be
@@ -47,7 +38,7 @@ import {
  * @example
  * // intersect a line and a segment
  * const { a, b, point } = intersectLine(line, segment, ear.math.includeL, ear.math.includeS);
-*/
+ */
 export const intersectLineLine = (
 	a,
 	b,
@@ -69,8 +60,10 @@ export const intersectLineLine = (
 	const b2a = [-a2b[0], -a2b[1]];
 	const t0 = cross2(a2b, b.vector) / determinant0;
 	const t1 = cross2(b2a, a.vector) / determinant1;
-	if (aDomain(t0, epsilon / magnitude2(a.vector))
-		&& bDomain(t1, epsilon / magnitude2(b.vector))) {
+	if (
+		aDomain(t0, epsilon / magnitude2(a.vector)) &&
+		bDomain(t1, epsilon / magnitude2(b.vector))
+	) {
 		return { a: t0, b: t1, point: add2(a.origin, scale2(a.vector, t0)) };
 	}
 	return { a: undefined, b: undefined, point: undefined };
@@ -132,16 +125,20 @@ export const intersectCircleLine = (
 	const rot90 = rotate90(norm);
 	const bvec = subtract2(line.origin, circle.origin);
 	const det = cross2(bvec, norm);
-	if (Math.abs(det) > circle.radius + epsilon) { return undefined; }
-	const side = Math.sqrt((circle.radius ** 2) - (det ** 2));
+	if (Math.abs(det) > circle.radius + epsilon) {
+		return undefined;
+	}
+	const side = Math.sqrt(circle.radius ** 2 - det ** 2);
 	const f = (s, i) => circle.origin[i] - rot90[i] * det + norm[i] * s;
 	/** @type {[number, number][]} */
-	const results = Math.abs(circle.radius - Math.abs(det)) < epsilon
-		? [side].map((s) => [f(s, 0), f(s, 1)]) // tangent to circle
-		: [-side, side].map((s) => [f(s, 0), f(s, 1)]);
-	const ts = results.map(res => res.map((n, i) => n - line.origin[i]))
-		.map(v => v[0] * line.vector[0] + line.vector[1] * v[1])
-		.map(d => d / magSq);
+	const results =
+		Math.abs(circle.radius - Math.abs(det)) < epsilon
+			? [side].map((s) => [f(s, 0), f(s, 1)]) // tangent to circle
+			: [-side, side].map((s) => [f(s, 0), f(s, 1)]);
+	const ts = results
+		.map((res) => res.map((n, i) => n - line.origin[i]))
+		.map((v) => v[0] * line.vector[0] + line.vector[1] * v[1])
+		.map((d) => d / magSq);
 	return results.filter((__, i) => lineDomain(ts[i], epsilon));
 };
 
@@ -170,13 +167,7 @@ export const intersectPolygonLine = (
 			vector: subtract2(arr[(i + 1) % arr.length], p),
 			origin: resize2(p),
 		}))
-		.map(sideLine => intersectLineLine(
-			line,
-			sideLine,
-			domainFunc,
-			includeS,
-			epsilon,
-		))
+		.map((sideLine) => intersectLineLine(line, sideLine, domainFunc, includeS, epsilon))
 		.filter(({ point }) => point !== undefined)
 		.sort((m, n) => m.a - n.a)
 		.map(({ a, point }) => ({ a, point }));
@@ -186,6 +177,5 @@ export const intersectPolygonLine = (
 
 	// cluster any intersections which have too similar of "a" parameters
 	// return only one element from each cluster
-	return clusterSortedGeneric(intersections, compare)
-		.map(([i0]) => intersections[i0]);
+	return clusterSortedGeneric(intersections, compare).map(([i0]) => intersections[i0]);
 };

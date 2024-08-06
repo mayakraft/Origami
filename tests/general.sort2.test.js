@@ -1,11 +1,15 @@
 import { expect, test } from "vitest";
 import ear from "../src/index.js";
 
-const equalTest = (a, b) => expect(JSON.stringify(a))
-	.toBe(JSON.stringify(b));
+const equalTest = (a, b) => expect(JSON.stringify(a)).toBe(JSON.stringify(b));
 
 test("sortPointsAlongVector", () => {
-	const points = [[1, 0], [0, 1], [-1, 0], [0, -1]];
+	const points = [
+		[1, 0],
+		[0, 1],
+		[-1, 0],
+		[0, -1],
+	];
 	const result = ear.general.sortPointsAlongVector(points, [1, 0]);
 	expect(result[0]).toBe(2);
 	expect([result[1], result[2]].sort((a, b) => a - b).join(" ")).toBe("1 3");
@@ -26,24 +30,60 @@ test("sortPointsAlongVector", () => {
 test("convexHullRadialSortPoints", () => {
 	equalTest(ear.math.convexHullRadialSortPoints(), []);
 
-	const result0 = ear.math.convexHullRadialSortPoints([[1, 0], [0, 1], [-1, 0]]);
+	const result0 = ear.math.convexHullRadialSortPoints([
+		[1, 0],
+		[0, 1],
+		[-1, 0],
+	]);
 	equalTest(result0, [[2], [0], [1]]);
-	const result1 = ear.math.convexHullRadialSortPoints([[0, 1], [-1, 0], [1, 0]]);
+	const result1 = ear.math.convexHullRadialSortPoints([
+		[0, 1],
+		[-1, 0],
+		[1, 0],
+	]);
 	equalTest(result1, [[1], [2], [0]]);
-	const result2 = ear.math.convexHullRadialSortPoints([[-1, 0], [1, 0], [0, 1]]);
+	const result2 = ear.math.convexHullRadialSortPoints([
+		[-1, 0],
+		[1, 0],
+		[0, 1],
+	]);
 	equalTest(result2, [[0], [1], [2]]);
 
-	const result3 = ear.math.convexHullRadialSortPoints([[1, 0], [0, 1], [-1, 0]], 2);
+	const result3 = ear.math.convexHullRadialSortPoints(
+		[
+			[1, 0],
+			[0, 1],
+			[-1, 0],
+		],
+		2,
+	);
 	equalTest(result3, [[2], [1, 0]]);
-	const result4 = ear.math.convexHullRadialSortPoints([[0, 1], [-1, 0], [1, 0]], 2);
+	const result4 = ear.math.convexHullRadialSortPoints(
+		[
+			[0, 1],
+			[-1, 0],
+			[1, 0],
+		],
+		2,
+	);
 	equalTest(result4, [[1], [0, 2]]);
-	const result5 = ear.math.convexHullRadialSortPoints([[-1, 0], [1, 0], [0, 1]], 2);
+	const result5 = ear.math.convexHullRadialSortPoints(
+		[
+			[-1, 0],
+			[1, 0],
+			[0, 1],
+		],
+		2,
+	);
 	equalTest(result5, [[0], [2, 1]]);
 });
 
 test("radialSortVectors3", () => {
-	const points = Array.from(Array(24))
-		.map(() => [Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1]);
+	const points = Array.from(Array(24)).map(() => [
+		Math.random() * 2 - 1,
+		Math.random() * 2 - 1,
+		Math.random() * 2 - 1,
+	]);
 	points.push([0, 0, 0]);
 	const result = ear.general.radialSortVectors3(points, [1, 0, 0]);
 	expect(result.length).toBe(25);

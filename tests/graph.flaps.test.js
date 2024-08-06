@@ -7,7 +7,10 @@ test("flaps, waterbomb, through faces", () => {
 	const vertices_coordsFolded = ear.graph.makeVerticesCoordsFlatFolded(graph);
 	const line = { vector: [0, 1], origin: [0.25, 0] };
 	const [sideA, sideB] = ear.graph.getFlaps(graph, line, vertices_coordsFolded);
-	expect(sideA).toMatchObject([[0, 7], [5, 6]]);
+	expect(sideA).toMatchObject([
+		[0, 7],
+		[5, 6],
+	]);
 	expect(sideB).toMatchObject([[1, 2, 3, 4, 0, 5, 6, 7]]);
 });
 
@@ -16,8 +19,14 @@ test("flaps, waterbomb, collinear through middle", () => {
 	const vertices_coordsFolded = ear.graph.makeVerticesCoordsFlatFolded(graph);
 	const line = { vector: [0, 1], origin: [0.5, 0] };
 	const [sideA, sideB] = ear.graph.getFlaps(graph, line, vertices_coordsFolded);
-	expect(sideA).toMatchObject([[0, 7], [5, 6]]);
-	expect(sideB).toMatchObject([[1, 2], [3, 4]]);
+	expect(sideA).toMatchObject([
+		[0, 7],
+		[5, 6],
+	]);
+	expect(sideB).toMatchObject([
+		[1, 2],
+		[3, 4],
+	]);
 });
 
 test("crane flaps, cut through middle of wing", () => {
@@ -31,17 +40,20 @@ test("crane flaps, cut through middle of wing", () => {
 	);
 	const [sideA, sideB] = ear.graph.getFlaps(graph, line, folded.vertices_coords);
 	expect(sideA).toMatchObject([
-		[0,4,35,36,43,46],
-		[1,6,7],
-		[2,16,17,18,19,20,21,22,23,25,27,30,32,33,37,38],
-		[3,8,9,10,11,12,13,14,15,26,28,29,31,34,39,40],
-		[5,24,41,42,44,45],
+		[0, 4, 35, 36, 43, 46],
+		[1, 6, 7],
+		[2, 16, 17, 18, 19, 20, 21, 22, 23, 25, 27, 30, 32, 33, 37, 38],
+		[3, 8, 9, 10, 11, 12, 13, 14, 15, 26, 28, 29, 31, 34, 39, 40],
+		[5, 24, 41, 42, 44, 45],
 	]);
 	expect(sideB).toMatchObject([
-		[47,48,49,50,0,1,2,3,4,5,6,7,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46],
-		[51,52,53,54,55,56,57,58,16,17,18,19,20,21,22,23],
-		[8,9,10,11,12,13,14,15],
-	])
+		[
+			47, 48, 49, 50, 0, 1, 2, 3, 4, 5, 6, 7, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34,
+			35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46,
+		],
+		[51, 52, 53, 54, 55, 56, 57, 58, 16, 17, 18, 19, 20, 21, 22, 23],
+		[8, 9, 10, 11, 12, 13, 14, 15],
+	]);
 });
 
 test("crane flaps, collinear with joining edge of wing", () => {

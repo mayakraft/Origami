@@ -27,7 +27,10 @@ test("no parent", () => {
 });
 
 test("parent element", () => {
-	const parent = (new DOMParser()).parseFromString("<div></div>", "text/xml").documentElement;
+	const parent = new DOMParser().parseFromString(
+		"<div></div>",
+		"text/xml",
+	).documentElement;
 	const svg = ear.svg(600, 600, parent);
 	expect(svg.parentNode.nodeName).toBe("div");
 });

@@ -1,10 +1,7 @@
 /**
  * Rabbit Ear (c) Kraft
  */
-import {
-	filterKeysWithPrefix,
-	filterKeysWithSuffix,
-} from "../fold/spec.js";
+import { filterKeysWithPrefix, filterKeysWithSuffix } from "../fold/spec.js";
 
 const ordersArrayNames = {
 	edges: "edgeOrders",
@@ -17,9 +14,8 @@ const ordersArrayNames = {
  * @param {any[]} arrays any number of arrays
  * @returns {number} the length of the longest array
  */
-const maxArraysLength = (arrays) => Math.max(0, ...(arrays
-	.filter(el => el !== undefined)
-	.map(el => el.length)));
+const maxArraysLength = (arrays) =>
+	Math.max(0, ...arrays.filter((el) => el !== undefined).map((el) => el.length));
 
 /**
  * @description Search inside arrays inside arrays inside arrays
@@ -30,12 +26,16 @@ const maxArraysLength = (arrays) => Math.max(0, ...(arrays
 const maxValueInArrayInArray = (arrays) => {
 	let max = -1; // will become 0 if nothing is found
 	arrays
-		.filter(a => a !== undefined)
-		.forEach(arr => arr
-			.forEach(el => el
-				.forEach((e) => {
-					if (e > max) { max = e; }
-				})));
+		.filter((a) => a !== undefined)
+		.forEach((arr) =>
+			arr.forEach((el) =>
+				el.forEach((e) => {
+					if (e > max) {
+						max = e;
+					}
+				}),
+			),
+		);
 	return max;
 };
 
@@ -48,10 +48,14 @@ const maxValueInArrayInArray = (arrays) => {
  */
 const maxValueInOrders = (array) => {
 	let max = -1; // will become 0 if nothing is found
-	array.forEach(el => {
+	array.forEach((el) => {
 		// exception. index 2 is orientation, not index. check only 0, 1
-		if (el[0] > max) { max = el[0]; }
-		if (el[1] > max) { max = el[1]; }
+		if (el[0] > max) {
+			max = el[0];
+		}
+		if (el[1] > max) {
+			max = el[1];
+		}
 	});
 	return max;
 };
@@ -70,8 +74,8 @@ const maxValueInOrders = (array) => {
  * @param {string} key the prefix for a key, eg: "vertices"
  * @returns {number} the number of the requested element type in the graph
  */
-export const count = (graph, key) => (
-	maxArraysLength(filterKeysWithPrefix(graph, key).map(k => graph[k])));
+export const count = (graph, key) =>
+	maxArraysLength(filterKeysWithPrefix(graph, key).map((k) => graph[k]));
 
 /**
  * @description Get the number of vertices in a graph.
@@ -83,29 +87,24 @@ export const countVertices = ({
 	vertices_vertices,
 	vertices_edges,
 	vertices_faces,
-}) => (
-	maxArraysLength([
-		vertices_coords,
-		vertices_vertices,
-		vertices_edges,
-		vertices_faces,
-	]));
+}) =>
+	maxArraysLength([vertices_coords, vertices_vertices, vertices_edges, vertices_faces]);
 
 /**
  * @description Get the number of edges in a graph.
  * @param {FOLD} graph a FOLD object
  * @returns {number} the number of edges in the graph
  */
-export const countEdges = ({ edges_vertices, edges_faces }) => (
-	maxArraysLength([edges_vertices, edges_faces]));
+export const countEdges = ({ edges_vertices, edges_faces }) =>
+	maxArraysLength([edges_vertices, edges_faces]);
 
 /**
  * @description Get the number of faces in a graph.
  * @param {FOLD} graph a FOLD object
  * @returns {number} the number of faces in the graph
  */
-export const countFaces = ({ faces_vertices, faces_edges, faces_faces }) => (
-	maxArraysLength([faces_vertices, faces_edges, faces_faces]));
+export const countFaces = ({ faces_vertices, faces_edges, faces_faces }) =>
+	maxArraysLength([faces_vertices, faces_edges, faces_faces]);
 
 /**
  * @description Get the number of vertices, edges, or faces in the graph, as
@@ -115,32 +114,29 @@ export const countFaces = ({ faces_vertices, faces_edges, faces_faces }) => (
  * @param {string} key the prefix for a key, eg: "vertices"
  * @returns {number} the number of vertices, edges, or faces in the graph.
  */
-export const countImplied = (graph, key) => Math.max(
-	// return the maximum value between (1/2):
-	// 1. a found geometry in another geometry's array ("vertex" in "faces_vertices")
-	maxValueInArrayInArray(
-		filterKeysWithSuffix(graph, key).map(str => graph[str]),
-	),
-	// 2. a found geometry in a faceOrders or edgeOrders type of array (special case)
-	graph[ordersArrayNames[key]]
-		? maxValueInOrders(graph[ordersArrayNames[key]])
-		: -1,
-) + 1;
+export const countImplied = (graph, key) =>
+	Math.max(
+		// return the maximum value between (1/2):
+		// 1. a found geometry in another geometry's array ("vertex" in "faces_vertices")
+		maxValueInArrayInArray(filterKeysWithSuffix(graph, key).map((str) => graph[str])),
+		// 2. a found geometry in a faceOrders or edgeOrders type of array (special case)
+		graph[ordersArrayNames[key]] ? maxValueInOrders(graph[ordersArrayNames[key]]) : -1,
+	) + 1;
 
 /**
  * @param {FOLD} graph a FOLD object
  * @returns {number} the number of components
  */
-export const countImpliedVertices = graph => countImplied(graph, "vertices");
+export const countImpliedVertices = (graph) => countImplied(graph, "vertices");
 
 /**
  * @param {FOLD} graph a FOLD object
  * @returns {number} the number of components
  */
-export const countImpliedEdges = graph => countImplied(graph, "edges");
+export const countImpliedEdges = (graph) => countImplied(graph, "edges");
 
 /**
  * @param {FOLD} graph a FOLD object
  * @returns {number} the number of components
  */
-export const countImpliedFaces = graph => countImplied(graph, "faces");
+export const countImpliedFaces = (graph) => countImplied(graph, "faces");

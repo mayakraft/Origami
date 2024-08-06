@@ -1,15 +1,10 @@
 /**
  * Rabbit Ear (c) Kraft
  */
-import {
-	file_spec,
-	file_creator,
-} from "../fold/rabbitear.js";
+import { file_spec, file_creator } from "../fold/rabbitear.js";
 import * as bases from "../fold/bases.js";
 import * as primitives from "../fold/primitives.js";
-import {
-	populate,
-} from "../graph/populate.js";
+import { populate } from "../graph/populate.js";
 import graphPrototype from "./graph.js";
 // import cpPrototype from "./cp.js";
 // import origamiPrototype from "./origami.js";
@@ -20,9 +15,9 @@ import graphPrototype from "./graph.js";
  * @param {...any} args
  * @returns {FOLD} a FOLD object
  */
-const makeGraphInstance = (...args) => Object
-	.assign(Object.create(graphPrototype), {
-		...args.reduce((a, b) => ({ ...a, ...b }), ({})),
+const makeGraphInstance = (...args) =>
+	Object.assign(Object.create(graphPrototype), {
+		...args.reduce((a, b) => ({ ...a, ...b }), {}),
 		file_spec,
 		file_creator,
 	});
@@ -92,7 +87,7 @@ Graph.prototype.constructor = Graph;
 // origami.prototype.constructor = origami;
 
 // static constructors for all the primitive FOLD shapes
-Object.keys(primitives).forEach(baseName => {
+Object.keys(primitives).forEach((baseName) => {
 	/** @param {...any} args */
 	Graph[baseName] = (...args) => makeGraphInstance(primitives[baseName](...args));
 	// cp[baseName] = (...args) => makeCPInstance(primitives[baseName](...args));
@@ -100,7 +95,7 @@ Object.keys(primitives).forEach(baseName => {
 });
 
 // static constructors for all the origami bases
-Object.keys(bases).forEach(baseName => {
+Object.keys(bases).forEach((baseName) => {
 	/** @param {...any} args */
 	Graph[baseName] = (...args) => makeGraphInstance(bases[baseName](...args));
 	// cp[baseName] = (...args) => makeCPInstance(bases[baseName](...args));

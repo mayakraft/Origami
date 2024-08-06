@@ -1,8 +1,8 @@
 /* SVG (c) Kraft */
-import RabbitEarWindow from '../environment/window.js';
-import { str_svg } from '../environment/strings.js';
-import { nodeNames } from '../spec/nodes.js';
-import Constructor from './index.js';
+import RabbitEarWindow from "../environment/window.js";
+import { str_svg } from "../environment/strings.js";
+import { nodeNames } from "../spec/nodes.js";
+import Constructor from "./index.js";
 
 /**
  * Rabbit Ear (c) Kraft
@@ -13,7 +13,7 @@ import Constructor from './index.js';
  */
 const constructorList = {};
 
-nodeNames.forEach(nodeName => {
+nodeNames.forEach((nodeName) => {
 	constructorList[nodeName] = (...args) => Constructor(nodeName, null, ...args);
 });
 
@@ -91,9 +91,10 @@ const constructors = Object.assign(constructorList);
  */
 const svg = (...args) => {
 	const svgElement = Constructor(str_svg, null, ...args);
-	const initialize = () => args
-		.filter(arg => typeof arg === "function")
-		.forEach(func => func.call(svgElement, svgElement));
+	const initialize = () =>
+		args
+			.filter((arg) => typeof arg === "function")
+			.forEach((func) => func.call(svgElement, svgElement));
 	// call initialize as soon as possible. check if page has loaded
 	if (RabbitEarWindow().document.readyState === "loading") {
 		RabbitEarWindow().document.addEventListener("DOMContentLoaded", initialize);

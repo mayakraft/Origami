@@ -31,7 +31,9 @@ test("makeFacesMatrix2 and makeFacesMatrix similarity", () => {
 test("makeFacesMatrix no folded creases", () => {
 	const foldfile = fs.readFileSync("./tests/files/fold/fan-flat-cp.fold", "utf-8");
 	const cp = JSON.parse(foldfile);
-	ear.graph.makeFacesMatrix(cp)
-		.forEach(mat => mat
-			.forEach((n, i) => expect(n).toBeCloseTo(ear.math.identity3x4[i])));
+	ear.graph
+		.makeFacesMatrix(cp)
+		.forEach((mat) =>
+			mat.forEach((n, i) => expect(n).toBeCloseTo(ear.math.identity3x4[i])),
+		);
 });

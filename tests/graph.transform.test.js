@@ -3,10 +3,7 @@ import ear from "../src/index.js";
 
 test("transform, uniform scale", () => {
 	const graph1 = ear.graph.fish();
-	const graph2 = ear.graph.scaleUniform(
-		structuredClone(graph1),
-		2,
-	);
+	const graph2 = ear.graph.scaleUniform(structuredClone(graph1), 2);
 	graph2.vertices_coords.forEach((v, i) => {
 		expect(v[0]).toBeCloseTo(graph1.vertices_coords[i][0] * 2);
 		expect(v[1]).toBeCloseTo(graph1.vertices_coords[i][1] * 2);
@@ -15,10 +12,7 @@ test("transform, uniform scale", () => {
 
 test("transform, non-uniform scale", () => {
 	const graph1 = ear.graph.fish();
-	const graph2 = ear.graph.scale(
-		structuredClone(graph1),
-		[2, 1],
-	);
+	const graph2 = ear.graph.scale(structuredClone(graph1), [2, 1]);
 	graph2.vertices_coords.forEach((v, i) => {
 		expect(v[0]).toBeCloseTo(graph1.vertices_coords[i][0] * 2);
 		expect(v[1]).toBeCloseTo(graph1.vertices_coords[i][1] * 1);
@@ -27,10 +21,7 @@ test("transform, non-uniform scale", () => {
 
 test("transform, translate", () => {
 	const graph1 = ear.graph.fish();
-	const graph2 = ear.graph.translate(
-		structuredClone(graph1),
-		[1, 2],
-	);
+	const graph2 = ear.graph.translate(structuredClone(graph1), [1, 2]);
 	graph2.vertices_coords.forEach((v, i) => {
 		expect(v[0]).toBeCloseTo(graph1.vertices_coords[i][0] + 1);
 		expect(v[1]).toBeCloseTo(graph1.vertices_coords[i][1] + 2);
@@ -40,10 +31,7 @@ test("transform, translate", () => {
 
 test("transform, translate, 3D with 2D vertices", () => {
 	const graph1 = ear.graph.fish();
-	const graph2 = ear.graph.translate(
-		structuredClone(graph1),
-		[1, 2, 3],
-	);
+	const graph2 = ear.graph.translate(structuredClone(graph1), [1, 2, 3]);
 	graph2.vertices_coords.forEach((v, i) => {
 		expect(v[0]).toBeCloseTo(graph1.vertices_coords[i][0] + 1);
 		expect(v[1]).toBeCloseTo(graph1.vertices_coords[i][1] + 2);
@@ -53,10 +41,7 @@ test("transform, translate, 3D with 2D vertices", () => {
 
 test("transform, translate3, 3D with 2D vertices", () => {
 	const graph1 = ear.graph.fish();
-	const graph2 = ear.graph.translate3(
-		structuredClone(graph1),
-		[1, 2, 3],
-	);
+	const graph2 = ear.graph.translate3(structuredClone(graph1), [1, 2, 3]);
 	graph2.vertices_coords.forEach((v, i) => {
 		expect(v[0]).toBeCloseTo(graph1.vertices_coords[i][0] + 1);
 		expect(v[1]).toBeCloseTo(graph1.vertices_coords[i][1] + 2);
@@ -66,11 +51,7 @@ test("transform, translate3, 3D with 2D vertices", () => {
 
 test("transform, rotate z", () => {
 	const graph1 = ear.graph.fish();
-	const graph2 = ear.graph.rotateZ(
-		structuredClone(graph1),
-		Math.PI,
-		[4, 4],
-	);
+	const graph2 = ear.graph.rotateZ(structuredClone(graph1), Math.PI, [4, 4]);
 	const bounds = ear.graph.boundingBox(graph2);
 	expect(bounds.min[0]).toBeCloseTo(7);
 	expect(bounds.min[1]).toBeCloseTo(7);
@@ -80,12 +61,7 @@ test("transform, rotate z", () => {
 
 test("transform, rotate 3D", () => {
 	const graph1 = ear.graph.fish();
-	const graph2 = ear.graph.rotate(
-		structuredClone(graph1),
-		Math.PI,
-		[0, 0, 1],
-		[4, 4],
-	);
+	const graph2 = ear.graph.rotate(structuredClone(graph1), Math.PI, [0, 0, 1], [4, 4]);
 	const bounds = ear.graph.boundingBox(graph2);
 	expect(bounds.min[0]).toBeCloseTo(7);
 	expect(bounds.min[1]).toBeCloseTo(7);
@@ -94,7 +70,12 @@ test("transform, rotate 3D", () => {
 });
 
 test("transform, unitize 2D", () => {
-	const graph1 = { vertices_coords: [[5, 3], [7, 4]] };
+	const graph1 = {
+		vertices_coords: [
+			[5, 3],
+			[7, 4],
+		],
+	};
 	const graph2 = ear.graph.unitize(structuredClone(graph1));
 	const bounds = ear.graph.boundingBox(graph2);
 	expect(bounds.min[0]).toBeCloseTo(0);
@@ -104,7 +85,12 @@ test("transform, unitize 2D", () => {
 });
 
 test("transform, unitize 3D", () => {
-	const graph1 = { vertices_coords: [[5, 3, 0], [7, 4, 3]] };
+	const graph1 = {
+		vertices_coords: [
+			[5, 3, 0],
+			[7, 4, 3],
+		],
+	};
 	const graph2 = ear.graph.unitize(structuredClone(graph1));
 	const bounds = ear.graph.boundingBox(graph2);
 	expect(bounds.min[0]).toBeCloseTo(0);

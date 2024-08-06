@@ -1,6 +1,6 @@
 /* SVG (c) Kraft */
-import cssColors from './cssColors.js';
-import { hexToRgb, hslToRgb, rgbToHex } from './convert.js';
+import cssColors from "./cssColors.js";
+import { hexToRgb, hslToRgb, rgbToHex } from "./convert.js";
 
 /**
  * Rabbit Ear (c) Kraft
@@ -9,9 +9,11 @@ import { hexToRgb, hslToRgb, rgbToHex } from './convert.js';
 /**
  *
  */
-const getParenNumbers = str => {
+const getParenNumbers = (str) => {
 	const match = str.match(/\(([^\)]+)\)/g);
-	if (match == null || !match.length) { return []; }
+	if (match == null || !match.length) {
+		return [];
+	}
 	return match[0]
 		.substring(1, match[0].length - 1)
 		.split(/[\s,]+/)
@@ -27,22 +29,28 @@ const getParenNumbers = str => {
  * with possible 4th value between 0 and 1.
  */
 const parseColorToRgb = (string) => {
-	if (cssColors[string]) { return hexToRgb(cssColors[string]); }
-	if (string[0] === "#") { return hexToRgb(string); }
-	if (string.substring(0, 4) === "rgba"
-		|| string.substring(0, 3) === "rgb") {
+	if (cssColors[string]) {
+		return hexToRgb(cssColors[string]);
+	}
+	if (string[0] === "#") {
+		return hexToRgb(string);
+	}
+	if (string.substring(0, 4) === "rgba" || string.substring(0, 3) === "rgb") {
 		const values = getParenNumbers(string);
 		[0, 1, 2]
-			.filter(i => values[i] === undefined)
-			.forEach(i => { values[i] = 0; });
+			.filter((i) => values[i] === undefined)
+			.forEach((i) => {
+				values[i] = 0;
+			});
 		return values;
 	}
-	if (string.substring(0, 4) === "hsla"
-		|| string.substring(0, 3) === "hsl") {
+	if (string.substring(0, 4) === "hsla" || string.substring(0, 3) === "hsl") {
 		const values = getParenNumbers(string);
 		[0, 1, 2]
-			.filter(i => values[i] === undefined)
-			.forEach(i => { values[i] = 0; });
+			.filter((i) => values[i] === undefined)
+			.forEach((i) => {
+				values[i] = 0;
+			});
 		return hslToRgb(values[0], values[1], values[2], values[3]);
 	}
 	return undefined;
@@ -56,23 +64,25 @@ const parseColorToRgb = (string) => {
  * @returns {string} a hex-color form of the input color string.
  */
 const parseColorToHex = (string) => {
-	if (cssColors[string]) { return cssColors[string].toUpperCase(); }
+	if (cssColors[string]) {
+		return cssColors[string].toUpperCase();
+	}
 	// convert back and forth, this converts 3 or 4 digit hex to 6 or 8.
 	if (string[0] === "#") {
 		const [r, g, b, a] = hexToRgb(string);
 		return rgbToHex(r, g, b, a);
 	}
-	if (string.substring(0, 4) === "rgba"
-		|| string.substring(0, 3) === "rgb") {
+	if (string.substring(0, 4) === "rgba" || string.substring(0, 3) === "rgb") {
 		const [r, g, b, a] = getParenNumbers(string);
 		return rgbToHex(r, g, b, a);
 	}
-	if (string.substring(0, 4) === "hsla"
-		|| string.substring(0, 3) === "hsl") {
+	if (string.substring(0, 4) === "hsla" || string.substring(0, 3) === "hsl") {
 		const values = getParenNumbers(string);
 		[0, 1, 2]
-			.filter(i => values[i] === undefined)
-			.forEach(i => { values[i] = 0; });
+			.filter((i) => values[i] === undefined)
+			.forEach((i) => {
+				values[i] = 0;
+			});
 		const [h, s, l, a] = values;
 		const [r, g, b] = hslToRgb(h, s, l, a);
 		return rgbToHex(r, g, b, a);

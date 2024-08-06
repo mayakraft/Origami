@@ -2,13 +2,8 @@
  * Rabbit Ear (c) Kraft
  */
 import window from "../../environment/window.js";
-import {
-	rgbToAssignment,
-} from "../../fold/colors.js";
-import {
-	parseColorToHex,
-	parseColorToRgb,
-} from "../../svg/colors/parseColor.js";
+import { rgbToAssignment } from "../../fold/colors.js";
+import { parseColorToHex, parseColorToRgb } from "../../svg/colors/parseColor.js";
 
 /**
  * @description Convert a color to a FOLD edge assignment
@@ -33,10 +28,15 @@ export const colorToAssignment = (color, customAssignments) => {
  */
 export const opacityToFoldAngle = (opacity, assignment) => {
 	switch (assignment) {
-	case "M": case "m": return -180 * opacity;
-	case "V": case "v": return 180 * opacity;
-	// "F", "B", "U", "C", opacity value doesn't matter.
-	default: return 0;
+		case "M":
+		case "m":
+			return -180 * opacity;
+		case "V":
+		case "v":
+			return 180 * opacity;
+		// "F", "B", "U", "C", opacity value doesn't matter.
+		default:
+			return 0;
 	}
 };
 
@@ -46,9 +46,8 @@ export const opacityToFoldAngle = (opacity, assignment) => {
  * @returns {string|undefined}
  */
 export const getEdgeStroke = (element, attributes) => {
-	const computedStroke = window().getComputedStyle != null
-		? window().getComputedStyle(element).stroke
-		: "";
+	const computedStroke =
+		window().getComputedStyle != null ? window().getComputedStyle(element).stroke : "";
 	if (computedStroke !== "" && computedStroke !== "none") {
 		return computedStroke;
 	}
@@ -64,16 +63,19 @@ export const getEdgeStroke = (element, attributes) => {
  * @returns {number|undefined}
  */
 export const getEdgeOpacity = (element, attributes) => {
-	const computedOpacity = window().getComputedStyle != null
-		? window().getComputedStyle(element).opacity
-		: "";
+	const computedOpacity =
+		window().getComputedStyle != null ? window().getComputedStyle(element).opacity : "";
 	if (computedOpacity !== "") {
 		const floatOpacity = parseFloat(computedOpacity);
-		if (!Number.isNaN(floatOpacity)) { return floatOpacity; }
+		if (!Number.isNaN(floatOpacity)) {
+			return floatOpacity;
+		}
 	}
 	if (attributes.opacity !== undefined) {
 		const floatOpacity = parseFloat(attributes.opacity);
-		if (!Number.isNaN(floatOpacity)) { return floatOpacity; }
+		if (!Number.isNaN(floatOpacity)) {
+			return floatOpacity;
+		}
 	}
 	return undefined;
 };

@@ -4,7 +4,7 @@
     "es2021": true,
     "node": true
   },
-  "extends": "airbnb-base",
+  "extends": ["airbnb-base", "prettier"],
   "ignores": ["*.d.ts"],
   "parserOptions": {
     "ecmaVersion": "latest",

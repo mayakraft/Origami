@@ -1,9 +1,7 @@
 /**
  * Rabbit Ear (c) Kraft
  */
-import {
-	EPSILON,
-} from "../../math/constant.js";
+import { EPSILON } from "../../math/constant.js";
 
 /**
  * @description To perform a squash fold we need a vertex and two adjacent

@@ -1,30 +1,14 @@
 /**
  * Rabbit Ear (c) Kraft
  */
-import {
-	topologicalSort,
-} from "./directedGraph.js";
-import {
-	makeFacesWinding,
-} from "./faces/winding.js";
-import {
-	join,
-} from "./join.js";
-import {
-	makeEdgesFacesUnsorted,
-} from "./make/edgesFaces.js";
-import {
-	invertArrayMap,
-} from "./maps.js";
-import {
-	makeFacesNormal,
-} from "./normals.js";
-import {
-	faceOrdersToDirectedEdges,
-} from "./orders.js";
-import {
-	planarizeVerbose,
-} from "./planarize/planarize.js";
+import { topologicalSort } from "./directedGraph.js";
+import { makeFacesWinding } from "./faces/winding.js";
+import { join } from "./join.js";
+import { makeEdgesFacesUnsorted } from "./make/edgesFaces.js";
+import { invertArrayMap } from "./maps.js";
+import { makeFacesNormal } from "./normals.js";
+import { faceOrdersToDirectedEdges } from "./orders.js";
+import { planarizeVerbose } from "./planarize/planarize.js";
 
 /**
  * @description Given a graph, reassign edge assignments to be "J" join
@@ -36,9 +20,11 @@ import {
  */
 const makeOneSide = (planar, flatBackmap) => {
 	planar.edges_faces.forEach((faces, e) => {
-		if (faces.length !== 2) { return; }
+		if (faces.length !== 2) {
+			return;
+		}
 		// get the top-most face in the stack, this is the face which will be visible
-		const [a, b] = faces.map(f => flatBackmap[f]);
+		const [a, b] = faces.map((f) => flatBackmap[f]);
 		// if a === b, the two adjacent faces came from the same face. change the
 		// assignment between them to be a "join".
 		if (a === b && planar.edges_assignment) {
@@ -60,16 +46,16 @@ const makeOneSide = (planar, flatBackmap) => {
  * @param {boolean[]} faces_winding
  * @param {number[]} flatBackmap
  */
-const correctFaceWinding = (planar, faces_winding, flatBackmap) => (
+const correctFaceWinding = (planar, faces_winding, flatBackmap) =>
 	planar.faces_vertices
 		.map((_, i) => i)
-		.filter(f => !faces_winding[flatBackmap[f]])
-		.forEach(f => {
+		.filter((f) => !faces_winding[flatBackmap[f]])
+		.forEach((f) => {
 			planar.faces_vertices[f].reverse();
 			planar.faces_edges[f].reverse();
 			// winding order between the two is not correct until this happens
 			planar.faces_edges[f].push(planar.faces_edges[f].shift());
-		}));
+		});
 
 /**
  * @description Create a copy of a graph suitable for rendering, fixing
@@ -84,7 +70,9 @@ const correctFaceWinding = (planar, faces_winding, flatBackmap) => (
 export const fixCycles = (graph) => {
 	const {
 		result: planar,
-		changes: { faces: { map } },
+		changes: {
+			faces: { map },
+		},
 	} = planarizeVerbose(graph);
 	planar.edges_faces = makeEdgesFacesUnsorted(planar);
 	const facesBackMap = invertArrayMap(map);
@@ -97,9 +85,8 @@ export const fixCycles = (graph) => {
 	// but we need to know if the root face's winding is flipped or not,
 	// at the very end of this method, this will determine the order between
 	// the "front" and "back" planes, which side of each other they should lie.
-	const rootFace = graph.faceOrders && graph.faceOrders.length
-		? graph.faceOrders[0][0]
-		: undefined;
+	const rootFace =
+		graph.faceOrders && graph.faceOrders.length ? graph.faceOrders[0][0] : undefined;
 
 	// this should happen on the input graph, not the planar graph.
 	const faces_normal = makeFacesNormal(graph);
@@ -111,20 +98,22 @@ export const fixCycles = (graph) => {
 
 	// todo: need to optimize this block
 	// backmap contains values with old face indices
-	const facesBackMapOrdered = facesBackMap.map(faces => {
+	const facesBackMapOrdered = facesBackMap.map((faces) => {
 		const lookup = {};
-		faces.forEach(f => { lookup[f] = true; });
+		faces.forEach((f) => {
+			lookup[f] = true;
+		});
 		const theseFaces = directedFacesOld.filter(([a, b]) => lookup[a] && lookup[b]);
 		const facesSorted = topologicalSort(theseFaces);
-		const missingFaces = faces.filter(f => facesSorted.indexOf(f) === -1);
+		const missingFaces = faces.filter((f) => facesSorted.indexOf(f) === -1);
 		return missingFaces.concat(facesSorted);
 	});
 
 	// now that our backmap is ordered along one axis, create two flat backmaps
 	// one for each side: front and back. create each by grabbing the first or
 	// last face from the ordered list, respectively.
-	const faceMapFront = facesBackMapOrdered.map(arr => arr[0])
-	const faceMapBack = facesBackMapOrdered.map(arr => arr.slice().reverse()[0]);
+	const faceMapFront = facesBackMapOrdered.map((arr) => arr[0]);
+	const faceMapBack = facesBackMapOrdered.map((arr) => arr.slice().reverse()[0]);
 
 	// duplicate the graph so that each graph represents what the graph appears
 	// like from both front and back directions. This involves reassigning some
@@ -145,13 +134,20 @@ export const fixCycles = (graph) => {
 	// to the g face ([f, g, order]) depending on its winding, so, order accordingly.
 	// Additionally, "in front of" is relative to one axis, the axis which was chosen
 	// by the root face (it's okay if "rootFace" is undefined).
-	const faceOrdersPairs = front.faces_vertices
-		.map((_, f) => [front.faces_vertices.length + f, f]);
+	const faceOrdersPairs = front.faces_vertices.map((_, f) => [
+		front.faces_vertices.length + f,
+		f,
+	]);
 	/** @type {[number, number, number][]} */
-	const faceOrders = faceOrdersPairs
-		.map(([a, b], f) => faces_winding[faceMapFront[f]]
-			? (faces_winding[rootFace] ? [a, b, 1] : [a, b, -1])
-			: (faces_winding[rootFace] ? [a, b, -1] : [a, b, 1]));
+	const faceOrders = faceOrdersPairs.map(([a, b], f) =>
+		faces_winding[faceMapFront[f]]
+			? faces_winding[rootFace]
+				? [a, b, 1]
+				: [a, b, -1]
+			: faces_winding[rootFace]
+				? [a, b, -1]
+				: [a, b, 1],
+	);
 
 	// console.log(front.faces_vertices, back.faces_vertices);
 	// join two graphs into one, the result is stored into "front" graph.
@@ -160,5 +156,5 @@ export const fixCycles = (graph) => {
 		...front,
 		faceOrders,
 		frame_classes: ["foldedForm"],
-	}
+	};
 };

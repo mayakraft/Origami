@@ -1,9 +1,7 @@
 /**
  * Rabbit Ear (c) Kraft
  */
-import {
-	parseColorToRgb,
-} from "../../svg/colors/parseColor.js";
+import { parseColorToRgb } from "../../svg/colors/parseColor.js";
 
 export const dark = {
 	B: [0.5, 0.5, 0.5],
@@ -49,7 +47,9 @@ export const light = {
  */
 export const parseColorToWebGLColor = (color) => {
 	if (typeof color === "string") {
-		const [r, g, b] = parseColorToRgb(color).slice(0, 3).map(n => n / 255);
+		const [r, g, b] = parseColorToRgb(color)
+			.slice(0, 3)
+			.map((n) => n / 255);
 		return [r, g, b];
 	}
 

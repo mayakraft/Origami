@@ -15,8 +15,8 @@ test("faces winding, folded", () => {
 	const crane = JSON.parse(foldfile);
 	const folded = ear.graph(crane).folded();
 	const windings = ear.graph.makeFacesWinding(folded);
-	const up = windings.filter(a => a === true).length;
-	const down = windings.filter(a => a === false).length;
+	const up = windings.filter((a) => a === true).length;
+	const down = windings.filter((a) => a === false).length;
 	// about half of the faces (within 5%) should be flipped
 	expect(Math.abs(up - down) < crane.faces_vertices.length * 0.05).toBe(true);
 });

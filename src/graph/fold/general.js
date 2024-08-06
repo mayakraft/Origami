@@ -1,26 +1,11 @@
 /**
  * Rabbit Ear (c) Kraft
  */
-import {
-	epsilonEqual,
-} from "../../math/compare.js";
-import {
-	pointsToLine2,
-} from "../../math/convert.js";
-import {
-	scale2,
-	cross2,
-	add2,
-	subtract2,
-	resize2,
-	average2,
-} from "../../math/vector.js";
-import {
-	edgeFoldAngleIsFlatFolded,
-} from "../../fold/spec.js";
-import {
-	invertFlatMap,
-} from "../maps.js";
+import { epsilonEqual } from "../../math/compare.js";
+import { pointsToLine2 } from "../../math/convert.js";
+import { scale2, cross2, add2, subtract2, resize2, average2 } from "../../math/vector.js";
+import { edgeFoldAngleIsFlatFolded } from "../../fold/spec.js";
+import { invertFlatMap } from "../maps.js";
 
 /**
  * @param {[number, number][]} points the points which make up the edge
@@ -62,21 +47,22 @@ export const reassignCollinearEdges = (
 	// edges which were created from the splitGraph method can be skipped,
 	// they have already been assigned and shouldn't be considered "collinear"
 	// anyway. "collinear" refers to preexisting collinear to the input line.
-  const newEdgeMap = invertFlatMap(splitGraphResult.edges.new);
+	const newEdgeMap = invertFlatMap(splitGraphResult.edges.new);
 
 	// using the overlapped vertices, get a list of edges collinear to the line
 	// these (old) vertex indices will match with the original input graph.
-	const verticesCollinear = splitGraphResult.vertices.intersect
-		.map(v => v !== undefined);
+	const verticesCollinear = splitGraphResult.vertices.intersect.map(
+		(v) => v !== undefined,
+	);
 
 	// these are new edge indices, relating to the graph after modification.
 	// skip the edges which were created in splitGraphResult.edges.new
 	// only keep the edges which existed before the split occurred.
 	const collinearEdges = edges_vertices
-		.map(verts => verticesCollinear[verts[0]] && verticesCollinear[verts[1]])
+		.map((verts) => verticesCollinear[verts[0]] && verticesCollinear[verts[1]])
 		.map((collinear, e) => (collinear ? e : undefined))
-		.filter(a => a !== undefined)
-		.filter(e => newEdgeMap[e] === undefined);
+		.filter((a) => a !== undefined)
+		.filter((e) => newEdgeMap[e] === undefined);
 
 	// no assignments to reassign. quit
 	if (!edges_assignment && !edges_foldAngle) {
@@ -91,15 +77,15 @@ export const reassignCollinearEdges = (
 	// is flat, and should become folded, in which case we can simply take either
 	// of its adjacent faces to know which assignment direction to assign.
 	const reassignableEdgesInfo = collinearEdges
-		.map(edge => ({
+		.map((edge) => ({
 			edge,
-			faces: edges_faces[edge].filter(a => a !== undefined),
+			faces: edges_faces[edge].filter((a) => a !== undefined),
 		}))
 		.filter(({ faces }) => faces.length === 2)
 		.filter(({ faces: [f0, f1] }) => faces_winding[f0] === faces_winding[f1]);
 
 	reassignableEdgesInfo.forEach(({ edge, faces }) => {
-		const winding = faces.map(face => faces_winding[face]).shift();
+		const winding = faces.map((face) => faces_winding[face]).shift();
 		edges_assignment[edge] = winding ? assignment : oppositeAssignment;
 		edges_foldAngle[edge] = winding ? foldAngle : oppositeFoldAngle;
 	});
@@ -119,11 +105,14 @@ export const reassignCollinearEdges = (
  */
 const adjacentFacesOrdersAssignments = (f0, f1, assignment) => {
 	switch (assignment) {
-	case "V":
-	case "v": return [f0, f1, 1];
-	case "M":
-	case "m": return [f0, f1, -1];
-	default: return undefined;
+		case "V":
+		case "v":
+			return [f0, f1, 1];
+		case "M":
+		case "m":
+			return [f0, f1, -1];
+		default:
+			return undefined;
 	}
 };
 
@@ -134,8 +123,12 @@ const adjacentFacesOrdersAssignments = (f0, f1, assignment) => {
  * @returns {[number, number, number]|undefined}
  */
 const adjacentFacesOrdersFoldAngles = (f0, f1, foldAngle) => {
-	if (epsilonEqual(foldAngle, 180)) { return [f0, f1, 1]; }
-	if (epsilonEqual(foldAngle, -180)) { return [f0, f1, -1]; }
+	if (epsilonEqual(foldAngle, 180)) {
+		return [f0, f1, 1];
+	}
+	if (epsilonEqual(foldAngle, -180)) {
+		return [f0, f1, -1];
+	}
 	return undefined;
 };
 
@@ -150,24 +143,25 @@ const adjacentFacesOrdersFoldAngles = (f0, f1, foldAngle) => {
  * @param {number[]} newEdges a list of new edges
  * @returns {[number, number, number][]} new faceOrders
  */
-export const makeNewFlatFoldFaceOrders = ({
-	edges_faces, edges_assignment, edges_foldAngle,
-}, newEdges) => {
-	const edges = newEdges.filter(e => edges_faces[e].length === 2);
-	const edgesAdjacentFaces = edges.map(e => edges_faces[e]);
+export const makeNewFlatFoldFaceOrders = (
+	{ edges_faces, edges_assignment, edges_foldAngle },
+	newEdges,
+) => {
+	const edges = newEdges.filter((e) => edges_faces[e].length === 2);
+	const edgesAdjacentFaces = edges.map((e) => edges_faces[e]);
 
 	if (edges_assignment) {
-		const assignments = edges.map(e => edges_assignment[e]);
+		const assignments = edges.map((e) => edges_assignment[e]);
 		return edgesAdjacentFaces
 			.map(([f0, f1], i) => adjacentFacesOrdersAssignments(f0, f1, assignments[i]))
-			.filter(a => a !== undefined);
+			.filter((a) => a !== undefined);
 	}
 
 	if (edges_foldAngle) {
-		const angles = edges.map(e => edges_foldAngle[e]);
+		const angles = edges.map((e) => edges_foldAngle[e]);
 		return edgesAdjacentFaces
 			.map(([f0, f1], i) => adjacentFacesOrdersFoldAngles(f0, f1, angles[i]))
-			.filter(a => a !== undefined);
+			.filter((a) => a !== undefined);
 	}
 
 	return [];
@@ -197,15 +191,18 @@ export const getInvalidFaceOrders = (
 	line,
 	newFaces,
 ) => {
-	if (!faceOrders) { return []; }
+	if (!faceOrders) {
+		return [];
+	}
 
 	const newFacesLookup = invertFlatMap(newFaces);
 
 	// this is a 2D only method, but could be extended into 3D.
 	const facesSide = faces_vertices
-		.map(vertices => vertices.map(v => vertices_coords[v]))
-		.map(poly => poly.map(resize2)).map(poly => average2(...poly))
-		.map(point => cross2(subtract2(point, line.origin), line.vector))
+		.map((vertices) => vertices.map((v) => vertices_coords[v]))
+		.map((poly) => poly.map(resize2))
+		.map((poly) => average2(...poly))
+		.map((point) => cross2(subtract2(point, line.origin), line.vector))
 		.map(Math.sign);
 
 	// these are indices of faceOrders which have a relationship between
@@ -217,39 +214,57 @@ export const getInvalidFaceOrders = (
 	//   between the faces.
 	// if the fold was 3D (not flat folded) we definitely need to throw them away.
 	return faceOrders
-		.map(([a, b], i) => (
-			(newFacesLookup[a] !== undefined || newFacesLookup[b] !== undefined)
-			&& ((facesSide[a] === 1 && facesSide[b] === -1)
-			|| (facesSide[a] === -1 && facesSide[b] === 1))
+		.map(([a, b], i) =>
+			(newFacesLookup[a] !== undefined || newFacesLookup[b] !== undefined) &&
+			((facesSide[a] === 1 && facesSide[b] === -1) ||
+				(facesSide[a] === -1 && facesSide[b] === 1))
 				? i
-				: undefined))
-		.filter(a => a !== undefined);
+				: undefined,
+		)
+		.filter((a) => a !== undefined);
 };
 
 /**
- * @description This method accompanies foldGraph() and accomplishes two things:
- * Due to many faces being split by a common line, many new faceOrders have
- * been updated/correct to include pairs of faces which don't even overlap.
- * This method finds and removes the now non-overlapping faces.
- * Additionally, in the specific case that the fold line is flat 180 M or V,
- * we are able to create new faceOrders between all edge-adjacent faces,
- * by considering the winding directions, and the assignment of the fold line.
+ * @description Due to many faces being split by a common line, many new
+ * faceOrders have been updated/correct to include pairs of faces which don't
+ * overlap. This method finds and removes the now non-overlapping faces.
+ * The splitGraph operation created many new faceOrders out of
+ * the old ones, for every old face's orders, each old face became two new faces,
+ * so every one of the old face's orders was replaced with two, referencing the
+ * new indices.
+ * The relationships between faces which no longer overlap, will be marked as
+ * "nowInvalidFaceOrders" and deleted from faceOrders.
  * @param {FOLD} graph a FOLD graph, faceOrders array is modified in place
  * @param {FOLD} folded the same graph with folded vertices_coords
  * @param {VecLine2} line
- * @param {number} foldAngle
- * @param {number[]} newEdges
  * @param {number[]} newFaces
  * @returns {undefined}
  */
-export const updateFaceOrders = (
-	graph,
-	folded,
-	line,
-	foldAngle,
-	newEdges,
-	newFaces,
-) => {
+export const removeInvalidFaceOrders = (graph, folded, line, newFaces) => {
+	// if the model is only a 3D model with no faceOrders, exit
+	if (!graph.faceOrders) {
+		return;
+	}
+
+	const invalidOrderLookup = {};
+	const nowInvalidFaceOrders = getInvalidFaceOrders(folded, line, newFaces);
+	nowInvalidFaceOrders.forEach((i) => {
+		invalidOrderLookup[i] = true;
+	});
+	graph.faceOrders = graph.faceOrders.filter((_, i) => !invalidOrderLookup[i]);
+};
+
+/**
+ * @description This method accompanies foldGraph() to be run at the end.
+ * In the specific case that the fold line is flat 180 M or V,
+ * we are able to create new faceOrders between all edge-adjacent faces,
+ * by considering the winding directions, and the assignment of the fold line.
+ * @param {FOLD} graph a FOLD graph, faceOrders array is modified in place
+ * @param {number} foldAngle
+ * @param {number[]} newEdges
+ * @returns {undefined}
+ */
+export const makeSimpleFoldFaceOrders = (graph, foldAngle, newEdges) => {
 	// true if 180deg "M" or "V", false if flat "F" or 3D.
 	const isFlatFolded = edgeFoldAngleIsFlatFolded(foldAngle);
 
@@ -257,35 +272,19 @@ export const updateFaceOrders = (
 	// let's create an empty array and fill it with what we know.
 	// This often happens when a brand new FOLD object, like an empty square,
 	// is being folded for the first time.
-	if (!graph.faceOrders && isFlatFolded) { graph.faceOrders = []; }
+	if (!graph.faceOrders && isFlatFolded) {
+		graph.faceOrders = [];
+	}
+
+	if (!isFlatFolded) {
+		return;
+	}
 
 	// if the assignment is 180 M or V, we generate new face orders between
 	// new faces which were just made by splitting a face with a new edge,
-	// depending on the edge's assignemnt, we can make a new faceOrder.
-	// These are adjacent faces only, so their solution is not geometric,
-	// we can be certain that the two faces in each pair overlap.
-	if (isFlatFolded) {
-		const newFaceOrders = makeNewFlatFoldFaceOrders(graph, newEdges);
-		graph.faceOrders = graph.faceOrders.concat(newFaceOrders);
-	}
-
-	// from this point on we are only operating on the graph's faceOrders,
-	// if the model is only a 3D model with no faceOrders, exit now.
-	if (!graph.faceOrders) { return; }
-
-	// the splitGraph operation created many new faceOrders out of the old ones,
-	// for every old face's orders, each old face became two new faces, so
-	// every one of the old face's orders was replaced with two, referencing the
-	// new indices.
-	// This generates a bunch of relationships between faces which no longer
-	// overlap, we will identify these as "nowInvalidFaceOrders" and
-	// delete these faceOrders
-	const invalidOrderLookup = {};
-	const nowInvalidFaceOrders = getInvalidFaceOrders(
-		folded,
-		line,
-		newFaces,
-	);
-	nowInvalidFaceOrders.forEach(i => { invalidOrderLookup[i] = true; });
-	graph.faceOrders = graph.faceOrders.filter((_, i) => !invalidOrderLookup[i]);
+	// depending on the edge's assignment, we can make a new faceOrder.
+	// These are adjacent faces only so we don't need to compute them
+	// geometrically, we can be certain that the two faces in each pair overlap.
+	const newFaceOrders = makeNewFlatFoldFaceOrders(graph, newEdges);
+	graph.faceOrders = graph.faceOrders.concat(newFaceOrders);
 };

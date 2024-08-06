@@ -44,10 +44,27 @@ test("all methods that return something else", () => {
 
 test("copy", () => {
 	const graph = ear.graph({
-		vertices_coords: [[0, 0], [1, 0], [1, 1], [0, 1]],
-		edges_vertices: [[0, 1], [1, 2], [2, 3], [3, 0], [0, 2]],
-		faces_vertices: [[0, 1, 2], [2, 3, 0]],
-		faces_edges: [[0, 1, 4], [2, 3, 4]],
+		vertices_coords: [
+			[0, 0],
+			[1, 0],
+			[1, 1],
+			[0, 1],
+		],
+		edges_vertices: [
+			[0, 1],
+			[1, 2],
+			[2, 3],
+			[3, 0],
+			[0, 2],
+		],
+		faces_vertices: [
+			[0, 1, 2],
+			[2, 3, 0],
+		],
+		faces_edges: [
+			[0, 1, 4],
+			[2, 3, 4],
+		],
 	});
 	const copy = graph.clone();
 	graph.vertices_coords = [];
@@ -113,38 +130,113 @@ test("copy", () => {
 test("populate", () => {
 	const graph = ear.graph({
 		vertices_coords: [
-			[0, 0], [1, 0], [2, 0], [3, 0], [4, 0], [4, 1], [3, 1], [2, 1], [1, 1], [0, 1],
+			[0, 0],
+			[1, 0],
+			[2, 0],
+			[3, 0],
+			[4, 0],
+			[4, 1],
+			[3, 1],
+			[2, 1],
+			[1, 1],
+			[0, 1],
 		],
 		edges_vertices: [
-			[0, 1], [1, 2], [2, 3], [3, 4], [4, 5], [5, 6], [6, 7],
-			[7, 8], [8, 9], [9, 0], [1, 8], [2, 7], [3, 6],
+			[0, 1],
+			[1, 2],
+			[2, 3],
+			[3, 4],
+			[4, 5],
+			[5, 6],
+			[6, 7],
+			[7, 8],
+			[8, 9],
+			[9, 0],
+			[1, 8],
+			[2, 7],
+			[3, 6],
 		],
 		edges_foldAngle: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 90, 90, 90],
-		edges_assignment: ["B", "B", "B", "B", "B", "B", "B", "B", "B", "B", "V", "V", "V", "V"],
+		edges_assignment: [
+			"B",
+			"B",
+			"B",
+			"B",
+			"B",
+			"B",
+			"B",
+			"B",
+			"B",
+			"B",
+			"V",
+			"V",
+			"V",
+			"V",
+		],
 	});
 
 	const extra_keys = [
-		"vertices_edges", "vertices_faces", "vertices_vertices",
-		"edges_vertices", "edges_faces",
-		"faces_vertices", "faces_edges", "faces_faces",
+		"vertices_edges",
+		"vertices_faces",
+		"vertices_vertices",
+		"edges_vertices",
+		"edges_faces",
+		"faces_vertices",
+		"faces_edges",
+		"faces_faces",
 	];
 	// calling graph() initializer now automatically runs populate();
 	// extra_keys.forEach(key => expect(graph.vertices_vertices).toBe(undefined));
 	graph.populate();
-	extra_keys.forEach(key => expect(graph[key]).not.toBe(undefined));
+	extra_keys.forEach((key) => expect(graph[key]).not.toBe(undefined));
 });
 
 test("affine transforms", () => {
 	const graph = ear.graph({
 		vertices_coords: [
-			[0, 0], [1, 0], [2, 0], [3, 0], [4, 0], [4, 1], [3, 1], [2, 1], [1, 1], [0, 1],
+			[0, 0],
+			[1, 0],
+			[2, 0],
+			[3, 0],
+			[4, 0],
+			[4, 1],
+			[3, 1],
+			[2, 1],
+			[1, 1],
+			[0, 1],
 		],
 		edges_vertices: [
-			[0, 1], [1, 2], [2, 3], [3, 4], [4, 5], [5, 6], [6, 7],
-			[7, 8], [8, 9], [9, 0], [1, 8], [2, 7], [3, 6],
+			[0, 1],
+			[1, 2],
+			[2, 3],
+			[3, 4],
+			[4, 5],
+			[5, 6],
+			[6, 7],
+			[7, 8],
+			[8, 9],
+			[9, 0],
+			[1, 8],
+			[2, 7],
+			[3, 6],
 		],
 		edges_foldAngle: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 90, 90, 90],
-		edges_assignment: ["B", "B", "B", "B", "B", "B", "B", "B", "B", "B", "V", "V", "V", "V"],
+		edges_assignment: [
+			"B",
+			"B",
+			"B",
+			"B",
+			"B",
+			"B",
+			"B",
+			"B",
+			"B",
+			"B",
+			"V",
+			"V",
+			"V",
+			"V",
+		],
 	});
 	graph.translate([4, 8]);
 	expect(graph.vertices_coords[5][0]).toBe(8);

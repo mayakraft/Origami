@@ -1,23 +1,10 @@
 /**
  * Rabbit Ear (c) Kraft
  */
-import {
-	EPSILON,
-	TWO_PI,
-} from "./constant.js";
-import {
-	vectorToAngle,
-	angleToVector,
-} from "./convert.js";
-import {
-	epsilonEqual,
-} from "./compare.js";
-import {
-	cross2,
-	normalize2,
-	subtract2,
-	distance2,
-} from "./vector.js";
+import { EPSILON, TWO_PI } from "./constant.js";
+import { vectorToAngle, angleToVector } from "./convert.js";
+import { epsilonEqual } from "./compare.js";
+import { cross2, normalize2, subtract2, distance2 } from "./vector.js";
 
 /**
  * measurements involving vectors and radians
@@ -33,11 +20,17 @@ import {
  */
 export const isCounterClockwiseBetween = (angle, floor, ceiling) => {
 	// eslint-disable-next-line no-param-reassign
-	while (ceiling < floor) { ceiling += TWO_PI; }
+	while (ceiling < floor) {
+		ceiling += TWO_PI;
+	}
 	// eslint-disable-next-line no-param-reassign
-	while (angle > floor) { angle -= TWO_PI; }
+	while (angle > floor) {
+		angle -= TWO_PI;
+	}
 	// eslint-disable-next-line no-param-reassign
-	while (angle < floor) { angle += TWO_PI; }
+	while (angle < floor) {
+		angle += TWO_PI;
+	}
 	return angle < ceiling;
 };
 
@@ -51,17 +44,23 @@ export const isCounterClockwiseBetween = (angle, floor, ceiling) => {
 export const clockwiseAngleRadians = (a, b) => {
 	// this is on average 50 to 100 times faster than clockwiseAngle2
 	// eslint-disable-next-line no-param-reassign
-	while (a < 0) { a += TWO_PI; }
+	while (a < 0) {
+		a += TWO_PI;
+	}
 	// eslint-disable-next-line no-param-reassign
-	while (b < 0) { b += TWO_PI; }
+	while (b < 0) {
+		b += TWO_PI;
+	}
 	// eslint-disable-next-line no-param-reassign
-	while (a > TWO_PI) { a -= TWO_PI; }
+	while (a > TWO_PI) {
+		a -= TWO_PI;
+	}
 	// eslint-disable-next-line no-param-reassign
-	while (b > TWO_PI) { b -= TWO_PI; }
+	while (b > TWO_PI) {
+		b -= TWO_PI;
+	}
 	const a_b = a - b;
-	return (a_b >= 0)
-		? a_b
-		: TWO_PI - (b - a);
+	return a_b >= 0 ? a_b : TWO_PI - (b - a);
 };
 
 /**
@@ -74,17 +73,23 @@ export const clockwiseAngleRadians = (a, b) => {
 export const counterClockwiseAngleRadians = (a, b) => {
 	// this is on average 50 to 100 times faster than counterClockwiseAngle2
 	// eslint-disable-next-line no-param-reassign
-	while (a < 0) { a += TWO_PI; }
+	while (a < 0) {
+		a += TWO_PI;
+	}
 	// eslint-disable-next-line no-param-reassign
-	while (b < 0) { b += TWO_PI; }
+	while (b < 0) {
+		b += TWO_PI;
+	}
 	// eslint-disable-next-line no-param-reassign
-	while (a > TWO_PI) { a -= TWO_PI; }
+	while (a > TWO_PI) {
+		a -= TWO_PI;
+	}
 	// eslint-disable-next-line no-param-reassign
-	while (b > TWO_PI) { b -= TWO_PI; }
+	while (b > TWO_PI) {
+		b -= TWO_PI;
+	}
 	const b_a = b - a;
-	return (b_a >= 0)
-		? b_a
-		: TWO_PI - (a - b);
+	return b_a >= 0 ? b_a : TWO_PI - (a - b);
 };
 
 /**
@@ -98,7 +103,9 @@ export const clockwiseAngle2 = (a, b) => {
 	const dotProduct = b[0] * a[0] + b[1] * a[1];
 	const determinant = b[0] * a[1] - b[1] * a[0];
 	let angle = Math.atan2(determinant, dotProduct);
-	if (angle < 0) { angle += TWO_PI; }
+	if (angle < 0) {
+		angle += TWO_PI;
+	}
 	return angle;
 };
 
@@ -113,7 +120,9 @@ export const counterClockwiseAngle2 = (a, b) => {
 	const dotProduct = a[0] * b[0] + a[1] * b[1];
 	const determinant = a[0] * b[1] - a[1] * b[0];
 	let angle = Math.atan2(determinant, dotProduct);
-	if (angle < 0) { angle += TWO_PI; }
+	if (angle < 0) {
+		angle += TWO_PI;
+	}
 	return angle;
 };
 
@@ -134,9 +143,8 @@ export const counterClockwiseAngle2 = (a, b) => {
  * @param {[number, number]} b one 2D vector
  * @returns {[number, number]} one 2D vector
  */
-export const clockwiseBisect2 = (a, b) => (
-	angleToVector(vectorToAngle(a) - clockwiseAngle2(a, b) / 2)
-);
+export const clockwiseBisect2 = (a, b) =>
+	angleToVector(vectorToAngle(a) - clockwiseAngle2(a, b) / 2);
 
 /**
  * @description calculate the angle bisection counter-clockwise from the first vector to the second.
@@ -144,9 +152,8 @@ export const clockwiseBisect2 = (a, b) => (
  * @param {[number, number]} b one 2D vector
  * @returns {[number, number]} one 2D vector
  */
-export const counterClockwiseBisect2 = (a, b) => (
-	angleToVector(vectorToAngle(a) + counterClockwiseAngle2(a, b) / 2)
-);
+export const counterClockwiseBisect2 = (a, b) =>
+	angleToVector(vectorToAngle(a) + counterClockwiseAngle2(a, b) / 2);
 
 /**
  * @description subsect into n-divisions the angle clockwise from one angle to the next
@@ -157,8 +164,7 @@ export const counterClockwiseBisect2 = (a, b) => (
  */
 export const clockwiseSubsectRadians = (angleA, angleB, divisions) => {
 	const angle = clockwiseAngleRadians(angleA, angleB) / divisions;
-	return Array.from(Array(divisions - 1))
-		.map((_, i) => angleA + angle * (i + 1));
+	return Array.from(Array(divisions - 1)).map((_, i) => angleA + angle * (i + 1));
 };
 
 /**
@@ -170,8 +176,7 @@ export const clockwiseSubsectRadians = (angleA, angleB, divisions) => {
  */
 export const counterClockwiseSubsectRadians = (angleA, angleB, divisions) => {
 	const angle = counterClockwiseAngleRadians(angleA, angleB) / divisions;
-	return Array.from(Array(divisions - 1))
-		.map((_, i) => angleA + angle * (i + 1));
+	return Array.from(Array(divisions - 1)).map((_, i) => angleA + angle * (i + 1));
 };
 
 /**
@@ -184,8 +189,7 @@ export const counterClockwiseSubsectRadians = (angleA, angleB, divisions) => {
 export const clockwiseSubsect2 = (vectorA, vectorB, divisions) => {
 	const angleA = Math.atan2(vectorA[1], vectorA[0]);
 	const angleB = Math.atan2(vectorB[1], vectorB[0]);
-	return clockwiseSubsectRadians(angleA, angleB, divisions)
-		.map(angleToVector);
+	return clockwiseSubsectRadians(angleA, angleB, divisions).map(angleToVector);
 };
 
 /**
@@ -198,8 +202,7 @@ export const clockwiseSubsect2 = (vectorA, vectorB, divisions) => {
 export const counterClockwiseSubsect2 = (vectorA, vectorB, divisions) => {
 	const angleA = Math.atan2(vectorA[1], vectorA[0]);
 	const angleB = Math.atan2(vectorB[1], vectorB[0]);
-	return counterClockwiseSubsectRadians(angleA, angleB, divisions)
-		.map(angleToVector);
+	return counterClockwiseSubsectRadians(angleA, angleB, divisions).map(angleToVector);
 };
 
 /**
@@ -228,9 +231,8 @@ export const counterClockwiseOrderRadians = (radians) => {
  * @returns {number[]} array of indices of the input array, indicating
  * the counter-clockwise sorted arrangement.
  */
-export const counterClockwiseOrder2 = (vectors) => (
-	counterClockwiseOrderRadians(vectors.map(vectorToAngle))
-);
+export const counterClockwiseOrder2 = (vectors) =>
+	counterClockwiseOrderRadians(vectors.map(vectorToAngle));
 
 /**
  * @description given an array of angles, return the sector angles between
@@ -238,12 +240,11 @@ export const counterClockwiseOrder2 = (vectors) => (
  * @param {number[]} radians array of angles in radians
  * @returns {number[]} array of sector angles in radians
  */
-export const counterClockwiseSectorsRadians = (radians) => (
+export const counterClockwiseSectorsRadians = (radians) =>
 	counterClockwiseOrderRadians(radians)
-		.map(i => radians[i])
+		.map((i) => radians[i])
 		.map((rad, i, arr) => [rad, arr[(i + 1) % arr.length]])
-		.map(pair => counterClockwiseAngleRadians(pair[0], pair[1]))
-);
+		.map((pair) => counterClockwiseAngleRadians(pair[0], pair[1]));
 
 /**
  * @description given an array of vectors, return the sector angles between
@@ -251,9 +252,8 @@ export const counterClockwiseSectorsRadians = (radians) => (
  * @param {[number, number][]} vectors array of 2D vectors (higher dimensions will be ignored)
  * @returns {number[]} array of sector angles in radians
  */
-export const counterClockwiseSectors2 = (vectors) => (
-	counterClockwiseSectorsRadians(vectors.map(vectorToAngle))
-);
+export const counterClockwiseSectors2 = (vectors) =>
+	counterClockwiseSectorsRadians(vectors.map(vectorToAngle));
 
 /**
  * subsect the angle between two lines, can handle parallel lines

@@ -1,17 +1,9 @@
 /**
  * Rabbit Ear (c) Kraft
  */
-import {
-	table,
-} from "./table.js";
-import {
-	constraintToFacePairs,
-	tacoTypeNames,
-	emptyCategoryObject,
-} from "./general.js";
-import {
-	uniqueElements,
-} from "../general/array.js";
+import { table } from "./table.js";
+import { constraintToFacePairs, tacoTypeNames, emptyCategoryObject } from "./general.js";
+import { uniqueElements } from "../general/array.js";
 
 /**
  * @description Given one particular taco/tortilla/transitivity constraint,
@@ -39,10 +31,10 @@ const buildRuleAndLookup = (type, constraint, ...orders) => {
 	const facePairsArray = constraintToFacePairs[type](constraint);
 	// are the two faces in each pair out of order (not sorted),
 	// meaning taht when we apply the order, we need to flip it first.
-	const flipped = facePairsArray.map(pair => pair[1] < pair[0]);
-	const facePairs = facePairsArray.map((pair, i) => (flipped[i]
-		? `${pair[1]} ${pair[0]}`
-		: `${pair[0]} ${pair[1]}`));
+	const flipped = facePairsArray.map((pair) => pair[1] < pair[0]);
+	const facePairs = facePairsArray.map((pair, i) =>
+		flipped[i] ? `${pair[1]} ${pair[0]}` : `${pair[0]} ${pair[1]}`,
+	);
 	// consult all "orders" parameters for a solution (1 or 2, not 0) to
 	// the facePair. for each facePair get the first solution found, and
 	// in the case of no solution, that facePair will be 0 (unknown).
@@ -50,7 +42,7 @@ const buildRuleAndLookup = (type, constraint, ...orders) => {
 
 	// for each facePair, get the first available entry in orders, or 0 if none.
 	const key = facePairs
-		.map(facePair => orders.find(o => o[facePair]))
+		.map((facePair) => orders.find((o) => o[facePair]))
 		.map((order, i) => (order === undefined ? 0 : order[facePairs[i]]))
 		.map((value, i) => (flipped[i] ? flipFacePairOrder[value] : value))
 		.join("");
@@ -67,9 +59,7 @@ const buildRuleAndLookup = (type, constraint, ...orders) => {
 	const [pairIndex, suggestedOrder] = table[type][key];
 	const facePair = facePairs[pairIndex];
 	/** @type {number} */
-	const order = flipped[pairIndex]
-		? flipFacePairOrder[suggestedOrder]
-		: suggestedOrder;
+	const order = flipped[pairIndex] ? flipFacePairOrder[suggestedOrder] : suggestedOrder;
 	return [facePair, order];
 };
 
@@ -143,11 +133,7 @@ const buildRuleAndLookup = (type, constraint, ...orders) => {
  *   transitivity: number[],
  * }}
  */
-const getConstraintIndicesFromFacePairs = (
-	constraints,
-	lookup,
-	facePairsSubsetArray,
-) => {
+const getConstraintIndicesFromFacePairs = (constraints, lookup, facePairsSubsetArray) => {
 	/**
 	 * @type {{
 	 *   taco_taco: number[],
@@ -157,17 +143,19 @@ const getConstraintIndicesFromFacePairs = (
 	 * }}
 	 */
 	const constraintIndices = emptyCategoryObject();
-	tacoTypeNames.forEach(type => {
+	tacoTypeNames.forEach((type) => {
 		// given the array of modified facePairs since last round, get all
 		// the indices in the constraints array in which these facePairs exist.
 		// this array will contain duplicates
 		/** @type {number[]} */
-		const constraintIndicesWithDups = facePairsSubsetArray
-			.flatMap(facePair => lookup[type][facePair]);
+		const constraintIndicesWithDups = facePairsSubsetArray.flatMap(
+			(facePair) => lookup[type][facePair],
+		);
 
 		// filter these constraint indices to remove duplicates
-		constraintIndices[type] = uniqueElements(constraintIndicesWithDups)
-			.filter(i => constraints[type][i]);
+		constraintIndices[type] = uniqueElements(constraintIndicesWithDups).filter(
+			(i) => constraints[type][i],
+		);
 	});
 	return constraintIndices;
 };
@@ -241,14 +229,20 @@ export const propagate = (
 					...orders,
 					newOrders,
 				);
-				if (lookupResult === true) { continue; }
+				if (lookupResult === true) {
+					continue;
+				}
 				if (lookupResult === false) {
-					throw new Error(`invalid ${type} ${indices[i]}:${constraints[type][indices[i]]}`);
+					throw new Error(
+						`invalid ${type} ${indices[i]}:${constraints[type][indices[i]]}`,
+					);
 				}
 				if (newOrders[lookupResult[0]]) {
 					// rule already exists. make sure the results match
 					if (newOrders[lookupResult[0]] !== lookupResult[1]) {
-						throw new Error(`conflict ${type} ${indices[i]}:${constraints[type][indices[i]]}`);
+						throw new Error(
+							`conflict ${type} ${indices[i]}:${constraints[type][indices[i]]}`,
+						);
 					}
 				} else {
 					const [key, value] = lookupResult;

@@ -1,9 +1,7 @@
 /**
  * Rabbit Ear (c) Kraft
  */
-import {
-	identity4x4,
-} from "../../math/matrix4.js";
+import { identity4x4 } from "../../math/matrix4.js";
 
 /**
  * @description Uniforms must exist so there are protections to ensure

@@ -14,25 +14,24 @@ test("all conversions with alpha", () => {
 
 	// core conversion methods
 	expect(ear.svg.rgbToHex(...rgbaValues)).toBe(hex);
-	ear.svg.hexToRgb(hex)
-		.forEach((n, i) => expect(n).toBe(rgbaValues[i]));
-	ear.svg.hslToRgb(...hslaValues)
+	ear.svg.hexToRgb(hex).forEach((n, i) => expect(n).toBe(rgbaValues[i]));
+	ear.svg
+		.hslToRgb(...hslaValues)
 		.map((n, i) => Math.abs(n - rgbaValues[i]))
-		.forEach(diff => expect(diff < 1).toBe(true));
+		.forEach((diff) => expect(diff < 1).toBe(true));
 
 	// parser methods
-	ear.svg.parseColorToRgb(hex)
-		.forEach((n, i) => expect(n).toBe(rgbaValues[i]));
-	ear.svg.parseColorToRgb(rgb)
-		.forEach((n, i) => expect(n).toBe(rgbaValues[i]));
-	ear.svg.parseColorToRgb(rgba)
-		.forEach((n, i) => expect(n).toBe(rgbaValues[i]));
-	ear.svg.parseColorToRgb(hsl)
+	ear.svg.parseColorToRgb(hex).forEach((n, i) => expect(n).toBe(rgbaValues[i]));
+	ear.svg.parseColorToRgb(rgb).forEach((n, i) => expect(n).toBe(rgbaValues[i]));
+	ear.svg.parseColorToRgb(rgba).forEach((n, i) => expect(n).toBe(rgbaValues[i]));
+	ear.svg
+		.parseColorToRgb(hsl)
 		.map((n, i) => Math.abs(n - rgbaValues[i]))
-		.forEach(diff => expect(diff < 1).toBe(true));
-	ear.svg.parseColorToRgb(hsla)
+		.forEach((diff) => expect(diff < 1).toBe(true));
+	ear.svg
+		.parseColorToRgb(hsla)
 		.map((n, i) => Math.abs(n - rgbaValues[i]))
-		.forEach(diff => expect(diff < 1).toBe(true));
+		.forEach((diff) => expect(diff < 1).toBe(true));
 
 	expect(ear.svg.parseColorToHex(hex)).toBe(hex);
 	expect(ear.svg.parseColorToHex(rgb)).toBe("#115588");
@@ -50,8 +49,7 @@ test("colors hexToRgb", () => {
 	const rgb1 = ear.svg.hexToRgb("#158");
 	const rgb2 = ear.svg.hexToRgb("#115588");
 	expect(JSON.stringify(rgb1)).toBe(JSON.stringify(rgb2));
-	[17, 85, 136]
-		.forEach((value, i) => expect(value).toBeCloseTo(rgb1[i]));
+	[17, 85, 136].forEach((value, i) => expect(value).toBeCloseTo(rgb1[i]));
 });
 
 test("colors hslToRgb", () => {

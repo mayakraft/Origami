@@ -1,12 +1,12 @@
 /* SVG (c) Kraft */
-import { str_string, str_function } from '../environment/strings.js';
+import { str_string, str_function } from "../environment/strings.js";
 
 /**
  * Rabbit Ear (c) Kraft
  */
 
-const svgIsIterable = (obj) => obj != null
-	&& typeof obj[Symbol.iterator] === str_function;
+const svgIsIterable = (obj) =>
+	obj != null && typeof obj[Symbol.iterator] === str_function;
 
 /**
  * @description flatten only until the point of comma separated entities.
@@ -17,15 +17,17 @@ const svgIsIterable = (obj) => obj != null
  */
 const svgSemiFlattenArrays = function () {
 	switch (arguments.length) {
-	case 0: return Array.from(arguments);
-	// only if its an array (is iterable) and NOT a string
-	case 1: return svgIsIterable(arguments[0]) && typeof arguments[0] !== str_string
-		? svgSemiFlattenArrays(...arguments[0])
-		: [arguments[0]];
-	default:
-		return Array.from(arguments).map(a => (svgIsIterable(a)
-			? [...svgSemiFlattenArrays(a)]
-			: a));
+		case 0:
+			return Array.from(arguments);
+		// only if its an array (is iterable) and NOT a string
+		case 1:
+			return svgIsIterable(arguments[0]) && typeof arguments[0] !== str_string
+				? svgSemiFlattenArrays(...arguments[0])
+				: [arguments[0]];
+		default:
+			return Array.from(arguments).map((a) =>
+				svgIsIterable(a) ? [...svgSemiFlattenArrays(a)] : a,
+			);
 	}
 };
 

@@ -15,23 +15,25 @@
  * @param {number[]} [faces] optional faces to become vertices_faces
  * @returns {number} the index of the newly created vertex
  */
-export const addVertex = (
-	graph,
-	coords,
-	vertices = [],
-	edges = [],
-	faces = [],
-) => {
-	if (!graph.vertices_coords) { graph.vertices_coords = []; }
+export const addVertex = (graph, coords, vertices = [], edges = [], faces = []) => {
+	if (!graph.vertices_coords) {
+		graph.vertices_coords = [];
+	}
 
 	// the index of the new vertex
 	const vertex = graph.vertices_coords.length;
 
 	// construct the new data for our vertex, it will be initially isolated.
 	graph.vertices_coords[vertex] = coords;
-	if (graph.vertices_vertices) { graph.vertices_vertices[vertex] = vertices; }
-	if (graph.vertices_edges) { graph.vertices_edges[vertex] = edges; }
-	if (graph.vertices_faces) { graph.vertices_faces[vertex] = faces; }
+	if (graph.vertices_vertices) {
+		graph.vertices_vertices[vertex] = vertices;
+	}
+	if (graph.vertices_edges) {
+		graph.vertices_edges[vertex] = edges;
+	}
+	if (graph.vertices_faces) {
+		graph.vertices_faces[vertex] = faces;
+	}
 
 	return vertex;
 };
@@ -49,7 +51,9 @@ export const addVertex = (
  * duplicate (non-added) vertices returns their pre-existing counterpart's index.
  */
 export const addVertices = (graph, points = []) => {
-	if (!graph.vertices_coords) { graph.vertices_coords = []; }
+	if (!graph.vertices_coords) {
+		graph.vertices_coords = [];
+	}
 
 	// the indices of the new vertices
 	const vertices = points.map((_, i) => graph.vertices_coords.length + i);
@@ -57,9 +61,15 @@ export const addVertices = (graph, points = []) => {
 	// construct the new data for our vertices, they will be initially isolated.
 	vertices.forEach((vertex, i) => {
 		graph.vertices_coords[vertex] = points[i];
-		if (graph.vertices_vertices) { graph.vertices_vertices[vertex] = []; }
-		if (graph.vertices_edges) { graph.vertices_edges[vertex] = []; }
-		if (graph.vertices_faces) { graph.vertices_faces[vertex] = []; }
+		if (graph.vertices_vertices) {
+			graph.vertices_vertices[vertex] = [];
+		}
+		if (graph.vertices_edges) {
+			graph.vertices_edges[vertex] = [];
+		}
+		if (graph.vertices_faces) {
+			graph.vertices_faces[vertex] = [];
+		}
 	});
 
 	return vertices;

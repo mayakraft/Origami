@@ -1,19 +1,10 @@
 /**
  * Rabbit Ear (c) Kraft
  */
-import {
-	getDimensionQuick,
-} from "../fold/spec.js";
-import {
-	resize2,
-	resize3,
-} from "../math/vector.js";
-import {
-	clone,
-} from "../general/clone.js";
-import {
-	makeFacesEdgesFromVertices,
-} from "./make/facesEdges.js";
+import { getDimensionQuick } from "../fold/spec.js";
+import { resize2, resize3 } from "../math/vector.js";
+import { clone } from "../general/clone.js";
+import { makeFacesEdgesFromVertices } from "./make/facesEdges.js";
 
 /**
  * @description Create a modified graph which contains vertices, edges,
@@ -29,20 +20,27 @@ import {
  * all faces are triangles.
  */
 export const explodeFaces = ({
-	vertices_coords, edges_vertices, edges_assignment, edges_foldAngle,
-	faces_vertices, faces_edges,
+	vertices_coords,
+	edges_vertices,
+	edges_assignment,
+	edges_foldAngle,
+	faces_vertices,
+	faces_edges,
 }) => {
 	if (!faces_vertices) {
 		if (edges_vertices) {
 			return clone({
-				vertices_coords, edges_vertices, edges_assignment, edges_foldAngle,
+				vertices_coords,
+				edges_vertices,
+				edges_assignment,
+				edges_foldAngle,
 			});
 		}
 		return vertices_coords ? clone({ vertices_coords }) : {};
 	}
 
 	let f = 0;
-	const faces_verticesNew = faces_vertices.map(face => face.map(() => f++));
+	const faces_verticesNew = faces_vertices.map((face) => face.map(() => f++));
 
 	// if vertices exist, add vertices
 	if (!vertices_coords) {
@@ -51,12 +49,14 @@ export const explodeFaces = ({
 
 	// typescript ensure vertices_coords is in the correct form
 	const dimensions = getDimensionQuick({ vertices_coords });
-	const vertices_coordsFlat = clone(faces_vertices
-		.flatMap(face => face.map(v => vertices_coords[v])));
+	const vertices_coordsFlat = clone(
+		faces_vertices.flatMap((face) => face.map((v) => vertices_coords[v])),
+	);
 	/** @type {[number, number][] | [number, number, number][]} */
-	const vertices_coordsNew = dimensions === 3
-		? vertices_coordsFlat.map(resize3)
-		: vertices_coordsFlat.map(resize2);
+	const vertices_coordsNew =
+		dimensions === 3
+			? vertices_coordsFlat.map(resize3)
+			: vertices_coordsFlat.map(resize2);
 
 	// if no edges exist, return the vertex-face graph.
 	if (!edges_vertices) {
@@ -75,10 +75,9 @@ export const explodeFaces = ({
 	let e = 0;
 	/** @type {[number, number][]} */
 	const edges_verticesNew = faces_edges
-		.flatMap(face => face
-			.map((_, i, arr) => (i === arr.length - 1
-				? [e, (++e - arr.length)]
-				: [e, (++e)])))
+		.flatMap((face) =>
+			face.map((_, i, arr) => (i === arr.length - 1 ? [e, ++e - arr.length] : [e, ++e])),
+		)
 		.map(([a, b]) => [a, b]);
 
 	const result = {
@@ -87,12 +86,12 @@ export const explodeFaces = ({
 		edges_vertices: edges_verticesNew,
 	};
 
-	const edgesMap = faces_edges.flatMap(edges => edges);
+	const edgesMap = faces_edges.flatMap((edges) => edges);
 	if (edges_assignment) {
-		result.edges_assignment = edgesMap.map(i => edges_assignment[i]);
+		result.edges_assignment = edgesMap.map((i) => edges_assignment[i]);
 	}
 	if (edges_foldAngle) {
-		result.edges_foldAngle = edgesMap.map(i => edges_foldAngle[i]);
+		result.edges_foldAngle = edgesMap.map((i) => edges_foldAngle[i]);
 	}
 	return result;
 };
@@ -105,7 +104,10 @@ export const explodeFaces = ({
  * @returns {FOLD} a new FOLD graph with shallow pointers to the input graph.
  */
 export const explodeEdges = ({
-	vertices_coords, edges_vertices, edges_assignment, edges_foldAngle,
+	vertices_coords,
+	edges_vertices,
+	edges_assignment,
+	edges_foldAngle,
 }) => {
 	// if no edges exist, return the vertices (if the exist) as they are
 	// technically exploded (weird yes).
@@ -119,11 +121,16 @@ export const explodeEdges = ({
 		/** @type {[number, number][]} */
 		edges_vertices: edges_vertices.map(() => [e++, e++]),
 	};
-	if (edges_assignment) { result.edges_assignment = edges_assignment; }
-	if (edges_foldAngle) { result.edges_foldAngle = edges_foldAngle; }
+	if (edges_assignment) {
+		result.edges_assignment = edges_assignment;
+	}
+	if (edges_foldAngle) {
+		result.edges_foldAngle = edges_foldAngle;
+	}
 	if (vertices_coords) {
-		result.vertices_coords = structuredClone(edges_vertices
-			.flatMap(edge => edge.map(v => vertices_coords[v])));
+		result.vertices_coords = structuredClone(
+			edges_vertices.flatMap((edge) => edge.map((v) => vertices_coords[v])),
+		);
 	}
 	return result;
 };

@@ -1,32 +1,13 @@
 /**
  * Rabbit Ear (c) Kraft
  */
-import {
-	getDimensionQuick,
-} from "../../fold/spec.js";
-import {
-	makePolygonNonCollinear,
-	centroid,
-} from "../../math/polygon.js";
-import {
-	average2,
-	average3,
-	resize2,
-	resize3,
-} from "../../math/vector.js";
-import {
-	walkPlanarFaces,
-	filterWalkedBoundaryFace,
-} from "../walk.js";
-import {
-	makeVerticesVertices,
-} from "./verticesVertices.js";
-import {
-	makeVerticesSectors,
-} from "./vertices.js";
-import {
-	makeVerticesToEdge,
-} from "./lookup.js";
+import { getDimensionQuick } from "../../fold/spec.js";
+import { makePolygonNonCollinear, centroid } from "../../math/polygon.js";
+import { average2, average3, resize2, resize3 } from "../../math/vector.js";
+import { walkPlanarFaces, filterWalkedBoundaryFace } from "../walk.js";
+import { makeVerticesVertices } from "./verticesVertices.js";
+import { makeVerticesSectors } from "./vertices.js";
+import { makeVerticesToEdge } from "./lookup.js";
 
 /**
  * @description Rebuild all faces in a 2D planar graph by walking counter-clockwise
@@ -43,30 +24,42 @@ import {
  * const { faces_vertices, faces_edges } = makePlanarFaces(graph);
  */
 export const makePlanarFaces = ({
-	vertices_coords, vertices_vertices, vertices_edges,
-	vertices_sectors, edges_vertices, edges_vector,
+	vertices_coords,
+	vertices_vertices,
+	vertices_edges,
+	vertices_sectors,
+	edges_vertices,
+	edges_vector,
 }) => {
 	if (!vertices_vertices) {
 		vertices_vertices = makeVerticesVertices({
-			vertices_coords, edges_vertices, vertices_edges,
+			vertices_coords,
+			edges_vertices,
+			vertices_edges,
 		});
 	}
 	if (!vertices_sectors) {
 		vertices_sectors = makeVerticesSectors({
-			vertices_coords, vertices_vertices, edges_vertices, edges_vector,
+			vertices_coords,
+			vertices_vertices,
+			edges_vertices,
+			edges_vector,
 		});
 	}
 	const vertices_edges_map = makeVerticesToEdge({ edges_vertices });
 	// removes the one face that outlines the piece with opposite winding.
 	// walkPlanarFaces stores edges as vertex pair strings, "4 9",
 	// convert these into edge indices
-	const res = filterWalkedBoundaryFace(walkPlanarFaces({
-		vertices_vertices, vertices_sectors,
-	})).map(f => ({ ...f, edges: f.edges.map(e => vertices_edges_map[e]) }));
+	const res = filterWalkedBoundaryFace(
+		walkPlanarFaces({
+			vertices_vertices,
+			vertices_sectors,
+		}),
+	).map((f) => ({ ...f, edges: f.edges.map((e) => vertices_edges_map[e]) }));
 	return {
-		faces_vertices: res.map(el => el.vertices),
-		faces_edges: res.map(el => el.edges),
-		faces_sectors: res.map(el => el.angles),
+		faces_vertices: res.map((el) => el.vertices),
+		faces_edges: res.map((el) => el.edges),
+		faces_sectors: res.map((el) => el.angles),
 	};
 };
 
@@ -86,11 +79,10 @@ export const makePlanarFaces = ({
  * @returns {([number, number] | [number, number, number])[][]} an array
  * of array of points, where each point is an array of 2 or 3 numbers
  */
-export const makeFacesPolygon = ({ vertices_coords, faces_vertices }, epsilon) => (
+export const makeFacesPolygon = ({ vertices_coords, faces_vertices }, epsilon) =>
 	faces_vertices
-		.map(verts => verts.map(v => vertices_coords[v]))
-		.map(polygon => makePolygonNonCollinear(polygon, epsilon))
-);
+		.map((verts) => verts.map((v) => vertices_coords[v]))
+		.map((polygon) => makePolygonNonCollinear(polygon, epsilon));
 
 /**
  * @description map vertices_coords onto each face's set of vertices,
@@ -100,21 +92,19 @@ export const makeFacesPolygon = ({ vertices_coords, faces_vertices }, epsilon) =
  * @returns {([number, number] | [number, number, number])[][]} an
  * array of array of points, where each point is an array of numbers
  */
-export const makeFacesPolygonQuick = ({ vertices_coords, faces_vertices }) => (
-	faces_vertices.map(verts => verts.map(v => vertices_coords[v]))
-);
+export const makeFacesPolygonQuick = ({ vertices_coords, faces_vertices }) =>
+	faces_vertices.map((verts) => verts.map((v) => vertices_coords[v]));
 
 /**
  * @description For every face, get the face's centroid.
  * @param {FOLD} graph a FOLD object, with vertices_coords, faces_vertices
  * @returns {[number, number][]} array of points, where each point is an array of numbers
  */
-export const makeFacesCentroid2D = ({ vertices_coords, faces_vertices }) => (
+export const makeFacesCentroid2D = ({ vertices_coords, faces_vertices }) =>
 	faces_vertices
-		.map(fv => fv.map(v => vertices_coords[v]))
-		.map(coords => coords.map(resize2))
-		.map(coords => centroid(coords))
-);
+		.map((fv) => fv.map((v) => vertices_coords[v]))
+		.map((coords) => coords.map(resize2))
+		.map((coords) => centroid(coords));
 
 /**
  * @description For every face, get the average of the face's vertices.
@@ -122,11 +112,10 @@ export const makeFacesCentroid2D = ({ vertices_coords, faces_vertices }) => (
  * @param {FOLD} graph a FOLD object, with vertices_coords, faces_vertices
  * @returns {[number, number][]} array of points, where each point is an array of numbers
  */
-export const makeFacesCenter2DQuick = ({ vertices_coords, faces_vertices }) => (
+export const makeFacesCenter2DQuick = ({ vertices_coords, faces_vertices }) =>
 	makeFacesPolygonQuick({ vertices_coords, faces_vertices })
-		.map(coords => coords.map(resize2))
-		.map(coords => average2(...coords))
-);
+		.map((coords) => coords.map(resize2))
+		.map((coords) => average2(...coords));
 
 /**
  * @description For every face, get the average of the face's vertices.
@@ -134,13 +123,12 @@ export const makeFacesCenter2DQuick = ({ vertices_coords, faces_vertices }) => (
  * @param {FOLD} graph a FOLD object, with vertices_coords, faces_vertices
  * @returns {[number, number, number][]} array of points, where each point is an array of numbers
  */
-export const makeFacesCenter3DQuick = ({ vertices_coords, faces_vertices }) => (
+export const makeFacesCenter3DQuick = ({ vertices_coords, faces_vertices }) =>
 	makeFacesPolygonQuick({ vertices_coords, faces_vertices })
-		.map(coords => coords.map(resize3))
-		.map(coords => average3(...coords))
+		.map((coords) => coords.map(resize3))
+		.map((coords) => average3(...coords))
 		// assume vertices_coords is 3D, if not, center point[2] will be NaN, fix it
-		.map(point => (Number.isNaN(point[2]) ? [point[0], point[1], 0] : point))
-);
+		.map((point) => (Number.isNaN(point[2]) ? [point[0], point[1], 0] : point));
 
 /**
  * @description For every face, get the average of the face's vertices.

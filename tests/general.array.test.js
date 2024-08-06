@@ -27,8 +27,9 @@ test("uniqueElements", () => {
 	// Test case 5: Array with objects
 	const testArray5 = [{ id: 1 }, { id: 2 }, { id: 3 }, { id: 1 }];
 	const result5 = ear.general.uniqueElements(testArray5);
-	expect(JSON.stringify(result5))
-		.toBe(JSON.stringify([{ id: 1 }, { id: 2 }, { id: 3 }, { id: 1 }]));
+	expect(JSON.stringify(result5)).toBe(
+		JSON.stringify([{ id: 1 }, { id: 2 }, { id: 3 }, { id: 1 }]),
+	);
 });
 
 test("nonUniqueElements - Array with no unique elements", () => {
@@ -152,70 +153,82 @@ test("epsilonUniqueSortedNumbers - Array with one element", () => {
 });
 
 test("array intersection", () => {
-	arraysMatch([1, 7, 9, 15], ear.general.arrayIntersection(
-		[1, 2, 4, 5, 7, 9, 11, 15, 18],
-		[19, 15, 14, 12, 9, 7, 3, 1],
-	));
-	arraysMatch([1, 7, 9, 15, 18], ear.general.arrayIntersection(
-		[1, 2, 4, 5, 7, 9, 11, 15, 18],
-		[18, 15, 14, 12, 9, 7, 3, 1],
-	));
-	arraysMatch([7, 9, 15, 18], ear.general.arrayIntersection(
-		[0, 1, 2, 4, 5, 7, 9, 11, 15, 18],
-		[18, 15, 14, 12, 9, 7, 3],
-	));
-	arraysMatch([6, 9], ear.general.arrayIntersection(
-		[1, 5, 6, 9, 13],
-		[16, 9, 6, 4, 2],
-	));
-	arraysMatch([3, 5, 7, 9], ear.general.arrayIntersection(
+	arraysMatch(
+		[1, 7, 9, 15],
+		ear.general.arrayIntersection(
+			[1, 2, 4, 5, 7, 9, 11, 15, 18],
+			[19, 15, 14, 12, 9, 7, 3, 1],
+		),
+	);
+	arraysMatch(
+		[1, 7, 9, 15, 18],
+		ear.general.arrayIntersection(
+			[1, 2, 4, 5, 7, 9, 11, 15, 18],
+			[18, 15, 14, 12, 9, 7, 3, 1],
+		),
+	);
+	arraysMatch(
+		[7, 9, 15, 18],
+		ear.general.arrayIntersection(
+			[0, 1, 2, 4, 5, 7, 9, 11, 15, 18],
+			[18, 15, 14, 12, 9, 7, 3],
+		),
+	);
+	arraysMatch([6, 9], ear.general.arrayIntersection([1, 5, 6, 9, 13], [16, 9, 6, 4, 2]));
+	arraysMatch([3, 5, 7, 9], ear.general.arrayIntersection([3, 5, 7, 9], [9, 7, 5, 3]));
+	arraysMatch([3, 5, 7, 9], ear.general.arrayIntersection([3, 5, 7, 9], [9, 7, 5, 3, 2]));
+	arraysMatch(
 		[3, 5, 7, 9],
-		[9, 7, 5, 3],
-	));
-	arraysMatch([3, 5, 7, 9], ear.general.arrayIntersection(
+		ear.general.arrayIntersection([3, 5, 7, 9], [11, 9, 7, 5, 3]),
+	);
+	arraysMatch(
 		[3, 5, 7, 9],
-		[9, 7, 5, 3, 2],
-	));
-	arraysMatch([3, 5, 7, 9], ear.general.arrayIntersection(
-		[3, 5, 7, 9],
-		[11, 9, 7, 5, 3],
-	));
-	arraysMatch([3, 5, 7, 9], ear.general.arrayIntersection(
-		[3, 5, 7, 9, 11],
-		[9, 7, 5, 3],
-	));
-	arraysMatch([3, 5, 7, 9], ear.general.arrayIntersection(
-		[2, 3, 5, 7, 9],
-		[9, 7, 5, 3],
-	));
-	arraysMatch([1, 2], ear.general.arrayIntersection(
-		[1, 2, 3, 4],
-		[0, 1, 2, 6, 7],
-	));
-	arraysMatch([1, 2, 7], ear.general.arrayIntersection(
-		[1, 2, 3, 4, 7],
-		[0, 1, 2, 6, 7],
-	));
+		ear.general.arrayIntersection([3, 5, 7, 9, 11], [9, 7, 5, 3]),
+	);
+	arraysMatch([3, 5, 7, 9], ear.general.arrayIntersection([2, 3, 5, 7, 9], [9, 7, 5, 3]));
+	arraysMatch([1, 2], ear.general.arrayIntersection([1, 2, 3, 4], [0, 1, 2, 6, 7]));
+	arraysMatch([1, 2, 7], ear.general.arrayIntersection([1, 2, 3, 4, 7], [0, 1, 2, 6, 7]));
 });
 
 test("rotateCircularArray", () => {
-	expect(ear.general.rotateCircularArray([0, 1, 2, 3, 4, 5], 2))
-		.toMatchObject([2, 3, 4, 5, 0, 1]);
+	expect(ear.general.rotateCircularArray([0, 1, 2, 3, 4, 5], 2)).toMatchObject([
+		2, 3, 4, 5, 0, 1,
+	]);
 
-	expect(ear.general.rotateCircularArray([0, 1, 2, 3, 4, 5], -1))
-		.toMatchObject([0, 1, 2, 3, 4, 5]);
+	expect(ear.general.rotateCircularArray([0, 1, 2, 3, 4, 5], -1)).toMatchObject([
+		0, 1, 2, 3, 4, 5,
+	]);
 
-	expect(ear.general.rotateCircularArray([0, 1, 2, 3, 4, 5], 8))
-		.toMatchObject([0, 1, 2, 3, 4, 5]);
+	expect(ear.general.rotateCircularArray([0, 1, 2, 3, 4, 5], 8)).toMatchObject([
+		0, 1, 2, 3, 4, 5,
+	]);
 
-	expect(ear.general.rotateCircularArray([0, 1, , , 4, 5], 0))
-		.toMatchObject([0, 1, , , 4, 5]);
+	expect(ear.general.rotateCircularArray([0, 1, , , 4, 5], 0)).toMatchObject([
+		0,
+		1,
+		,
+		,
+		4,
+		5,
+	]);
 
-	expect(ear.general.rotateCircularArray([0, 1, , , 4, 5], 2))
-		.toMatchObject([, , 4, 5, 0, 1]);
+	expect(ear.general.rotateCircularArray([0, 1, , , 4, 5], 2)).toMatchObject([
+		,
+		,
+		4,
+		5,
+		0,
+		1,
+	]);
 
-	expect(ear.general.rotateCircularArray([0, 1, , , 4, 5], 5))
-		.toMatchObject([5, 0, 1, , , 4]);
+	expect(ear.general.rotateCircularArray([0, 1, , , 4, 5], 5)).toMatchObject([
+		5,
+		0,
+		1,
+		,
+		,
+		4,
+	]);
 });
 
 test("chooseTwoPairs - Array with even number of items", () => {
@@ -227,7 +240,7 @@ test("chooseTwoPairs - Array with even number of items", () => {
 		["A", "D"],
 		["B", "C"],
 		["B", "D"],
-		["C", "D"]
+		["C", "D"],
 	]);
 });
 
@@ -237,7 +250,7 @@ test("chooseTwoPairs - Array with odd number of items", () => {
 	expect(result).toEqual([
 		["X", "Y"],
 		["X", "Z"],
-		["Y", "Z"]
+		["Y", "Z"],
 	]);
 });
 
@@ -383,51 +396,58 @@ test("arrayMinimumIndex", () => {
 	expect(ear.general.arrayMinimumIndex(array2)).toBe(6);
 
 	const array3 = [97, 98, 99, , , , , , 5, 6, 7];
-	expect(ear.general.arrayMinimumIndex(array3, n => -n)).toBe(2);
+	expect(ear.general.arrayMinimumIndex(array3, (n) => -n)).toBe(2);
 
 	const array4 = [0, 1, 2, , , , , , 99, 98, 97];
-	expect(ear.general.arrayMinimumIndex(array4, n => -n)).toBe(8);
+	expect(ear.general.arrayMinimumIndex(array4, (n) => -n)).toBe(8);
 });
 
-test("arrayMaximumIndex", () => {
-
-});
+test("arrayMaximumIndex", () => {});
 
 test("mergeArraysWithHoles", () => {
-	expect(ear.general.mergeArraysWithHoles(
-		[0, 1, , , 4, 5],
-		[, , 2, 3, , , 6, 7],
-	)).toMatchObject([0, 1, 2, 3, 4, 5, 6, 7]);
+	expect(
+		ear.general.mergeArraysWithHoles([0, 1, , , 4, 5], [, , 2, 3, , , 6, 7]),
+	).toMatchObject([0, 1, 2, 3, 4, 5, 6, 7]);
 
-	expect(ear.general.mergeArraysWithHoles(
-		[0, 1, , , 4, 5],
-		[, , 2, 3],
-	)).toMatchObject([0, 1, 2, 3, 4, 5]);
+	expect(ear.general.mergeArraysWithHoles([0, 1, , , 4, 5], [, , 2, 3])).toMatchObject([
+		0, 1, 2, 3, 4, 5,
+	]);
 
-	expect(ear.general.mergeArraysWithHoles(
-		[0, 1, , 4, 5],
-		[, 2, 3, , 6, 7],
-	)).toMatchObject([0, 2, 3, 4, 6, 7]);
+	expect(
+		ear.general.mergeArraysWithHoles([0, 1, , 4, 5], [, 2, 3, , 6, 7]),
+	).toMatchObject([0, 2, 3, 4, 6, 7]);
 
-	expect(ear.general.mergeArraysWithHoles(
-		[, "b", , , , "f", "g", , "i"],
-		[, , 3, , 5, , , 8],
-	)).toMatchObject([, "b", 3, , 5, "f", "g", 8, "i"]);
+	expect(
+		ear.general.mergeArraysWithHoles([, "b", , , , "f", "g", , "i"], [, , 3, , 5, , , 8]),
+	).toMatchObject([, "b", 3, , 5, "f", "g", 8, "i"]);
 });
 
 test("clustersToReflexiveArrays", () => {
-	const result = ear.general.clustersToReflexiveArrays([[0, 2], [1, 3, 4]]);
-	expect(result).toMatchObject([
-		[2], [3, 4], [0], [1, 4], [1, 3]
+	const result = ear.general.clustersToReflexiveArrays([
+		[0, 2],
+		[1, 3, 4],
 	]);
+	expect(result).toMatchObject([[2], [3, 4], [0], [1, 4], [1, 3]]);
 });
 
 test("clustersToReflexiveArrays", () => {
 	const example = [[6, 0, 2, 4], [5, 14, 1, 7, 13, 3], [10, 9], [11, 12], [8]];
 	const result = ear.general.clustersToReflexiveArrays(example);
 	expect(result).toMatchObject([
-		[6, 2, 4], [5, 14, 7, 13, 3], [6, 0, 4], [5, 14, 1, 7, 13],
-		[6, 0, 2], [14, 1, 7, 13, 3], [0, 2, 4], [5, 14, 1, 13, 3],
-		[], [10], [9], [12], [11], [5, 14, 1, 7, 3], [5, 1, 7, 13, 3],
+		[6, 2, 4],
+		[5, 14, 7, 13, 3],
+		[6, 0, 4],
+		[5, 14, 1, 7, 13],
+		[6, 0, 2],
+		[14, 1, 7, 13, 3],
+		[0, 2, 4],
+		[5, 14, 1, 13, 3],
+		[],
+		[10],
+		[9],
+		[12],
+		[11],
+		[5, 14, 1, 7, 3],
+		[5, 1, 7, 13, 3],
 	]);
 });

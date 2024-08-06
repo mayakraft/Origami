@@ -1,36 +1,14 @@
 /**
  * Rabbit Ear (c) Kraft
  */
-import {
-	EPSILON,
-} from "../math/constant.js";
-import {
-	exclude,
-	includeL,
-	includeS,
-} from "../math/compare.js";
-import {
-	magSquared,
-	dot2,
-	cross2,
-	subtract2,
-	resize2,
-} from "../math/vector.js";
-import {
-	pointsToLine2,
-} from "../math/convert.js";
-import {
-	intersectLineLine,
-} from "../math/intersect.js";
-import {
-	overlapConvexPolygonPoint,
-} from "../math/overlap.js";
-import {
-	clusterSortedGeneric,
-} from "../general/cluster.js";
-import {
-	makeFacesEdgesFromVertices,
-} from "./make/facesEdges.js";
+import { EPSILON } from "../math/constant.js";
+import { exclude, includeL, includeS } from "../math/compare.js";
+import { magSquared, dot2, cross2, subtract2, resize2 } from "../math/vector.js";
+import { pointsToLine2 } from "../math/convert.js";
+import { intersectLineLine } from "../math/intersect.js";
+import { overlapConvexPolygonPoint } from "../math/overlap.js";
+import { clusterSortedGeneric } from "../general/cluster.js";
+import { makeFacesEdgesFromVertices } from "./make/facesEdges.js";
 
 /**
  * @description Intersect a line/ray/segment with a FOLD graph but only
@@ -56,11 +34,11 @@ export const intersectLineVertices = (
 		return Array(vertices_coords.length).fill(undefined);
 	}
 	return vertices_coords
-		.map(coord => subtract2(coord, origin))
-		.map(vec => {
+		.map((coord) => subtract2(coord, origin))
+		.map((vec) => {
 			const parameter = dot2(vec, vector) / lineMagSq;
-			return Math.abs(cross2(vec, vector)) < epsilon
-				&& lineDomain(parameter, epsilon / lineMag)
+			return Math.abs(cross2(vec, vector)) < epsilon &&
+				lineDomain(parameter, epsilon / lineMag)
 				? parameter
 				: undefined;
 		});
@@ -94,7 +72,9 @@ export const intersectLineVerticesEdges = (
 	lineDomain = includeL,
 	epsilon = EPSILON,
 ) => {
-	if (!vertices_coords) { return { vertices: [], edges: [] }; }
+	if (!vertices_coords) {
+		return { vertices: [], edges: [] };
+	}
 
 	// for every vertex, does that vertex lie along the line.
 	const vertices = intersectLineVertices(
@@ -104,15 +84,18 @@ export const intersectLineVerticesEdges = (
 		epsilon,
 	);
 
-	if (!edges_vertices) { return { vertices, edges: [] }; }
+	if (!edges_vertices) {
+		return { vertices, edges: [] };
+	}
 
 	// for every edge, a list of its vertices that lie along the line (0, 1, or 2)
 	// if an edge has 1-2 overlapping vertices, we can skip the intersection call
 	// if an edge has no overlapping vertices, we must run the edge-intersection.
-	const edgesVerticesOverlap = edges_vertices
-		.map(ev => ev
-			.map(v => (vertices[v] !== undefined ? v : undefined))
-			.filter(a => a !== undefined));
+	const edgesVerticesOverlap = edges_vertices.map((ev) =>
+		ev
+			.map((v) => (vertices[v] !== undefined ? v : undefined))
+			.filter((a) => a !== undefined),
+	);
 
 	// if the edge contains no vertices which overlap the line,
 	// perform a line-segment intersection, otherwise do nothing.
@@ -122,16 +105,18 @@ export const intersectLineVerticesEdges = (
 	// Additionally, add a { vertex: undefined } key/value to all intersections.
 	// const edgesNoOverlapIntersection = edges_vertices
 	const edges = edges_vertices
-		.map(ev => ev.map(v => vertices_coords[v]))
-		.map(([s0, s1], e) => (edgesVerticesOverlap[e].length === 0
-			? intersectLineLine(
-				{ vector, origin },
-				pointsToLine2(s0, s1),
-				lineDomain,
-				includeS,
-			)
-			: undefined))
-		.map(res => (res === undefined || !res.point ? undefined : res));
+		.map((ev) => ev.map((v) => vertices_coords[v]))
+		.map(([s0, s1], e) =>
+			edgesVerticesOverlap[e].length === 0
+				? intersectLineLine(
+						{ vector, origin },
+						pointsToLine2(s0, s1),
+						lineDomain,
+						includeS,
+					)
+				: undefined,
+		)
+		.map((res) => (res === undefined || !res.point ? undefined : res));
 
 	// if our line crosses the edge at one vertex, we still want to include the
 	// intersection information, but we can construct it ourselves without
@@ -205,7 +190,9 @@ export const intersectLine = (
 		epsilon,
 	);
 
-	if (!faces_vertices) { return { vertices, edges, faces: [] }; }
+	if (!faces_vertices) {
+		return { vertices, edges, faces: [] };
+	}
 
 	if (!faces_edges) {
 		// eslint-disable-next-line no-param-reassign
@@ -215,18 +202,18 @@ export const intersectLine = (
 	// for every face, get every edge of that face's intersection with our line,
 	// filter out any edges which had no intersection.
 	// it's possible for faces to have 0, 1, 2, 3... any number of intersections.
-	const facesEdgeIntersections = faces_edges
-		.map(fe => fe
-			.map(edge => (edges[edge]
-				? { ...edges[edge], edge }
-				: undefined))
-			.filter(a => a !== undefined));
-	const facesVertexIntersections = faces_vertices
-		.map(fv => fv
-			.map(vertex => (vertices[vertex] !== undefined
-				? { a: vertices[vertex], vertex }
-				: undefined))
-			.filter(a => a !== undefined));
+	const facesEdgeIntersections = faces_edges.map((fe) =>
+		fe
+			.map((edge) => (edges[edge] ? { ...edges[edge], edge } : undefined))
+			.filter((a) => a !== undefined),
+	);
+	const facesVertexIntersections = faces_vertices.map((fv) =>
+		fv
+			.map((vertex) =>
+				vertices[vertex] !== undefined ? { a: vertices[vertex], vertex } : undefined,
+			)
+			.filter((a) => a !== undefined),
+	);
 
 	const facesIntersections = faces_vertices.map((_, v) => [
 		...facesVertexIntersections[v],
@@ -243,11 +230,13 @@ export const intersectLine = (
 	// Finally, filter out any invalid intersections from the face which
 	// includes two vertices that form a collinear edge
 	const faces = facesIntersections
-		.map(intersections => intersections.sort((p, q) => p.a - q.a))
-		.map(intersections => clusterSortedGeneric(intersections, epsilonEqual)
-			.map(cluster => cluster.map(index => intersections[index])))
-		.map(clusters => clusters
-			.map(cluster => cluster[0]));
+		.map((intersections) => intersections.sort((p, q) => p.a - q.a))
+		.map((intersections) =>
+			clusterSortedGeneric(intersections, epsilonEqual).map((cluster) =>
+				cluster.map((index) => intersections[index]),
+			),
+		)
+		.map((clusters) => clusters.map((cluster) => cluster[0]));
 
 	return { vertices, edges, faces };
 };
@@ -325,13 +314,13 @@ export const intersectLineAndPoints = (
 	const facesInteriorPoints = !interiorPoints.length
 		? faces.map(() => [])
 		: faces.map((_, face) => {
-			const polygon = faces_vertices[face].map(v => vertices_coords2[v]);
-			const pointsOverlap = interiorPoints.map(point => ({
-				...overlapConvexPolygonPoint(polygon, point, exclude, epsilon),
-				point,
-			}));
-			return pointsOverlap.filter(el => el.overlap);
-		});
+				const polygon = faces_vertices[face].map((v) => vertices_coords2[v]);
+				const pointsOverlap = interiorPoints.map((point) => ({
+					...overlapConvexPolygonPoint(polygon, point, exclude, epsilon),
+					point,
+				}));
+				return pointsOverlap.filter((el) => el.overlap);
+			});
 
 	// Every face in this list will contain a list of intersection events
 	// that occur inside this face. The events are one of three categories:
@@ -340,11 +329,13 @@ export const intersectLineAndPoints = (
 	// - point: an object describing a point lying interior to the face
 	const newFacesData = faces.map((intersections, f) => ({
 		edges: intersections
-			.map(el => ("edge" in el && "a" in el && "b" in el && "point" in el ? el : undefined))
-			.filter(a => a !== undefined),
+			.map((el) =>
+				"edge" in el && "a" in el && "b" in el && "point" in el ? el : undefined,
+			)
+			.filter((a) => a !== undefined),
 		vertices: intersections
-			.map(el => ("vertex" in el && "a" in el ? el : undefined))
-			.filter(a => a !== undefined),
+			.map((el) => ("vertex" in el && "a" in el ? el : undefined))
+			.filter((a) => a !== undefined),
 		points: facesInteriorPoints[f],
 	}));
 
@@ -374,29 +365,32 @@ export const filterCollinearFacesData = ({ edges_vertices }, { vertices, faces }
 	// the form of vertices, so, pairs of vertices which form a collinear edge.
 	const collinearVertices = [];
 	edges_vertices
-		.map(verts => (vertices[verts[0]] !== undefined
-			&& vertices[verts[1]] !== undefined))
+		.map((verts) => vertices[verts[0]] !== undefined && vertices[verts[1]] !== undefined)
 		.map((collinear, edge) => (collinear ? edge : undefined))
-		.filter(a => a !== undefined)
-		.map(edge => edges_vertices[edge])
-		.forEach(verts => collinearVertices.push(verts));
+		.filter((a) => a !== undefined)
+		.map((edge) => edges_vertices[edge])
+		.forEach((verts) => collinearVertices.push(verts));
 
-	const facesVertices = faces.map(face => face.vertices.map(({ vertex }) => vertex));
+	const facesVertices = faces.map((face) => face.vertices.map(({ vertex }) => vertex));
 	const facesVerticesHash = [];
-	facesVertices.forEach((_, f) => { facesVerticesHash[f] = {}; });
-	facesVertices
-		.forEach((verts, f) => verts
-			.forEach(v => { facesVerticesHash[f][v] = true; }));
+	facesVertices.forEach((_, f) => {
+		facesVerticesHash[f] = {};
+	});
+	facesVertices.forEach((verts, f) =>
+		verts.forEach((v) => {
+			facesVerticesHash[f][v] = true;
+		}),
+	);
 
 	faces.forEach((face, f) => {
 		const removeVertices = {};
 		collinearVertices
-			.filter(pair => facesVerticesHash[f][pair[0]] && facesVerticesHash[f][pair[1]])
-			.forEach(pair => {
+			.filter((pair) => facesVerticesHash[f][pair[0]] && facesVerticesHash[f][pair[1]])
+			.forEach((pair) => {
 				removeVertices[pair[0]] = true;
 				removeVertices[pair[1]] = true;
 			});
 		// eslint-disable-next-line no-param-reassign
-		faces[f].vertices = face.vertices.filter(el => !removeVertices[el.vertex]);
+		faces[f].vertices = face.vertices.filter((el) => !removeVertices[el.vertex]);
 	});
 };

@@ -2,12 +2,8 @@
  * Rabbit Ear (c) Kraft
  */
 import Messages from "../environment/messages.js";
-import {
-	propagate,
-} from "./propagate.js";
-import {
-	getBranches,
-} from "./getBranches.js";
+import { propagate } from "./propagate.js";
+import { getBranches } from "./getBranches.js";
 
 /**
  * @description Given an array of unsolved facePair keys, attempt to solve
@@ -42,12 +38,7 @@ import {
  * branch is an array of solution objects when taken together compose
  * a complete solution.
  */
-const solveBranch = (
-	constraints,
-	lookup,
-	unsolvedKeys,
-	...orders
-) => {
+const solveBranch = (constraints, lookup, unsolvedKeys, ...orders) => {
 	// the purpose of this branch is to solve the unsolved keys, where currently,
 	// there is nothing to solve, so we make the first step by choosing one key
 	// guessing the value (either 1 or 2), and propagating that guess'
@@ -70,14 +61,14 @@ const solveBranch = (
 		try {
 			const result = propagate(constraints, lookup, [guessKey], ...orders, guess);
 			return Object.assign(result, guess);
-		} catch (error) { return undefined; }
+		} catch (error) {
+			return undefined;
+		}
 	};
 
 	// now that we have our guessKey, choose all possible values that the key
 	// can be (either 1 or 2) and run propagate with a new solution subset object.
-	const guessResults = [1, 2]
-		.map(tryPropagate)
-		.filter(a => a !== undefined);
+	const guessResults = [1, 2].map(tryPropagate).filter((a) => a !== undefined);
 
 	// For every unfinished solution, where each solution contains a different
 	// result to one or more of the face-pairs from each other, consider each
@@ -87,25 +78,22 @@ const solveBranch = (
 	// filtered out later in the return statement. Recurse with the subset of
 	// unfinishedKeys, and append the new branch's set of orders to the end.
 
-	return guessResults.map(order => (
+	return guessResults.map((order) =>
 		// check if all variables are solved or more work is required.
 		// store the result as either completed or unfinished
 		Object.keys(order).length === unsolvedKeys.length
 			? { orders: order }
 			: {
-				orders: order,
-				branches: getBranches(
-					unsolvedKeys.filter(key => !(key in order)),
-					constraints,
-					lookup,
-				).map(branchUnsolvedKeys => solveBranch(
-					constraints,
-					lookup,
-					branchUnsolvedKeys,
-					...orders,
-					order,
-				)),
-			}));
+					orders: order,
+					branches: getBranches(
+						unsolvedKeys.filter((key) => !(key in order)),
+						constraints,
+						lookup,
+					).map((branchUnsolvedKeys) =>
+						solveBranch(constraints, lookup, branchUnsolvedKeys, ...orders, order),
+					),
+				},
+	);
 };
 
 /**
@@ -161,7 +149,7 @@ export const solver = ({ constraints, lookup, facePairs, orders }) => {
 	const rootOrders = { ...orders, ...initialResult };
 
 	// get all keys unsolved after the first round of propagate
-	const remainingKeys = facePairs.filter(key => !(key in rootOrders));
+	const remainingKeys = facePairs.filter((key) => !(key in rootOrders));
 
 	// group the remaining keys into groups that are isolated from one another.
 	// recursively solve each branch, each branch could have more than one solution.
@@ -170,16 +158,11 @@ export const solver = ({ constraints, lookup, facePairs, orders }) => {
 		return remainingKeys.length === 0
 			? { orders: rootOrders }
 			: {
-				orders: rootOrders,
-				branches: getBranches(remainingKeys, constraints, lookup)
-					.map(unsolvedKeys => solveBranch(
-						constraints,
-						lookup,
-						unsolvedKeys,
-						orders,
-						initialResult,
-					)),
-			};
+					orders: rootOrders,
+					branches: getBranches(remainingKeys, constraints, lookup).map((unsolvedKeys) =>
+						solveBranch(constraints, lookup, unsolvedKeys, orders, initialResult),
+					),
+				};
 	} catch (error) {
 		throw new Error(Messages.noLayerSolution, { cause: error });
 	}

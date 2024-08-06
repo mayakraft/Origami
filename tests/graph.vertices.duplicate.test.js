@@ -3,10 +3,9 @@ import { expect, test } from "vitest";
 import ear from "../src/index.js";
 
 test("duplicateVertices", () => {
-	const graph = JSON.parse(fs.readFileSync(
-		"./tests/files/fold/bird-disjoint-edges.fold",
-		"utf-8",
-	));
+	const graph = JSON.parse(
+		fs.readFileSync("./tests/files/fold/bird-disjoint-edges.fold", "utf-8"),
+	);
 	const duplicates = ear.graph.duplicateVertices(graph);
 	// every point in this graph should be duplicate.
 	expect(duplicates.length).toBe(ear.graph.bird().vertices_coords.length);
@@ -125,8 +124,21 @@ test("merge duplicate vertices, outside epsilon", () => {
 // that aren't actually duplicate. not good but technically correct.
 test("removeDuplicateVertices with 2D and 3D vertices", () => {
 	const graph = {
-		vertices_coords: [[0, 0], [1, 0], [2, 0], [1, 0, 1], [2, 0, -2], [0, 0, 3]],
-		edges_vertices: [[0, 1], [1, 2], [2, 3], [3, 4], [4, 0]],
+		vertices_coords: [
+			[0, 0],
+			[1, 0],
+			[2, 0],
+			[1, 0, 1],
+			[2, 0, -2],
+			[0, 0, 3],
+		],
+		edges_vertices: [
+			[0, 1],
+			[1, 2],
+			[2, 3],
+			[3, 4],
+			[4, 0],
+		],
 	};
 	expect(graph.vertices_coords.length).toBe(6);
 	expect(graph.edges_vertices.length).toBe(5);

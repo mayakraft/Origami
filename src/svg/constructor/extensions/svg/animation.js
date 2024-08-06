@@ -1,6 +1,6 @@
 /* SVG (c) Kraft */
-import RabbitEarWindow from '../../../environment/window.js';
-import { makeUUID } from '../../../general/string.js';
+import RabbitEarWindow from "../../../environment/window.js";
+import { makeUUID } from "../../../general/string.js";
 
 /**
  * Rabbit Ear (c) Kraft
@@ -16,12 +16,14 @@ const Animation = function (element) {
 		if (RabbitEarWindow().cancelAnimationFrame) {
 			RabbitEarWindow().cancelAnimationFrame(requestId);
 		}
-		Object.keys(handlers).forEach(uuid => delete handlers[uuid]);
+		Object.keys(handlers).forEach((uuid) => delete handlers[uuid]);
 	};
 
 	const play = (handler) => {
 		stop();
-		if (!handler || !(RabbitEarWindow().requestAnimationFrame)) { return; }
+		if (!handler || !RabbitEarWindow().requestAnimationFrame) {
+			return;
+		}
 		start = performance.now();
 		frame = 0;
 		const uuid = makeUUID();

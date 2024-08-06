@@ -1,33 +1,14 @@
 /**
  * Rabbit Ear (c) Kraft
  */
-import {
-	EPSILON,
-} from "../../math/constant.js";
-import {
-	includeL,
-	includeR,
-	includeS,
-} from "../../math/compare.js";
-import {
-	pointsToLine2,
-} from "../../math/convert.js";
-import {
-	mergeNextmaps,
-} from "../maps.js";
-import {
-	intersectLineAndPoints,
-	filterCollinearFacesData,
-} from "../intersect.js";
-import {
-	splitEdge,
-} from "./splitEdge.js";
-import {
-	splitFace,
-} from "./splitFace.js";
-import {
-	addVertices,
-} from "../add/vertex.js";
+import { EPSILON } from "../../math/constant.js";
+import { includeL, includeR, includeS } from "../../math/compare.js";
+import { pointsToLine2 } from "../../math/convert.js";
+import { mergeNextmaps } from "../maps.js";
+import { intersectLineAndPoints, filterCollinearFacesData } from "../intersect.js";
+import { splitEdge } from "./splitEdge.js";
+import { splitFace } from "./splitFace.js";
+import { addVertices } from "../add/vertex.js";
 
 /**
  * @typedef SplitGraphEvent
@@ -65,9 +46,8 @@ import {
  * @param {...any[]} arrays a list of arrays
  * @returns {number} the sum of all the array lengths
  */
-const arraysLengthSum = (...arrays) => arrays
-	.map(arr => arr.length)
-	.reduce((a, b) => a + b, 0);
+const arraysLengthSum = (...arrays) =>
+	arrays.map((arr) => arr.length).reduce((a, b) => a + b, 0);
 
 /**
  * @description The internal function for splitting a graph with a line
@@ -142,16 +122,17 @@ export const splitGraphWithLineAndPoints = (
 	// split the edge creating two edges and one vertex, and update the edge map.
 	// store the source for how this vertex was made (edge split object).
 	intersections.edges
-		.map((intersection, edge) => (intersection
-			? ({ ...intersection, edge })
-			: undefined))
-		.filter(a => a !== undefined)
+		.map((intersection, edge) => (intersection ? { ...intersection, edge } : undefined))
+		.filter((a) => a !== undefined)
 		.forEach(({ a, b, point, edge }) => {
 			const newEdge = edgeMap[edge][0];
 			const [v0, v1] = graph.edges_vertices[newEdge];
 			/** @type {[number, number]} */
 			const vertices = [v0, v1];
-			const { vertex, edges: { map } } = splitEdge(graph, newEdge, point);
+			const {
+				vertex,
+				edges: { map },
+			} = splitEdge(graph, newEdge, point);
 
 			// the intersection information that created this vertex
 			verticesSource[vertex] = { a, b, vertices, edge, point };
@@ -170,8 +151,9 @@ export const splitGraphWithLineAndPoints = (
 	// where two of these events exist per face. This cuts out non-convex faces.
 	intersections.faces
 		.map(({ vertices, edges, points }, face) => ({ vertices, edges, points, face }))
-		.filter(({ vertices, edges, points }) => (
-			arraysLengthSum(vertices, edges, points) === 2))
+		.filter(
+			({ vertices, edges, points }) => arraysLengthSum(vertices, edges, points) === 2,
+		)
 		.forEach(({ vertices, edges, points, face }) => {
 			const newFace = faceMap[face][0];
 
@@ -191,7 +173,8 @@ export const splitGraphWithLineAndPoints = (
 			// - overlapped, pre-existing vertices
 			// - vertices created by intersected edges
 			// - isolated points inside of the face
-			const allNewVertices = vertices.map(({ vertex }) => vertex)
+			const allNewVertices = vertices
+				.map(({ vertex }) => vertex)
 				.concat(splitEdgesVertices)
 				.concat(isolatedPointVertices);
 			/** @type {[number, number]} */
@@ -225,7 +208,9 @@ export const splitGraphWithLineAndPoints = (
 
 	// these were set to the old face indices and need updating
 	verticesSource.forEach(({ face }, i) => {
-		if (face !== undefined) { verticesSource[i].faces = faceMap[face]; }
+		if (face !== undefined) {
+			verticesSource[i].faces = faceMap[face];
+		}
 	});
 
 	// each edge's new faces, found in faceMap[face], will contain two faces
@@ -233,7 +218,9 @@ export const splitGraphWithLineAndPoints = (
 	// will contain only one element if a segment was used as input to this method
 	// and a leaf edge was added to a face, not fully splitting it into two.
 	edgesSource.forEach(({ face }, i) => {
-		if (face !== undefined) { edgesSource[i].faces = faceMap[face]; }
+		if (face !== undefined) {
+			edgesSource[i].faces = faceMap[face];
+		}
 	});
 
 	// // using the overlapped vertices, make a list of edges collinear to the line
@@ -275,14 +262,8 @@ export const splitGraphWithLineAndPoints = (
  * @param {number} [epsilon=1e-6] an optional epsilon
  * @returns {SplitGraphEvent} an object describing the changes
  */
-export const splitGraphWithLine = (graph, line, epsilon = EPSILON) => (
-	splitGraphWithLineAndPoints(
-		graph,
-		line,
-		includeL,
-		[],
-		epsilon,
-	));
+export const splitGraphWithLine = (graph, line, epsilon = EPSILON) =>
+	splitGraphWithLineAndPoints(graph, line, includeL, [], epsilon);
 
 /**
  * @description Split a graph with a ray, modifying the graph in place,
@@ -292,14 +273,8 @@ export const splitGraphWithLine = (graph, line, epsilon = EPSILON) => (
  * @param {number} [epsilon=1e-6] an optional epsilon
  * @returns {SplitGraphEvent} an object describing the changes
  */
-export const splitGraphWithRay = (graph, ray, epsilon = EPSILON) => (
-	splitGraphWithLineAndPoints(
-		graph,
-		ray,
-		includeR,
-		[ray.origin],
-		epsilon,
-	));
+export const splitGraphWithRay = (graph, ray, epsilon = EPSILON) =>
+	splitGraphWithLineAndPoints(graph, ray, includeR, [ray.origin], epsilon);
 
 /**
  * @description Split a graph with a segment, modifying the graph in place,
@@ -309,11 +284,11 @@ export const splitGraphWithRay = (graph, ray, epsilon = EPSILON) => (
  * @param {number} [epsilon=1e-6] an optional epsilon
  * @returns {SplitGraphEvent} an object describing the changes
  */
-export const splitGraphWithSegment = (graph, segment, epsilon = EPSILON) => (
+export const splitGraphWithSegment = (graph, segment, epsilon = EPSILON) =>
 	splitGraphWithLineAndPoints(
 		graph,
 		pointsToLine2(segment[0], segment[1]),
 		includeS,
 		segment,
 		epsilon,
-	));
+	);

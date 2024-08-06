@@ -6,13 +6,13 @@ import ear from "../src/index.js";
 // there is some overlap between 2D and 3D, for comparison sake.
 
 test("2D layer solver, Randlett flapping bird", () => {
-	const foldfile = fs.readFileSync("./tests/files/fold/randlett-flapping-bird.fold", "utf-8");
+	const foldfile = fs.readFileSync(
+		"./tests/files/fold/randlett-flapping-bird.fold",
+		"utf-8",
+	);
 	const fold = JSON.parse(foldfile);
 	const folded = ear.graph.getFramesByClassName(fold, "foldedForm")[0];
-	const {
-		orders,
-		branches,
-	} = ear.layer(folded);
+	const { orders, branches } = ear.layer(folded);
 	expect(orders).toMatchObject(folded.faceOrders);
 	expect(branches).toBe(undefined);
 });
@@ -27,40 +27,62 @@ test("2D layer solver, preliminary fold", () => {
 	// going bottom up, two paths on either side
 	// 0 to 2 to 4 to 5
 	// 0 to 1 to 3 to 5
-	const faceOrdersStrings = faceOrders.map(order => JSON.stringify(order));
+	const faceOrdersStrings = faceOrders.map((order) => JSON.stringify(order));
 	// 0 and 5, both facing each other
-	expect(faceOrdersStrings.includes(JSON.stringify([0, 5, 1]))
-		|| faceOrdersStrings.includes(JSON.stringify([5, 0, 1]))).toBe(true);
+	expect(
+		faceOrdersStrings.includes(JSON.stringify([0, 5, 1])) ||
+			faceOrdersStrings.includes(JSON.stringify([5, 0, 1])),
+	).toBe(true);
 	// 0 and 1, both facing each other
-	expect(faceOrdersStrings.includes(JSON.stringify([0, 1, 1]))
-		|| faceOrdersStrings.includes(JSON.stringify([1, 0, 1]))).toBe(true);
+	expect(
+		faceOrdersStrings.includes(JSON.stringify([0, 1, 1])) ||
+			faceOrdersStrings.includes(JSON.stringify([1, 0, 1])),
+	).toBe(true);
 	// 0 and 3, both facing same direction, 3 on top
-	expect(faceOrdersStrings.includes(JSON.stringify([0, 3, -1]))
-		|| faceOrdersStrings.includes(JSON.stringify([3, 0, 1]))).toBe(true);
+	expect(
+		faceOrdersStrings.includes(JSON.stringify([0, 3, -1])) ||
+			faceOrdersStrings.includes(JSON.stringify([3, 0, 1])),
+	).toBe(true);
 	// 1 and 3, both facing away from each other
-	expect(faceOrdersStrings.includes(JSON.stringify([1, 3, -1]))
-		|| faceOrdersStrings.includes(JSON.stringify([3, 1, -1]))).toBe(true);
+	expect(
+		faceOrdersStrings.includes(JSON.stringify([1, 3, -1])) ||
+			faceOrdersStrings.includes(JSON.stringify([3, 1, -1])),
+	).toBe(true);
 	// 1 and 5, both facing same direction, 1 on top
-	expect(faceOrdersStrings.includes(JSON.stringify([1, 5, 1]))
-		|| faceOrdersStrings.includes(JSON.stringify([5, 1, -1]))).toBe(true);
+	expect(
+		faceOrdersStrings.includes(JSON.stringify([1, 5, 1])) ||
+			faceOrdersStrings.includes(JSON.stringify([5, 1, -1])),
+	).toBe(true);
 	// 3 and 5, both facing each other
-	expect(faceOrdersStrings.includes(JSON.stringify([3, 5, 1]))
-		|| faceOrdersStrings.includes(JSON.stringify([5, 3, 1]))).toBe(true);
+	expect(
+		faceOrdersStrings.includes(JSON.stringify([3, 5, 1])) ||
+			faceOrdersStrings.includes(JSON.stringify([5, 3, 1])),
+	).toBe(true);
 	// 0 and 2, both facing each other
-	expect(faceOrdersStrings.includes(JSON.stringify([0, 2, 1]))
-		|| faceOrdersStrings.includes(JSON.stringify([2, 0, 1]))).toBe(true);
+	expect(
+		faceOrdersStrings.includes(JSON.stringify([0, 2, 1])) ||
+			faceOrdersStrings.includes(JSON.stringify([2, 0, 1])),
+	).toBe(true);
 	// 0 and 4, both facing same direction, 3 on top
-	expect(faceOrdersStrings.includes(JSON.stringify([0, 4, -1]))
-		|| faceOrdersStrings.includes(JSON.stringify([4, 0, 1]))).toBe(true);
+	expect(
+		faceOrdersStrings.includes(JSON.stringify([0, 4, -1])) ||
+			faceOrdersStrings.includes(JSON.stringify([4, 0, 1])),
+	).toBe(true);
 	// 2 and 4, both facing away from each other
-	expect(faceOrdersStrings.includes(JSON.stringify([2, 4, -1]))
-		|| faceOrdersStrings.includes(JSON.stringify([4, 2, -1]))).toBe(true);
+	expect(
+		faceOrdersStrings.includes(JSON.stringify([2, 4, -1])) ||
+			faceOrdersStrings.includes(JSON.stringify([4, 2, -1])),
+	).toBe(true);
 	// 2 and 5, both facing same direction, 1 on top
-	expect(faceOrdersStrings.includes(JSON.stringify([2, 5, 1]))
-		|| faceOrdersStrings.includes(JSON.stringify([5, 2, -1]))).toBe(true);
+	expect(
+		faceOrdersStrings.includes(JSON.stringify([2, 5, 1])) ||
+			faceOrdersStrings.includes(JSON.stringify([5, 2, -1])),
+	).toBe(true);
 	// 4 and 5, both facing each other
-	expect(faceOrdersStrings.includes(JSON.stringify([4, 5, 1]))
-		|| faceOrdersStrings.includes(JSON.stringify([5, 4, 1]))).toBe(true);
+	expect(
+		faceOrdersStrings.includes(JSON.stringify([4, 5, 1])) ||
+			faceOrdersStrings.includes(JSON.stringify([5, 4, 1])),
+	).toBe(true);
 });
 
 test("3D layer solver, preliminary fold", () => {
@@ -73,40 +95,62 @@ test("3D layer solver, preliminary fold", () => {
 	// going bottom up, two paths on either side
 	// 0 to 2 to 4 to 5
 	// 0 to 1 to 3 to 5
-	const faceOrdersStrings = faceOrders.map(order => JSON.stringify(order));
+	const faceOrdersStrings = faceOrders.map((order) => JSON.stringify(order));
 	// 0 and 5, both facing each other
-	expect(faceOrdersStrings.includes(JSON.stringify([0, 5, 1]))
-		|| faceOrdersStrings.includes(JSON.stringify([5, 0, 1]))).toBe(true);
+	expect(
+		faceOrdersStrings.includes(JSON.stringify([0, 5, 1])) ||
+			faceOrdersStrings.includes(JSON.stringify([5, 0, 1])),
+	).toBe(true);
 	// 0 and 1, both facing each other
-	expect(faceOrdersStrings.includes(JSON.stringify([0, 1, 1]))
-		|| faceOrdersStrings.includes(JSON.stringify([1, 0, 1]))).toBe(true);
+	expect(
+		faceOrdersStrings.includes(JSON.stringify([0, 1, 1])) ||
+			faceOrdersStrings.includes(JSON.stringify([1, 0, 1])),
+	).toBe(true);
 	// 0 and 3, both facing same direction, 3 on top
-	expect(faceOrdersStrings.includes(JSON.stringify([0, 3, -1]))
-		|| faceOrdersStrings.includes(JSON.stringify([3, 0, 1]))).toBe(true);
+	expect(
+		faceOrdersStrings.includes(JSON.stringify([0, 3, -1])) ||
+			faceOrdersStrings.includes(JSON.stringify([3, 0, 1])),
+	).toBe(true);
 	// 1 and 3, both facing away from each other
-	expect(faceOrdersStrings.includes(JSON.stringify([1, 3, -1]))
-		|| faceOrdersStrings.includes(JSON.stringify([3, 1, -1]))).toBe(true);
+	expect(
+		faceOrdersStrings.includes(JSON.stringify([1, 3, -1])) ||
+			faceOrdersStrings.includes(JSON.stringify([3, 1, -1])),
+	).toBe(true);
 	// 1 and 5, both facing same direction, 1 on top
-	expect(faceOrdersStrings.includes(JSON.stringify([1, 5, 1]))
-		|| faceOrdersStrings.includes(JSON.stringify([5, 1, -1]))).toBe(true);
+	expect(
+		faceOrdersStrings.includes(JSON.stringify([1, 5, 1])) ||
+			faceOrdersStrings.includes(JSON.stringify([5, 1, -1])),
+	).toBe(true);
 	// 3 and 5, both facing each other
-	expect(faceOrdersStrings.includes(JSON.stringify([3, 5, 1]))
-		|| faceOrdersStrings.includes(JSON.stringify([5, 3, 1]))).toBe(true);
+	expect(
+		faceOrdersStrings.includes(JSON.stringify([3, 5, 1])) ||
+			faceOrdersStrings.includes(JSON.stringify([5, 3, 1])),
+	).toBe(true);
 	// 0 and 2, both facing each other
-	expect(faceOrdersStrings.includes(JSON.stringify([0, 2, 1]))
-		|| faceOrdersStrings.includes(JSON.stringify([2, 0, 1]))).toBe(true);
+	expect(
+		faceOrdersStrings.includes(JSON.stringify([0, 2, 1])) ||
+			faceOrdersStrings.includes(JSON.stringify([2, 0, 1])),
+	).toBe(true);
 	// 0 and 4, both facing same direction, 3 on top
-	expect(faceOrdersStrings.includes(JSON.stringify([0, 4, -1]))
-		|| faceOrdersStrings.includes(JSON.stringify([4, 0, 1]))).toBe(true);
+	expect(
+		faceOrdersStrings.includes(JSON.stringify([0, 4, -1])) ||
+			faceOrdersStrings.includes(JSON.stringify([4, 0, 1])),
+	).toBe(true);
 	// 2 and 4, both facing away from each other
-	expect(faceOrdersStrings.includes(JSON.stringify([2, 4, -1]))
-		|| faceOrdersStrings.includes(JSON.stringify([4, 2, -1]))).toBe(true);
+	expect(
+		faceOrdersStrings.includes(JSON.stringify([2, 4, -1])) ||
+			faceOrdersStrings.includes(JSON.stringify([4, 2, -1])),
+	).toBe(true);
 	// 2 and 5, both facing same direction, 1 on top
-	expect(faceOrdersStrings.includes(JSON.stringify([2, 5, 1]))
-		|| faceOrdersStrings.includes(JSON.stringify([5, 2, -1]))).toBe(true);
+	expect(
+		faceOrdersStrings.includes(JSON.stringify([2, 5, 1])) ||
+			faceOrdersStrings.includes(JSON.stringify([5, 2, -1])),
+	).toBe(true);
 	// 4 and 5, both facing each other
-	expect(faceOrdersStrings.includes(JSON.stringify([4, 5, 1]))
-		|| faceOrdersStrings.includes(JSON.stringify([5, 4, 1]))).toBe(true);
+	expect(
+		faceOrdersStrings.includes(JSON.stringify([4, 5, 1])) ||
+			faceOrdersStrings.includes(JSON.stringify([5, 4, 1])),
+	).toBe(true);
 });
 
 test("2D layer solver, preliminary fold, layers linearized", () => {
@@ -140,7 +184,7 @@ test("2D layer solver, kabuto", () => {
 	]);
 	const layerSolutions = solution.compileAll();
 	expect(layerSolutions).toHaveLength(9);
-	layerSolutions.forEach(orders => expect(orders).toHaveLength(117));
+	layerSolutions.forEach((orders) => expect(orders).toHaveLength(117));
 });
 
 test("2D layer solver, kraft-bird", () => {
@@ -154,10 +198,13 @@ test("2D layer solver, kraft-bird", () => {
 	const faceOrders = ear.layer(folded).faceOrders();
 	expect(faceOrders).toHaveLength(5848);
 
-	fs.writeFileSync(`./tests/tmp/kraft-bird-base-solved.fold`, JSON.stringify({
-		...folded,
-		faceOrders,
-	}));
+	fs.writeFileSync(
+		`./tests/tmp/kraft-bird-base-solved.fold`,
+		JSON.stringify({
+			...folded,
+			faceOrders,
+		}),
+	);
 });
 
 // // takes about 2 seconds

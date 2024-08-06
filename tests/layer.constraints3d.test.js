@@ -53,7 +53,10 @@ test("makeSolverConstraints3D cube octagon", () => {
 	const folded = ear.graph.getFramesByClassName(fold, "foldedForm")[0];
 	ear.graph.populate(folded);
 
-	const expectedJSON = fs.readFileSync("./tests/files/json/cube-octagon-constraints.json", "utf-8");
+	const expectedJSON = fs.readFileSync(
+		"./tests/files/json/cube-octagon-constraints.json",
+		"utf-8",
+	);
 	const expected = JSON.parse(expectedJSON);
 
 	const solverConstraints = ear.layer.makeSolverConstraints3D(folded);
@@ -64,16 +67,19 @@ test("makeSolverConstraints3D cube octagon", () => {
 // things which examine the overlapping geometry in 3D and generate
 // either additional solutions (orders) or conditions (tacos/tortillas/transitivity)
 test("makeSolverConstraints3D layer 3D test cases", () => {
-	const foldfile = fs.readFileSync("./tests/files/fold/layers-3d-edge-edge.fold", "utf-8");
+	const foldfile = fs.readFileSync(
+		"./tests/files/fold/layers-3d-edge-edge.fold",
+		"utf-8",
+	);
 	const fold = JSON.parse(foldfile);
 	const frames = ear.graph.getFileFramesAsArray(fold);
-	const foldedForms = frames.map(frame => ({
+	const foldedForms = frames.map((frame) => ({
 		...frame,
 		vertices_coords: ear.graph.makeVerticesCoordsFolded(frame),
 	}));
-	foldedForms.forEach(folded => ear.graph.populate(folded));
+	foldedForms.forEach((folded) => ear.graph.populate(folded));
 
-	const results = foldedForms.map(folded => {
+	const results = foldedForms.map((folded) => {
 		try {
 			return ear.layer.makeSolverConstraints3D(folded);
 		} catch (error) {
@@ -82,7 +88,10 @@ test("makeSolverConstraints3D layer 3D test cases", () => {
 	});
 
 	expect(results[0].constraints).toMatchObject({
-		taco_taco: [], taco_tortilla: [], tortilla_tortilla: [], transitivity: [],
+		taco_taco: [],
+		taco_tortilla: [],
+		tortilla_tortilla: [],
+		transitivity: [],
 	});
 	expect(results[0].facePairs).toMatchObject(["0 4"]);
 	expect(results[0].orders).toMatchObject({ "0 4": 2 });
@@ -111,7 +120,10 @@ test("makeSolverConstraints3D layer 3D test cases", () => {
 	expect(results[3].constraints).toMatchObject({
 		taco_taco: [],
 		taco_tortilla: [],
-		tortilla_tortilla: [[1, 2, 4, 3], [0, 1, 5, 4]],
+		tortilla_tortilla: [
+			[1, 2, 4, 3],
+			[0, 1, 5, 4],
+		],
 		transitivity: [],
 	});
 	expect(results[3].facePairs).toMatchObject(["0 5", "1 4", "2 3"]);
@@ -122,7 +134,10 @@ test("makeSolverConstraints3D layer 3D test cases", () => {
 	expect(results[5].constraints).toMatchObject({
 		taco_taco: [],
 		taco_tortilla: [],
-		tortilla_tortilla: [[1, 2, 9, 8], [2, 3, 8, 7]],
+		tortilla_tortilla: [
+			[1, 2, 9, 8],
+			[2, 3, 8, 7],
+		],
 		transitivity: [],
 	});
 	expect(results[5].facePairs).toMatchObject(["1 9", "2 8", "3 7"]);
@@ -138,22 +153,43 @@ test("makeSolverConstraints3D layer 3D test cases", () => {
 	//   and 2-3-9-8 is a 3D-bent-tortilla at 90 degrees
 	expect(results[6].constraints).toMatchObject({
 		taco_taco: [[4, 6, 5, 7]],
-		taco_tortilla: [[5, 4, 6], [5, 7, 6]],
-		tortilla_tortilla: [[1, 2, 10, 9], [3, 4, 8, 7], [2, 3, 9, 8]],
+		taco_tortilla: [
+			[5, 4, 6],
+			[5, 7, 6],
+		],
+		tortilla_tortilla: [
+			[1, 2, 10, 9],
+			[3, 4, 8, 7],
+			[2, 3, 9, 8],
+		],
 		transitivity: [],
 	});
 	expect(results[6].facePairs).toMatchObject([
-		"1 10", "2 9", "3 8", "4 7", "4 5", "4 6", "5 7", "5 6", "6 7",
+		"1 10",
+		"2 9",
+		"3 8",
+		"4 7",
+		"4 5",
+		"4 6",
+		"5 7",
+		"5 6",
+		"6 7",
 	]);
 	// 1-10 is known via the 3d overlapping edges algorithm
 	// 4-5, 5-6, 6-7 are simply flat adjacent faces
 	expect(results[6].orders).toMatchObject({
-		"1 10": 1, "4 5": 2, "5 6": 2, "6 7": 1,
+		"1 10": 1,
+		"4 5": 2,
+		"5 6": 2,
+		"6 7": 1,
 	});
 });
 
 test("makeSolverConstraints3D coplanar angles 3D", () => {
-	const foldfile = fs.readFileSync("./tests/files/fold/layers-3d-edge-face.fold", "utf-8");
+	const foldfile = fs.readFileSync(
+		"./tests/files/fold/layers-3d-edge-face.fold",
+		"utf-8",
+	);
 	const fold = JSON.parse(foldfile);
 	const frame2 = ear.graph.flattenFrame(fold, 1);
 	const folded1 = {
@@ -171,8 +207,9 @@ test("makeSolverConstraints3D coplanar angles 3D", () => {
 
 	// frame 2 has a longer side length that crosses one of the faces,
 	// but everything should remain consistent
-	expect(ear.layer.makeSolverConstraints3D(folded1))
-		.toMatchObject(ear.layer.makeSolverConstraints3D(folded2));
+	expect(ear.layer.makeSolverConstraints3D(folded1)).toMatchObject(
+		ear.layer.makeSolverConstraints3D(folded2),
+	);
 
 	const {
 		constraints: { taco_taco, taco_tortilla, tortilla_tortilla, transitivity },
@@ -188,7 +225,10 @@ test("makeSolverConstraints3D coplanar angles 3D", () => {
 	expect(faces_winding).toMatchObject([true, true, true, false, true, false]);
 	expect(orders).toMatchObject({ "3 4": 1, "4 5": 2, "1 5": 1 });
 	expect(taco_taco).toMatchObject([[3, 1, 4, 5]]);
-	expect(taco_tortilla).toMatchObject([[4, 1, 5], [4, 3, 5]]);
+	expect(taco_tortilla).toMatchObject([
+		[4, 1, 5],
+		[4, 3, 5],
+	]);
 	expect(tortilla_tortilla).toMatchObject([]);
 	expect(transitivity).toMatchObject([]);
 
@@ -211,18 +251,64 @@ test("makeSolverConstraints3D panels 6x2", () => {
 	[
 		// every permutation of pairs of these:
 		// 0, 1, 2, 3, 4, 5
-		"0 1", "0 2", "0 3", "0 4", "0 5", "1 2", "1 3", "1 4", "1 5",
-		"2 3", "2 4", "2 5", "3 4", "3 5", "4 5",
+		"0 1",
+		"0 2",
+		"0 3",
+		"0 4",
+		"0 5",
+		"1 2",
+		"1 3",
+		"1 4",
+		"1 5",
+		"2 3",
+		"2 4",
+		"2 5",
+		"3 4",
+		"3 5",
+		"4 5",
 		// every permutation of pairs of these:
 		// 6, 7, 8, 9, 10, 11
-		"6 7", "6 8", "6 9", "6 10", "6 11", "7 8", "7 9", "7 10", "7 11",
-		"8 9", "8 10", "8 11", "9 10", "9 11", "10 11",
-	].forEach(key => expect(facePairs).toContain(key));
+		"6 7",
+		"6 8",
+		"6 9",
+		"6 10",
+		"6 11",
+		"7 8",
+		"7 9",
+		"7 10",
+		"7 11",
+		"8 9",
+		"8 10",
+		"8 11",
+		"9 10",
+		"9 11",
+		"10 11",
+	].forEach((key) => expect(facePairs).toContain(key));
 	expect(faces_winding).toMatchObject([
-		true, false, true, false, true, false, true, false, true, false, true, false,
+		true,
+		false,
+		true,
+		false,
+		true,
+		false,
+		true,
+		false,
+		true,
+		false,
+		true,
+		false,
 	]);
 	expect(orders).toMatchObject({
-		"0 1": 2, "1 2": 2, "2 3": 2, "3 4": 1, "4 5": 1, "6 7": 2, "7 8": 2, "8 9": 2, "9 10": 1, "10 11": 1,
+		"0 1": 2,
+		"1 2": 2,
+		"2 3": 2,
+		"3 4": 1,
+		"4 5": 1,
+		"6 7": 2,
+		"7 8": 2,
+		"8 9": 2,
+		"9 10": 1,
+		"10 11": 1,
 	});
 
 	expect(taco_taco).toMatchObject([
@@ -277,7 +363,10 @@ test("makeSolverConstraints3D maze-u", () => {
 	const fold = JSON.parse(foldfile);
 	const folded = ear.graph.getFramesByClassName(fold, "foldedForm")[0];
 	ear.graph.populate(folded);
-	const expectedJSON = fs.readFileSync("./tests/files/json/maze-u-constraints.json", "utf-8");
+	const expectedJSON = fs.readFileSync(
+		"./tests/files/json/maze-u-constraints.json",
+		"utf-8",
+	);
 	const expected = JSON.parse(expectedJSON);
 	const solverConstraints = ear.layer.makeSolverConstraints3D(folded);
 	expect(solverConstraints).toMatchObject(expected);

@@ -1,18 +1,8 @@
 /**
  * Rabbit Ear (c) Kraft
  */
-import {
-	EPSILON,
-	TWO_PI,
-} from "./constant.js";
-import {
-	cross2,
-	scale2,
-	add2,
-	subtract,
-	subtract3,
-	parallel,
-} from "./vector.js";
+import { EPSILON, TWO_PI } from "./constant.js";
+import { cross2, scale2, add2, subtract, subtract3, parallel } from "./vector.js";
 
 /**
  * the radius parameter measures from the center to the midpoint of the edge
@@ -20,12 +10,11 @@ import {
  * todo: also possible to parameterize the radius as the center to the points
  * todo: can be edge-aligned
  */
-const angleArray = count => Array
-	.from(Array(Math.floor(count)))
-	.map((_, i) => TWO_PI * (i / count));
+const angleArray = (count) =>
+	Array.from(Array(Math.floor(count))).map((_, i) => TWO_PI * (i / count));
 
-const anglesToVecs = (angles, radius) => angles
-	.map(a => [radius * Math.cos(a), radius * Math.sin(a)]);
+const anglesToVecs = (angles, radius) =>
+	angles.map((a) => [radius * Math.cos(a), radius * Math.sin(a)]);
 
 // a = 2r tan(π/n)
 
@@ -36,9 +25,8 @@ const anglesToVecs = (angles, radius) => angles
  * @param {number} [circumradius=1] the polygon's circumradius
  * @returns {[number, number][]} an array of 2D points
  */
-export const makePolygonCircumradius = (sides = 3, circumradius = 1) => (
-	anglesToVecs(angleArray(sides), circumradius)
-);
+export const makePolygonCircumradius = (sides = 3, circumradius = 1) =>
+	anglesToVecs(angleArray(sides), circumradius);
 
 /**
  * @description Make a regular polygon from a circumradius,
@@ -49,7 +37,7 @@ export const makePolygonCircumradius = (sides = 3, circumradius = 1) => (
  */
 export const makePolygonCircumradiusSide = (sides = 3, circumradius = 1) => {
 	const halfwedge = Math.PI / sides;
-	const angles = angleArray(sides).map(a => a + halfwedge);
+	const angles = angleArray(sides).map((a) => a + halfwedge);
 	return anglesToVecs(angles, circumradius);
 };
 
@@ -60,8 +48,8 @@ export const makePolygonCircumradiusSide = (sides = 3, circumradius = 1) => {
  * @param {number} [inradius=1] the polygon's inradius
  * @returns {[number, number][]} an array of points, each point as an arrays of numbers
  */
-export const makePolygonInradius = (sides = 3, inradius = 1) => (
-	makePolygonCircumradius(sides, inradius / Math.cos(Math.PI / sides)));
+export const makePolygonInradius = (sides = 3, inradius = 1) =>
+	makePolygonCircumradius(sides, inradius / Math.cos(Math.PI / sides));
 
 /**
  * @description Make a regular polygon from a inradius,
@@ -70,8 +58,8 @@ export const makePolygonInradius = (sides = 3, inradius = 1) => (
  * @param {number} [inradius=1] the polygon's inradius
  * @returns {[number, number][]} an array of points, each point as an arrays of numbers
  */
-export const makePolygonInradiusSide = (sides = 3, inradius = 1) => (
-	makePolygonCircumradiusSide(sides, inradius / Math.cos(Math.PI / sides)));
+export const makePolygonInradiusSide = (sides = 3, inradius = 1) =>
+	makePolygonCircumradiusSide(sides, inradius / Math.cos(Math.PI / sides));
 
 /**
  * @description Make a regular polygon from a side length,
@@ -80,8 +68,8 @@ export const makePolygonInradiusSide = (sides = 3, inradius = 1) => (
  * @param {number} [length=1] the polygon's side length
  * @returns {[number, number][]} an array of points, each point as an arrays of numbers
  */
-export const makePolygonSideLength = (sides = 3, length = 1) => (
-	makePolygonCircumradius(sides, (length / 2) / Math.sin(Math.PI / sides)));
+export const makePolygonSideLength = (sides = 3, length = 1) =>
+	makePolygonCircumradius(sides, length / 2 / Math.sin(Math.PI / sides));
 
 /**
  * @description Make a regular polygon from a side length,
@@ -90,8 +78,8 @@ export const makePolygonSideLength = (sides = 3, length = 1) => (
  * @param {number} [length=1] the polygon's side length
  * @returns {[number, number][]} an array of points, each point as an arrays of numbers
  */
-export const makePolygonSideLengthSide = (sides = 3, length = 1) => (
-	makePolygonCircumradiusSide(sides, (length / 2) / Math.sin(Math.PI / sides)));
+export const makePolygonSideLengthSide = (sides = 3, length = 1) =>
+	makePolygonCircumradiusSide(sides, length / 2 / Math.sin(Math.PI / sides));
 
 /**
  * @description Remove any collinear vertices from a n-dimensional polygon.
@@ -105,13 +93,13 @@ export const makePolygonNonCollinear = (polygon, epsilon = EPSILON) => {
 	// index map [i] to [i, i+1]
 	const edges_vector = polygon
 		.map((v, i, arr) => [v, arr[(i + 1) % arr.length]])
-		.map(pair => subtract(pair[1], pair[0]));
+		.map((pair) => subtract(pair[1], pair[0]));
 	// the vertex to be removed. true=valid, false=collinear.
 	// ask if an edge is parallel to its predecessor, this way,
 	// the edge index will match to the collinear vertex.
 	const vertex_collinear = edges_vector
 		.map((vector, i, arr) => [vector, arr[(i + arr.length - 1) % arr.length]])
-		.map(pair => !parallel(pair[1], pair[0], epsilon));
+		.map((pair) => !parallel(pair[1], pair[0], epsilon));
 	return polygon.filter((_, v) => vertex_collinear[v]);
 };
 
@@ -127,13 +115,13 @@ export const makePolygonNonCollinear3 = (polygon, epsilon = EPSILON) => {
 	// index map [i] to [i, i+1]
 	const edges_vector = polygon
 		.map((v, i, arr) => [v, arr[(i + 1) % arr.length]])
-		.map(pair => subtract3(pair[1], pair[0]));
+		.map((pair) => subtract3(pair[1], pair[0]));
 	// the vertex to be removed. true=valid, false=collinear.
 	// ask if an edge is parallel to its predecessor, this way,
 	// the edge index will match to the collinear vertex.
 	const vertex_collinear = edges_vector
 		.map((vector, i, arr) => [vector, arr[(i + arr.length - 1) % arr.length]])
-		.map(pair => !parallel(pair[1], pair[0], epsilon));
+		.map((pair) => !parallel(pair[1], pair[0], epsilon));
 	return polygon.filter((_, v) => vertex_collinear[v]);
 };
 
@@ -146,10 +134,12 @@ export const makePolygonNonCollinear3 = (polygon, epsilon = EPSILON) => {
  * @example
  * var area = polygon.signedArea([ [1,2], [5,6], [7,0] ])
  */
-export const signedArea = points => 0.5 * points
-	.map((el, i, arr) => [el, arr[(i + 1) % arr.length]])
-	.map(([a, b]) => cross2(a, b))
-	.reduce((a, b) => a + b, 0);
+export const signedArea = (points) =>
+	0.5 *
+	points
+		.map((el, i, arr) => [el, arr[(i + 1) % arr.length]])
+		.map(([a, b]) => cross2(a, b))
+		.reduce((a, b) => a + b, 0);
 
 /**
  * @description Calculates the centroid or the center of mass of the polygon.
@@ -175,7 +165,9 @@ export const centroid = (points) => {
  */
 const getDimension = (points) => {
 	for (let i = 0; i < points.length; i += 1) {
-		if (points[i] && points[i].length) { return points[i].length; }
+		if (points[i] && points[i].length) {
+			return points[i].length;
+		}
 	}
 	return 0;
 };
@@ -191,17 +183,24 @@ const getDimension = (points) => {
  * "span" is the lengths. returns "undefined" if no points were provided.
  */
 export const boundingBox = (points, padding = 0) => {
-	if (!points || !points.length) { return undefined; }
+	if (!points || !points.length) {
+		return undefined;
+	}
 	const dimension = getDimension(points);
 	const min = Array(dimension).fill(Infinity);
 	const max = Array(dimension).fill(-Infinity);
 	points
-		.filter(p => p !== undefined)
-		.forEach(point => point
-			.forEach((c, i) => {
-				if (c < min[i]) { min[i] = c - padding; }
-				if (c > max[i]) { max[i] = c + padding; }
-			}));
+		.filter((p) => p !== undefined)
+		.forEach((point) =>
+			point.forEach((c, i) => {
+				if (c < min[i]) {
+					min[i] = c - padding;
+				}
+				if (c > max[i]) {
+					max[i] = c + padding;
+				}
+			}),
+		);
 	const span = max.map((m, i) => m - min[i]);
 	return { min, max, span };
 };

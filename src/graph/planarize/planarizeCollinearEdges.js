@@ -1,34 +1,14 @@
 /**
  * Rabbit Ear (c) Kraft
  */
-import {
-	EPSILON,
-} from "../../math/constant.js";
-import {
-	epsilonEqual,
-} from "../../math/compare.js";
-import {
-	dot2,
-	subtract2,
-	resize2,
-} from "../../math/vector.js";
-import {
-	uniqueElements,
-} from "../../general/array.js";
-import {
-	clusterSortedGeneric,
-} from "../../general/cluster.js";
-import {
-	invertFlatToArrayMap,
-	invertArrayMap,
-	invertArrayToFlatMap,
-} from "../maps.js";
-import {
-	getEdgesLine,
-} from "../edges/lines.js";
-import {
-	makeVerticesEdgesUnsorted,
-} from "../make/verticesEdges.js";
+import { EPSILON } from "../../math/constant.js";
+import { epsilonEqual } from "../../math/compare.js";
+import { dot2, subtract2, resize2 } from "../../math/vector.js";
+import { uniqueElements } from "../../general/array.js";
+import { clusterSortedGeneric } from "../../general/cluster.js";
+import { invertFlatToArrayMap, invertArrayMap, invertArrayToFlatMap } from "../maps.js";
+import { getEdgesLine } from "../edges/lines.js";
+import { makeVerticesEdgesUnsorted } from "../make/verticesEdges.js";
 
 /**
  * @param {number[][][]} lines_verticesClusters
@@ -37,15 +17,17 @@ import {
 const lineVertexClustersToNewVertices = (lines_verticesClusters) => {
 	const nextMap = [];
 	let newIndex = 0;
-	lines_verticesClusters
-		.map(clusters => clusters
-			.map(verticesCluster => {
-				const match = verticesCluster.map(v => nextMap[v]).shift();
-				const matchFound = match !== undefined;
-				const index = matchFound ? match : newIndex;
-				verticesCluster.forEach(v => { nextMap[v] = index; });
-				return matchFound ? match : newIndex++;
-			}));
+	lines_verticesClusters.map((clusters) =>
+		clusters.map((verticesCluster) => {
+			const match = verticesCluster.map((v) => nextMap[v]).shift();
+			const matchFound = match !== undefined;
+			const index = matchFound ? match : newIndex;
+			verticesCluster.forEach((v) => {
+				nextMap[v] = index;
+			});
+			return matchFound ? match : newIndex++;
+		}),
+	);
 	// it's possible for two or more vertices to lie at the same point and
 	// each be involved in two or more crossing lines (folded form windmill base).
 	// as a result, multiple lines are trying to claim the same vertex, causing
@@ -54,7 +36,7 @@ const lineVertexClustersToNewVertices = (lines_verticesClusters) => {
 	// created, a row is missing. a real simple and elegant solution is simply to
 	// create the backmap, remove any empty rows, then convert it back into
 	// a next map, this will decrement all indices to cover the gaps in the counting.
-	const backMap = invertFlatToArrayMap(nextMap).filter(a => a);
+	const backMap = invertFlatToArrayMap(nextMap).filter((a) => a);
 	return invertArrayToFlatMap(backMap);
 };
 
@@ -67,15 +49,17 @@ const lineEdgeClustersToNewEdges = (lines_edgesClusters) => {
 	// edgeClusters can contain empty arrays which are the gap between
 	// collinear edges where no edge exists, this area does not get turned
 	// into an edge, and should be skipped.
-	lines_edgesClusters
-		.map(clusters => clusters
-			.map(cluster => {
-				cluster
-					.filter(i => map[i] === undefined)
-					.forEach(i => { map[i] = []; });
-				cluster.forEach(i => map[i].push(newIndex));
-				return cluster.length ? newIndex++ : newIndex;
-			}));
+	lines_edgesClusters.map((clusters) =>
+		clusters.map((cluster) => {
+			cluster
+				.filter((i) => map[i] === undefined)
+				.forEach((i) => {
+					map[i] = [];
+				});
+			cluster.forEach((i) => map[i].push(newIndex));
+			return cluster.length ? newIndex++ : newIndex;
+		}),
+	);
 	return map;
 };
 
@@ -91,7 +75,7 @@ const lineEdgeClustersToNewEdges = (lines_edgesClusters) => {
  *   should be able to override unassigned.
  */
 const assignmentPriority = { B: 1, C: 2, V: 3, M: 4, J: 5, F: 6, U: 7 };
-Object.keys(assignmentPriority).forEach(key => {
+Object.keys(assignmentPriority).forEach((key) => {
 	assignmentPriority[key.toLowerCase()] = assignmentPriority[key];
 });
 
@@ -103,7 +87,9 @@ Object.keys(assignmentPriority).forEach(key => {
  * @returns {number} the index of the input array with the highest priority
  */
 const highestPriorityAssignmentIndex = (assignments) => {
-	if (assignments.length === 1) { return 0; }
+	if (assignments.length === 1) {
+		return 0;
+	}
 	let index = 0;
 	assignments.forEach((a, i) => {
 		if (assignmentPriority[a] < assignmentPriority[assignments[index]]) {
@@ -111,7 +97,7 @@ const highestPriorityAssignmentIndex = (assignments) => {
 		}
 	});
 	return index;
-}
+};
 
 /**
  * @description Make one step to planarize a graph into the 2D XY plane
@@ -130,16 +116,14 @@ const highestPriorityAssignmentIndex = (assignments) => {
  * a new FOLD object, with
  * an info object which describes all changes to the graph.
  */
-export const planarizeCollinearEdges = ({
-	vertices_coords,
-	edges_vertices,
-	edges_assignment,
-	edges_foldAngle,
-}, epsilon = EPSILON) => {
-	const {
-		lines,
-		edges_line,
-	} = getEdgesLine({ vertices_coords, edges_vertices }, epsilon);
+export const planarizeCollinearEdges = (
+	{ vertices_coords, edges_vertices, edges_assignment, edges_foldAngle },
+	epsilon = EPSILON,
+) => {
+	const { lines, edges_line } = getEdgesLine(
+		{ vertices_coords, edges_vertices },
+		epsilon,
+	);
 
 	const vertices_edges = makeVerticesEdgesUnsorted({ edges_vertices });
 
@@ -153,24 +137,29 @@ export const planarizeCollinearEdges = ({
 	// this method ignores these types of overlap entirely, dealing with these
 	// happens if you instead call the main "planarize" method.
 	const lines_verticesInfo = lines_edges
-		.map(edges => uniqueElements(edges.flatMap(edge => edges_vertices[edge])))
-		.map((vertices, l) => vertices
-			.map(v => ({
-				v,
-				p: dot2(subtract2(vertices_coords[v], lines[l].origin), lines[l].vector),
-			})).sort((a, b) => a.p - b.p));
+		.map((edges) => uniqueElements(edges.flatMap((edge) => edges_vertices[edge])))
+		.map((vertices, l) =>
+			vertices
+				.map((v) => ({
+					v,
+					p: dot2(subtract2(vertices_coords[v], lines[l].origin), lines[l].vector),
+				}))
+				.sort((a, b) => a.p - b.p),
+		);
 
-	const lines_vertices = lines_verticesInfo
-		.map(objs => objs.map(({ v }) => v));
-	const lines_verticesParameter = lines_verticesInfo
-		.map(objs => objs.map(({ p }) => p));
+	const lines_vertices = lines_verticesInfo.map((objs) => objs.map(({ v }) => v));
+	const lines_verticesParameter = lines_verticesInfo.map((objs) =>
+		objs.map(({ p }) => p),
+	);
 
 	// for each line, all vertices along the line are put into arrays where
 	// similar vertices are grouped into the same list. even unique vertices
 	// are placed into arrays with just one item.
-	const lines_verticesClusters = lines_verticesParameter
-		.map((params, l) => clusterSortedGeneric(params, epsilonEqual)
-			.map(cluster => cluster.map(i => lines_vertices[l][i])));
+	const lines_verticesClusters = lines_verticesParameter.map((params, l) =>
+		clusterSortedGeneric(params, epsilonEqual).map((cluster) =>
+			cluster.map((i) => lines_vertices[l][i]),
+		),
+	);
 
 	const vertexNextMap = lineVertexClustersToNewVertices(lines_verticesClusters);
 	const vertexBackMap = invertFlatToArrayMap(vertexNextMap);
@@ -181,52 +170,55 @@ export const planarizeCollinearEdges = ({
 	// gap between collinear edges, where no edge exists in this gap.
 	// [[ 12, 28], [29], [], [13]]
 	// a graph with circular edges will break here.
-	const lines_edgesClusters = lines_verticesClusters
-		.map((verticesClusters, l) => {
-			// this lookup contains all edges which lie along this line
-			const edgesLookup = {};
-			lines_edges[l].forEach(e => { edgesLookup[e] = true; });
-			// push edges onto the stack and pop them off.
-			/** @type {Set<number>} */
-			const edges = new Set();
-			// fencepost between the clusters of vertices to make new edges
-			return Array
-				.from(Array(verticesClusters.length - 1))
-				.map((_, i) => verticesClusters[i])
-				.map(vertices => {
-					// we want to return a list of all edges which are currently on the stack.
-					// these are edges which either start or end at this point along the line.
-					const adjacentEdges = uniqueElements(vertices
-						.flatMap(vertex => vertices_edges[vertex])
-						// only edges which are along this line are allowed
-						.filter(edge => edgesLookup[edge]));
-					// true: if the edge is not already on the stack, false if it is.
-					const adjacentEdgesIsNew = adjacentEdges.map(e => !edges.has(e));
-					adjacentEdges.forEach((edge, i) => (adjacentEdgesIsNew[i]
-						? edges.add(edge)
-						: edges.delete(edge)));
-					return Array.from(edges);
-				});
+	const lines_edgesClusters = lines_verticesClusters.map((verticesClusters, l) => {
+		// this lookup contains all edges which lie along this line
+		const edgesLookup = {};
+		lines_edges[l].forEach((e) => {
+			edgesLookup[e] = true;
 		});
+		// push edges onto the stack and pop them off.
+		/** @type {Set<number>} */
+		const edges = new Set();
+		// fencepost between the clusters of vertices to make new edges
+		return Array.from(Array(verticesClusters.length - 1))
+			.map((_, i) => verticesClusters[i])
+			.map((vertices) => {
+				// we want to return a list of all edges which are currently on the stack.
+				// these are edges which either start or end at this point along the line.
+				const adjacentEdges = uniqueElements(
+					vertices
+						.flatMap((vertex) => vertices_edges[vertex])
+						// only edges which are along this line are allowed
+						.filter((edge) => edgesLookup[edge]),
+				);
+				// true: if the edge is not already on the stack, false if it is.
+				const adjacentEdgesIsNew = adjacentEdges.map((e) => !edges.has(e));
+				adjacentEdges.forEach((edge, i) =>
+					adjacentEdgesIsNew[i] ? edges.add(edge) : edges.delete(edge),
+				);
+				return Array.from(edges);
+			});
+	});
 
 	/** @type {[number, number][]} */
 	const newEdgesVertices = lines_verticesClusters
 		// .map(clusters => clusters.map(cluster => vertexNextMap[cluster[0]][0]))
-		.map(clusters => clusters.map(cluster => vertexNextMap[cluster[0]]))
-		.flatMap((vertices, i) => Array
-			.from(Array(vertices.length - 1))
-			// if the edgeCluster is empty, no edge exists between these vertices
-			.map((_, j) => (lines_edgesClusters[i][j].length
-				? [vertices[j], vertices[j + 1]]
-				: undefined)))
+		.map((clusters) => clusters.map((cluster) => vertexNextMap[cluster[0]]))
+		.flatMap((vertices, i) =>
+			Array.from(Array(vertices.length - 1))
+				// if the edgeCluster is empty, no edge exists between these vertices
+				.map((_, j) =>
+					lines_edgesClusters[i][j].length ? [vertices[j], vertices[j + 1]] : undefined,
+				),
+		)
 		// filter out the undefineds, where no edge exists between vertices
-		.filter(a => a !== undefined)
+		.filter((a) => a !== undefined)
 		.map(([a, b]) => [a, b]);
 
 	const edgesNextMap = lineEdgeClustersToNewEdges(lines_edgesClusters);
 
 	const newVerticesCoords = vertexBackMap
-		.map(vertices => vertices_coords[vertices[0]])
+		.map((vertices) => vertices_coords[vertices[0]])
 		.map(resize2);
 
 	const result = {
@@ -244,16 +236,18 @@ export const planarizeCollinearEdges = ({
 		// "wins out", use this edge to carry over assignment/foldAngle if exists.
 		const edgesBackMapIndexToUse = edges_assignment
 			? edgesBackMap
-				.map(edges => edges.map(edge => edges_assignment[edge]))
-				.map(highestPriorityAssignmentIndex)
+					.map((edges) => edges.map((edge) => edges_assignment[edge]))
+					.map(highestPriorityAssignmentIndex)
 			: edgesBackMap.map(() => 0);
 		if (edges_assignment) {
-			result.edges_assignment = edgesBackMapIndexToUse
-				.map((index, i) => edges_assignment[edgesBackMap[i][index]]);
+			result.edges_assignment = edgesBackMapIndexToUse.map(
+				(index, i) => edges_assignment[edgesBackMap[i][index]],
+			);
 		}
 		if (edges_foldAngle) {
-			result.edges_foldAngle = edgesBackMapIndexToUse
-				.map((index, i) => edges_foldAngle[edgesBackMap[i][index]]);
+			result.edges_foldAngle = edgesBackMapIndexToUse.map(
+				(index, i) => edges_foldAngle[edgesBackMap[i][index]],
+			);
 		}
 	}
 

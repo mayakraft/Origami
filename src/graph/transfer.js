@@ -1,16 +1,9 @@
 /**
  * Rabbit Ear (c) Kraft
  */
-import {
-	distance2,
-	resize2,
-} from "../math/vector.js";
-import {
-	collinearPoints,
-} from "../math/line.js";
-import {
-	trilateration2,
-} from "../math/triangle.js";
+import { distance2, resize2 } from "../math/vector.js";
+import { collinearPoints } from "../math/line.js";
+import { trilateration2 } from "../math/triangle.js";
 
 /**
  * @description Transfer a point from one graph to another, given the
@@ -29,27 +22,33 @@ export const transferPointInFaceBetweenGraphs = (from, to, face, point) => {
 	// invalid references or non existent coordinate data.
 
 	// Filter out any vertices which have non existent coords or are collinear.
-	const faceVerticesInitial = to.faces_vertices[face]
-		.filter(v => from.vertices_coords[v] && to.vertices_coords[v]);
+	const faceVerticesInitial = to.faces_vertices[face].filter(
+		(v) => from.vertices_coords[v] && to.vertices_coords[v],
+	);
 
 	// Trilateration will fail if the three chosen vertices are collinear.
 	// For every vertex, check collinearity between prev-this-next vertex.
 	const faceVertsInitialCollinear = faceVerticesInitial
 		.map((v, i, arr) => [
-			arr[(i + arr.length - 1) % arr.length], v, arr[(i + 1) % arr.length],
+			arr[(i + arr.length - 1) % arr.length],
+			v,
+			arr[(i + 1) % arr.length],
 		])
-		.map(verts => {
-			const [a, b, c] = verts.map(v => from.vertices_coords[v]);
-			const [d, e, f] = verts.map(v => to.vertices_coords[v]);
+		.map((verts) => {
+			const [a, b, c] = verts.map((v) => from.vertices_coords[v]);
+			const [d, e, f] = verts.map((v) => to.vertices_coords[v]);
 			return [a, b, c, d, e, f];
 		})
 		.map(([a, b, c, d, e, f]) => collinearPoints(a, b, c) || collinearPoints(d, e, f));
 
 	// we want only vertices which are not collinear
-	const faceVertsValid = faceVerticesInitial
-		.filter((_, i) => !faceVertsInitialCollinear[i]);
+	const faceVertsValid = faceVerticesInitial.filter(
+		(_, i) => !faceVertsInitialCollinear[i],
+	);
 
-	if (faceVertsValid.length < 3) { return undefined; }
+	if (faceVertsValid.length < 3) {
+		return undefined;
+	}
 	// const faceVertices = resize3(faceVertsValid);
 	const [a, b, c] = faceVertsValid;
 

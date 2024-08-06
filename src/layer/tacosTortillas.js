@@ -1,23 +1,11 @@
 /**
  * Rabbit Ear (c) Kraft
  */
-import {
-	EPSILON,
-} from "../math/constant.js";
-import {
-	makeFacesCenterQuick,
-} from "../graph/make/faces.js";
-import {
-	getEdgesEdgesCollinearOverlap,
-	getEdgesFacesOverlap,
-} from "../graph/overlap.js";
-import {
-	connectedComponentsPairs,
-} from "../graph/connectedComponents.js";
-import {
-	makeEdgesFacesSide,
-	makeEdgePairsFacesSide,
-} from "./facesSide.js";
+import { EPSILON } from "../math/constant.js";
+import { makeFacesCenterQuick } from "../graph/make/faces.js";
+import { getEdgesEdgesCollinearOverlap, getEdgesFacesOverlap } from "../graph/overlap.js";
+import { connectedComponentsPairs } from "../graph/connectedComponents.js";
+import { makeEdgesFacesSide, makeEdgePairsFacesSide } from "./facesSide.js";
 
 /**
  * @description Assign a classification to a face-pair which will assist us in
@@ -44,7 +32,9 @@ const classifyEdgePair = (edgePairFacesSide) => {
 	// both edges are tacos. taco-taco is the only case where it might result as
 	// invalid. taco-taco is only valid if both tacos are on the same side.
 	if (isTaco[0] && isTaco[1]) {
-		if (edgePairFacesSide[0][0] !== edgePairFacesSide[1][0]) { return 0; }
+		if (edgePairFacesSide[0][0] !== edgePairFacesSide[1][0]) {
+			return 0;
+		}
 		return 1;
 	}
 
@@ -78,30 +68,38 @@ const classifyEdgePair = (edgePairFacesSide) => {
  */
 const formatTacoTortilla = ([faces0, faces1], classification) => {
 	switch (classification) {
-	// taco: faces0
-	case 4: return [faces0[0], faces1[0], faces0[1]];
-	case 5: return [faces0[0], faces1[1], faces0[1]];
-	// taco: faces1
-	case 6: return [faces1[0], faces0[0], faces1[1]];
-	case 7: return [faces1[0], faces0[1], faces1[1]];
-	default: return undefined;
+		// taco: faces0
+		case 4:
+			return [faces0[0], faces1[0], faces0[1]];
+		case 5:
+			return [faces0[0], faces1[1], faces0[1]];
+		// taco: faces1
+		case 6:
+			return [faces1[0], faces0[0], faces1[1]];
+		case 7:
+			return [faces1[0], faces0[1], faces1[1]];
+		default:
+			return undefined;
 	}
 };
 
 /**
-* @param {[[number, number], [number, number]]} facePairs two pairs of
-* faces indices, the adjacent faces to the two edges involved.
-* @param {number} classification the class id number that is
-* the result of calling classifyEdgePair()
-* @returns {TortillaTortillaConstraint?} four face indices involved in a
-* tortilla-tortilla where [0] is above/below [2] and [1] is above/below [3]
-*/
+ * @param {[[number, number], [number, number]]} facePairs two pairs of
+ * faces indices, the adjacent faces to the two edges involved.
+ * @param {number} classification the class id number that is
+ * the result of calling classifyEdgePair()
+ * @returns {TortillaTortillaConstraint?} four face indices involved in a
+ * tortilla-tortilla where [0] is above/below [2] and [1] is above/below [3]
+ */
 const formatTortillaTortilla = ([faces0, faces1], classification) => {
 	switch (classification) {
-	case 2: return [...faces0, ...faces1];
-	// [0] from one is above [1] in the other, we need to flip one of them.
-	case 3: return [...faces0, faces1[1], faces1[0]];
-	default: return undefined;
+		case 2:
+			return [...faces0, ...faces1];
+		// [0] from one is above [1] in the other, we need to flip one of them.
+		case 3:
+			return [...faces0, faces1[1], faces1[0]];
+		default:
+			return undefined;
 	}
 };
 
@@ -126,22 +124,21 @@ export const makeTortillaTortillaFacesCrossing = (
 	// a tortilla-edge is defined by an edge having two adjacent faces,
 	// and both of those faces are on either side of the edge
 	const tortilla_edge_indices = edgesFacesSide
-		.map(side => side.length === 2 && side[0] !== side[1])
+		.map((side) => side.length === 2 && side[0] !== side[1])
 		.map((isTortilla, i) => (isTortilla ? i : undefined))
-		.filter(a => a !== undefined);
+		.filter((a) => a !== undefined);
 
 	/** @type {number[][]} */
 	const tortillas_faces_crossing = [];
-	tortilla_edge_indices.forEach(edge => {
+	tortilla_edge_indices.forEach((edge) => {
 		tortillas_faces_crossing[edge] = edgesFacesOverlap[edge];
 	});
 
 	/** @type {TortillaTortillaConstraint[]} */
 	return tortillas_faces_crossing
-		.flatMap((faces, e) => faces
-			.map(face => [...edges_faces[e], face, face]))
-		.filter(arr => arr.length === 4)
-		.map(arr => [arr[0], arr[1], arr[2], arr[3]]);
+		.flatMap((faces, e) => faces.map((face) => [...edges_faces[e], face, face]))
+		.filter((arr) => arr.length === 4)
+		.map((arr) => [arr[0], arr[1], arr[2], arr[3]]);
 };
 
 /**
@@ -158,23 +155,39 @@ export const makeTortillaTortillaFacesCrossing = (
  * @notes due to the face_center calculation to determine face-edge sidedness, this
  * is currently hardcoded to only work with convex polygons.
  */
-export const makeTacosAndTortillas = ({
-	vertices_coords, edges_vertices, edges_faces, faces_vertices, faces_edges,
-	faces_center,
-}, epsilon = EPSILON) => {
+export const makeTacosAndTortillas = (
+	{
+		vertices_coords,
+		edges_vertices,
+		edges_faces,
+		faces_vertices,
+		faces_edges,
+		faces_center,
+	},
+	epsilon = EPSILON,
+) => {
 	if (!faces_center) {
 		// eslint-disable-next-line no-param-reassign
 		faces_center = makeFacesCenterQuick({ vertices_coords, faces_vertices });
 	}
 
-	const edgesFacesOverlap = getEdgesFacesOverlap({
-		vertices_coords, edges_vertices, faces_vertices, faces_edges,
-	}, epsilon);
+	const edgesFacesOverlap = getEdgesFacesOverlap(
+		{
+			vertices_coords,
+			edges_vertices,
+			faces_vertices,
+			faces_edges,
+		},
+		epsilon,
+	);
 
 	// for each edge, for its adjacent faces (1 or 2), which side of the edge
 	// (using the edge's vector) is each face on?
 	const edgesFacesSide = makeEdgesFacesSide({
-		vertices_coords, edges_vertices, edges_faces, faces_center,
+		vertices_coords,
+		edges_vertices,
+		edges_faces,
+		faces_center,
 	});
 
 	// every permutation of pairs of overlapping, parallel edges, where both
@@ -183,14 +196,20 @@ export const makeTacosAndTortillas = ({
 	// this will contain unique pairs ([4, 9] but not [9, 4]), smallest first.
 	const edgePairs = connectedComponentsPairs(
 		getEdgesEdgesCollinearOverlap({ vertices_coords, edges_vertices }, epsilon),
-	).filter(pair => pair.every(edge => edges_faces[edge].length > 1));
+	).filter((pair) => pair.every((edge) => edges_faces[edge].length > 1));
 
 	// convert every face into a +1 or -1 based on which side of the edge is it on.
 	// ie: tacos will have similar numbers, tortillas will have one of either.
 	// the +1/-1 is determined by the cross product to the vector of the edge.
-	const edgePairsFacesSide = makeEdgePairsFacesSide({
-		vertices_coords, edges_vertices, edges_faces, faces_center,
-	}, edgePairs);
+	const edgePairsFacesSide = makeEdgePairsFacesSide(
+		{
+			vertices_coords,
+			edges_vertices,
+			edges_faces,
+			faces_center,
+		},
+		edgePairs,
+	);
 
 	// classify each edgePairFaces into its taco/tortilla type using an encoding
 	// that includes additional details about the location of faces, for example
@@ -207,7 +226,7 @@ export const makeTacosAndTortillas = ({
 	);
 
 	/** @type {[[number, number], [number, number]][]} */
-	const edgePairsFaces = edgePairs.map(edgePair => [
+	const edgePairsFaces = edgePairs.map((edgePair) => [
 		[edges_faces[edgePair[0]][0], edges_faces[edgePair[0]][1]],
 		[edges_faces[edgePair[1]][0], edges_faces[edgePair[1]][1]],
 	]);
@@ -217,32 +236,34 @@ export const makeTacosAndTortillas = ({
 	// which simply cross through the middle of a face (below).
 	/** @type {TacoTortillaConstraint[]} */
 	const tacoTortillaCrossing = edgesFacesOverlap
-		.map((faces, e) => (edgesFacesSide[e].length > 1
-			&& edgesFacesSide[e][0] === edgesFacesSide[e][1]
-			? faces
-			: []))
+		.map((faces, e) =>
+			edgesFacesSide[e].length > 1 && edgesFacesSide[e][0] === edgesFacesSide[e][1]
+				? faces
+				: [],
+		)
 		.map((tortillas, edge) => ({ taco: edges_faces[edge], tortillas }))
 		.filter(({ tortillas }) => tortillas.length)
-		.flatMap(({ taco: [a, b], tortillas }) => tortillas
-			.map(tortilla => [a, tortilla, b]))
-		.map(arr => [arr[0], arr[1], arr[2]]);
+		.flatMap(({ taco: [a, b], tortillas }) =>
+			tortillas.map((tortilla) => [a, tortilla, b]),
+		)
+		.map((arr) => [arr[0], arr[1], arr[2]]);
 
 	// taco-taco
 	// map faces [[a, b], [c, d]] into [a, c, b, d]
 	/** @type {TacoTacoConstraint[]} */
 	const taco_taco = edgePairsFacesType
 		.map((n, i) => (n === 1 ? i : undefined))
-		.filter(a => a !== undefined)
-		.map(i => edgePairs[i].map(edge => edges_faces[edge]))
-		.map(el => [el[0][0], el[1][0], el[0][1], el[1][1]]);
+		.filter((a) => a !== undefined)
+		.map((i) => edgePairs[i].map((edge) => edges_faces[edge]))
+		.map((el) => [el[0][0], el[1][0], el[0][1], el[1][1]]);
 
 	// taco-tortilla
 	// map faces { taco: [a, b], tortilla: c } into [a, c, b]
 	/** @type {TacoTortillaConstraint[]} */
 	const taco_tortilla = edgePairsFacesType
 		.map((n, i) => (n > 3 ? i : undefined))
-		.filter(a => a !== undefined)
-		.map(i => formatTacoTortilla(edgePairsFaces[i], edgePairsFacesType[i]))
+		.filter((a) => a !== undefined)
+		.map((i) => formatTacoTortilla(edgePairsFaces[i], edgePairsFacesType[i]))
 		.concat(tacoTortillaCrossing);
 
 	// tortilla-tortilla
@@ -252,8 +273,8 @@ export const makeTacosAndTortillas = ({
 	/** @type {TortillaTortillaConstraint[]} */
 	const tortilla_tortilla = edgePairsFacesType
 		.map((n, i) => (n === 2 || n === 3 ? i : undefined))
-		.filter(a => a !== undefined)
-		.map(i => formatTortillaTortilla(edgePairsFaces[i], edgePairsFacesType[i]))
+		.filter((a) => a !== undefined)
+		.map((i) => formatTortillaTortilla(edgePairsFaces[i], edgePairsFacesType[i]))
 		.concat(tortillaTortillaCrossing);
 
 	return {

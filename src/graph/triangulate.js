@@ -14,9 +14,12 @@ import { makeVerticesToEdge, makeVerticesToFace } from "./make/lookup.js";
  * @returns {number[][]} an array of arrays where the inner arrays are
  * all of length 3.
  */
-const makeTriangleFan = (indices) => Array
-	.from(Array(indices.length - 2))
-	.map((_, i) => [indices[0], indices[i + 1], indices[i + 2]]);
+const makeTriangleFan = (indices) =>
+	Array.from(Array(indices.length - 2)).map((_, i) => [
+		indices[0],
+		indices[i + 1],
+		indices[i + 2],
+	]);
 
 /**
  * @description Triangulate a faces_vertices with the capability to handle
@@ -24,11 +27,10 @@ const makeTriangleFan = (indices) => Array
  * @param {FOLD} graph a FOLD object.
  * @returns {number[][]} faces_vertices where all faces have only 3 vertices
  */
-export const triangulateConvexFacesVertices = ({ faces_vertices }) => (
-	faces_vertices.flatMap(vertices => (vertices.length < 4
-		? [vertices]
-		: makeTriangleFan(vertices)))
-);
+export const triangulateConvexFacesVertices = ({ faces_vertices }) =>
+	faces_vertices.flatMap((vertices) =>
+		vertices.length < 4 ? [vertices] : makeTriangleFan(vertices),
+	);
 
 /**
  * @description convert an array of any values into an array of arrays
@@ -38,10 +40,12 @@ export const triangulateConvexFacesVertices = ({ faces_vertices }) => (
  * @param {any[]} array an array containing any type
  * @returns {any[][]} array of arrays where each inner array is length 3.
  */
-const groupByThree = (array) => (array.length === 3 ? [array] : Array
-	.from(Array(Math.floor(array.length / 3)))
-	.map((_, i) => [i * 3 + 0, i * 3 + 1, i * 3 + 2]
-		.map(j => array[j])));
+const groupByThree = (array) =>
+	array.length === 3
+		? [array]
+		: Array.from(Array(Math.floor(array.length / 3))).map((_, i) =>
+				[i * 3 + 0, i * 3 + 1, i * 3 + 2].map((j) => array[j]),
+			);
 
 /**
  * @description Triangulate a faces_vertices with the capability to handle
@@ -76,19 +80,22 @@ export const triangulateNonConvexFacesVertices = (
 	// earcut does not maintain winding order, create a lookup for use later
 	const faces_winding = makeFacesWinding({ vertices_coords, faces_vertices });
 
-	return faces_vertices
-		.map(fv => fv.flatMap(v => vertices_coords[v]))
-		.map(polygon => earcut(polygon, null, dimensions))
-		// earcut returns vertices [0...n] local to this one polygon
-		// convert these indices back to the face's faces_vertices.
-		.map((vertices, i) => vertices
-			.map(j => faces_vertices[i][j]))
-		// finally, earcut does not maintain winding order, before we flatten
-		// the list, reverse the triangles if they come from a face with an
-		// upside-down winding.
-		.flatMap((res, face) => (faces_winding[face]
-			? groupByThree(res)
-			: groupByThree(res).map(arr => arr.reverse())));
+	return (
+		faces_vertices
+			.map((fv) => fv.flatMap((v) => vertices_coords[v]))
+			.map((polygon) => earcut(polygon, null, dimensions))
+			// earcut returns vertices [0...n] local to this one polygon
+			// convert these indices back to the face's faces_vertices.
+			.map((vertices, i) => vertices.map((j) => faces_vertices[i][j]))
+			// finally, earcut does not maintain winding order, before we flatten
+			// the list, reverse the triangles if they come from a face with an
+			// upside-down winding.
+			.flatMap((res, face) =>
+				faces_winding[face]
+					? groupByThree(res)
+					: groupByThree(res).map((arr) => arr.reverse()),
+			)
+	);
 };
 
 /**
@@ -109,22 +116,27 @@ const makeNewEdgesAssignment = (
 ) => {
 	const edges_assignment = edges_vertices
 		? edges_vertices.map(() => "U")
-		: Array.from(Array(countImpliedEdges({ faces_edges: faces_edgesNew })))
-			.map(() => "U");
+		: Array.from(Array(countImpliedEdges({ faces_edges: faces_edgesNew }))).map(
+				() => "U",
+			);
 	const lookup = makeVerticesToFace({ faces_vertices });
-	faces_verticesNew.map((verts, i) => verts
-		.map((v, j, arr) => [v, arr[(j + 1) % arr.length]])
-		.forEach(([v0, v1], j) => {
-			const keys = [`${v0} ${v1}`, `${v1} ${v0}`];
-			if (lookup[keys[0]] === undefined && lookup[keys[1]] === undefined) {
-				const edge = faces_edgesNew[i][j];
-				edges_assignment[edge] = "J";
-			}
-		}));
+	faces_verticesNew.map((verts, i) =>
+		verts
+			.map((v, j, arr) => [v, arr[(j + 1) % arr.length]])
+			.forEach(([v0, v1], j) => {
+				const keys = [`${v0} ${v1}`, `${v1} ${v0}`];
+				if (lookup[keys[0]] === undefined && lookup[keys[1]] === undefined) {
+					const edge = faces_edgesNew[i][j];
+					edges_assignment[edge] = "J";
+				}
+			}),
+	);
 	Array.from(Array(edges_assignment.length))
 		.map((_, i) => i)
-		.filter(i => edges_assignment[i] === undefined)
-		.forEach(i => { edges_assignment[i] = "U"; });
+		.filter((i) => edges_assignment[i] === undefined)
+		.forEach((i) => {
+			edges_assignment[i] = "U";
+		});
 	return edges_assignment;
 };
 
@@ -152,25 +164,27 @@ const rebuildTriangleEdges = (
 	const edges_verticesAppended = [];
 
 	// this is an entirely new list of faces_edges, to replace entirely the old one
-	const faces_edgesNew = faces_verticesNew
-		.map(vertices => vertices
-			.map((v, i, arr) => {
-				/** @type {[number, number]} */
-				const edge_vertices = [v, arr[(i + 1) % arr.length]];
-				const vertexPair = edge_vertices.join(" ");
-				if (vertexPair in edgeLookup) { return edgeLookup[vertexPair]; }
-				edges_verticesAppended.push(edge_vertices);
-				edgeLookup[vertexPair] = e;
-				edgeLookup[edge_vertices.slice().reverse().join(" ")] = e;
-				return e++;
-			}));
+	const faces_edgesNew = faces_verticesNew.map((vertices) =>
+		vertices.map((v, i, arr) => {
+			/** @type {[number, number]} */
+			const edge_vertices = [v, arr[(i + 1) % arr.length]];
+			const vertexPair = edge_vertices.join(" ");
+			if (vertexPair in edgeLookup) {
+				return edgeLookup[vertexPair];
+			}
+			edges_verticesAppended.push(edge_vertices);
+			edgeLookup[vertexPair] = e;
+			edgeLookup[edge_vertices.slice().reverse().join(" ")] = e;
+			return e++;
+		}),
+	);
 
 	const edges_assignmentNew = edges_assignment
 		? edges_assignment.concat(edges_verticesAppended.map(() => "J"))
 		: makeNewEdgesAssignment(
-			{ edges_vertices, faces_vertices },
-			{ faces_vertices: faces_verticesNew, faces_edges: faces_edgesNew },
-		);
+				{ edges_vertices, faces_vertices },
+				{ faces_vertices: faces_verticesNew, faces_edges: faces_edgesNew },
+			);
 
 	const result = {
 		edges_vertices: edges_vertices
@@ -197,8 +211,8 @@ const rebuildTriangleEdges = (
 const makeTriangulatedFacesNextMap = ({ faces_vertices }) => {
 	let count = 0;
 	return faces_vertices
-		.map(verts => Math.max(3, verts.length))
-		.map(length => Array.from(Array(length - 2)).map(() => count++));
+		.map((verts) => Math.max(3, verts.length))
+		.map((length) => Array.from(Array(length - 2)).map(() => count++));
 };
 
 /**
@@ -221,17 +235,27 @@ const makeTriangulatedFacesNextMap = ({ faces_vertices }) => {
  * @todo preserve faceOrders, match preexisting faces against new ones,
  * this may create too much unnecessary data but at least it will work.
  */
-export const triangulate = ({
-	vertices_coords, edges_vertices, edges_assignment, edges_foldAngle,
-	faces_vertices, faceOrders,
-}, earcut) => {
+export const triangulate = (
+	{
+		vertices_coords,
+		edges_vertices,
+		edges_assignment,
+		edges_foldAngle,
+		faces_vertices,
+		faceOrders,
+	},
+	earcut,
+) => {
 	if (!faces_vertices) {
 		const result = {
-			vertices_coords, edges_vertices, edges_assignment, edges_foldAngle,
+			vertices_coords,
+			edges_vertices,
+			edges_assignment,
+			edges_foldAngle,
 		};
 		Object.keys(result)
-			.filter(key => !result[key])
-			.forEach(key => delete result[key]);
+			.filter((key) => !result[key])
+			.forEach((key) => delete result[key]);
 		return { result, changes: {} };
 	}
 	const nextMap = makeTriangulatedFacesNextMap({ faces_vertices });
@@ -242,9 +266,15 @@ export const triangulate = ({
 
 	// this graph contains edges_vertices and faces_edges, and if they exist,
 	// edges_assignment and edges_foldAngle
-	const edgeGraph = rebuildTriangleEdges({
-		edges_vertices, edges_assignment, edges_foldAngle, faces_vertices,
-	}, { faces_vertices: faces_verticesNew });
+	const edgeGraph = rebuildTriangleEdges(
+		{
+			edges_vertices,
+			edges_assignment,
+			edges_foldAngle,
+			faces_vertices,
+		},
+		{ faces_vertices: faces_verticesNew },
+	);
 
 	// add vertices_coords and faces_vertices to the new triangulated edge graph
 	const result = {
@@ -255,9 +285,9 @@ export const triangulate = ({
 
 	// create an edge map
 	const startingEdgeCount = edges_vertices ? edges_vertices.length : 0;
-	const newEdges = Array
-		.from(Array(edgeGraph.edges_vertices.length - startingEdgeCount))
-		.map((_, i) => startingEdgeCount + i);
+	const newEdges = Array.from(
+		Array(edgeGraph.edges_vertices.length - startingEdgeCount),
+	).map((_, i) => startingEdgeCount + i);
 	const changes = {
 		faces: { map: nextMap },
 		edges: { new: newEdges },

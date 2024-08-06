@@ -68,7 +68,9 @@ export const walkSingleFace = (
 		// 1. if the user supplied a non-empty "walkedEdges" parameter, make sure
 		// we have not encountered one of these edges. If so, the face we are
 		// trying to build was already previously built, exit and return undefined.
-		if (walkedEdges[nextEdgeVertices]) { return undefined; }
+		if (walkedEdges[nextEdgeVertices]) {
+			return undefined;
+		}
 
 		// 2. if we are seeing an edge that we have previously seen during
 		// the construction of this face, then we are done, return this face.
@@ -77,7 +79,9 @@ export const walkSingleFace = (
 			Object.assign(walkedEdges, thisWalkedEdges);
 			face.vertices.pop();
 			face.edges.pop();
-			if (!face.angles.length) { delete face.angles; }
+			if (!face.angles.length) {
+				delete face.angles;
+			}
 			return face;
 		}
 		thisWalkedEdges[nextEdgeVertices] = true;
@@ -107,10 +111,11 @@ export const walkPlanarFaces = ({ vertices_vertices, vertices_sectors }) => {
 	// walked edges is maintained globally, no walking down the same edge twice
 	const walkedEdges = {};
 	const graph = { vertices_vertices, vertices_sectors };
-	return vertices_vertices
-		.flatMap((adj_verts, v) => adj_verts
-			.map(adj_vert => walkSingleFace(graph, v, adj_vert, walkedEdges))
-			.filter(a => a !== undefined));
+	return vertices_vertices.flatMap((adj_verts, v) =>
+		adj_verts
+			.map((adj_vert) => walkSingleFace(graph, v, adj_vert, walkedEdges))
+			.filter((a) => a !== undefined),
+	);
 };
 
 /**
@@ -129,7 +134,7 @@ export const walkPlanarFaces = ({ vertices_vertices, vertices_sectors }) => {
  * @returns {{ vertices: number[], edges: string[], angles?: number[] }[]}
  * a copy of the same input array with one fewer element
  */
-export const filterWalkedBoundaryFace = (walkedFaces) => walkedFaces
-	.filter(face => face.angles
-		.map(a => Math.PI - a)
-		.reduce((a, b) => a + b, 0) > 0);
+export const filterWalkedBoundaryFace = (walkedFaces) =>
+	walkedFaces.filter(
+		(face) => face.angles.map((a) => Math.PI - a).reduce((a, b) => a + b, 0) > 0,
+	);

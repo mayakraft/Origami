@@ -1,21 +1,15 @@
 /**
  * Rabbit Ear (c) Kraft
  */
-import {
-	prepareForRendering,
-} from "../../graph/rendering.js";
-import {
-	createProgram,
-} from "../general/webgl.js";
+import { prepareForRendering } from "../../graph/rendering.js";
+import { createProgram } from "../general/webgl.js";
 import {
 	makeFoldedVertexArrays,
 	makeFoldedElementArrays,
 	makeThickEdgesVertexArrays,
 	makeThickEdgesElementArrays,
 } from "./arrays.js";
-import {
-	makeUniforms,
-} from "./uniforms.js";
+import { makeUniforms } from "./uniforms.js";
 import {
 	model_100_vert,
 	model_100_frag,
@@ -40,9 +34,10 @@ import {
  */
 export const foldedFormFaces = (gl, version = 1, graph = {}, options = {}) => {
 	const exploded = prepareForRendering(graph, options);
-	const program = version === 1
-		? createProgram(gl, model_100_vert, model_100_frag)
-		: createProgram(gl, model_300_vert, model_300_frag);
+	const program =
+		version === 1
+			? createProgram(gl, model_100_vert, model_100_frag)
+			: createProgram(gl, model_300_vert, model_300_frag);
 	return {
 		program,
 		vertexArrays: makeFoldedVertexArrays(gl, program, exploded, options),
@@ -61,9 +56,10 @@ export const foldedFormFaces = (gl, version = 1, graph = {}, options = {}) => {
  */
 export const foldedFormFacesOutlined = (gl, version = 1, graph = {}, options = {}) => {
 	const exploded = prepareForRendering(graph, options);
-	const program = version === 1
-		? createProgram(gl, outlined_model_100_vert, outlined_model_100_frag)
-		: createProgram(gl, outlined_model_300_vert, outlined_model_300_frag);
+	const program =
+		version === 1
+			? createProgram(gl, outlined_model_100_vert, outlined_model_100_frag)
+			: createProgram(gl, outlined_model_300_vert, outlined_model_300_frag);
 	return {
 		program,
 		vertexArrays: makeFoldedVertexArrays(gl, program, exploded, options),
@@ -81,9 +77,10 @@ export const foldedFormFacesOutlined = (gl, version = 1, graph = {}, options = {
  * @returns {WebGLModel}
  */
 export const foldedFormEdges = (gl, version = 1, graph = {}, options = {}) => {
-	const program = version === 1
-		? createProgram(gl, thick_edges_100_vert, simple_100_frag)
-		: createProgram(gl, thick_edges_300_vert, simple_300_frag);
+	const program =
+		version === 1
+			? createProgram(gl, thick_edges_100_vert, simple_100_frag)
+			: createProgram(gl, thick_edges_300_vert, simple_300_frag);
 	return {
 		program,
 		vertexArrays: makeThickEdgesVertexArrays(gl, program, graph, options),

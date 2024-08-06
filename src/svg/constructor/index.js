@@ -1,10 +1,10 @@
 /* SVG (c) Kraft */
-import RabbitEarWindow from '../environment/window.js';
-import NS from '../spec/namespace.js';
-import nodes_children from '../spec/nodes_children.js';
-import nodes_attributes from '../spec/nodes_attributes.js';
-import { toCamel } from '../general/string.js';
-import extensions from './extensions/index.js';
+import RabbitEarWindow from "../environment/window.js";
+import NS from "../spec/namespace.js";
+import nodes_children from "../spec/nodes_children.js";
+import nodes_attributes from "../spec/nodes_attributes.js";
+import { toCamel } from "../general/string.js";
+import extensions from "./extensions/index.js";
 
 /**
  * Rabbit Ear (c) Kraft
@@ -30,9 +30,8 @@ const passthroughArgs = (...args) => args;
 const Constructor = (name, parent, ...initArgs) => {
 	// the node name (like "line" for <line>) which is usually the
 	// same as "name", but can sometimes differ in the case of custom elements
-	const nodeName = extensions[name] && extensions[name].nodeName
-		? extensions[name].nodeName
-		: name;
+	const nodeName =
+		extensions[name] && extensions[name].nodeName ? extensions[name].nodeName : name;
 	const { init, args, methods } = extensions[name] || {};
 	const attributes = nodes_attributes[nodeName] || [];
 	const children = nodes_children[nodeName] || [];
@@ -40,12 +39,14 @@ const Constructor = (name, parent, ...initArgs) => {
 	// create the element itself under the svg namespace.
 	// or, if the extension specifies a custom initializer, run it instead
 	const element = init
-		?	init(parent, ...initArgs)
+		? init(parent, ...initArgs)
 		: RabbitEarWindow().document.createElementNS(NS, nodeName);
 
 	// if the parent exists, and the element has no parent yet (could have been
 	// added during the init), make this element a child.
-	if (parent && !element.parentElement) { parent.appendChild(element); }
+	if (parent && !element.parentElement) {
+		parent.appendChild(element);
+	}
 
 	// some element initializers can set some attributes set right after
 	// initialization, if the extension specifies how to assign them,
@@ -57,18 +58,21 @@ const Constructor = (name, parent, ...initArgs) => {
 
 	// if the extension specifies methods these will be bound to the object
 	if (methods) {
-		Object.keys(methods)
-			.forEach(methodName => Object.defineProperty(element, methodName, {
+		Object.keys(methods).forEach((methodName) =>
+			Object.defineProperty(element, methodName, {
 				value: function () {
 					return methods[methodName](element, ...arguments);
 				},
-			}));
+			}),
+		);
 	}
 
 	// camelCase functional style attribute setters, like .stroke() .strokeWidth()
 	attributes.forEach((attribute) => {
 		const attrNameCamel = toCamel(attribute);
-		if (element[attrNameCamel]) { return; }
+		if (element[attrNameCamel]) {
+			return;
+		}
 		Object.defineProperty(element, attrNameCamel, {
 			value: function () {
 				element.setAttribute(attribute, ...arguments);
@@ -80,8 +84,12 @@ const Constructor = (name, parent, ...initArgs) => {
 	// allow this element to initialize another element, and this
 	// child element will be automatically appended to this element
 	children.forEach((childNode) => {
-		if (element[childNode]) { return; }
-		const value = function () { return Constructor(childNode, element, ...arguments); };
+		if (element[childNode]) {
+			return;
+		}
+		const value = function () {
+			return Constructor(childNode, element, ...arguments);
+		};
 		Object.defineProperty(element, childNode, { value });
 	});
 

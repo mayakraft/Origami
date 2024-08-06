@@ -5,8 +5,15 @@ import ear from "../src/index.js";
 // should edges_faces be empty, or contain empty arrays one for each edge
 test("no face graph", () => {
 	const origami = ear.graph({
-		vertices_coords: [[0, 0], [0.5, 0.5], [1, 0]],
-		edges_vertices: [[0, 1], [1, 2]],
+		vertices_coords: [
+			[0, 0],
+			[0.5, 0.5],
+			[1, 0],
+		],
+		edges_vertices: [
+			[0, 1],
+			[1, 2],
+		],
 		edges_assignment: ["B", "B"],
 	});
 
@@ -17,7 +24,10 @@ test("no face graph", () => {
 
 test("edges_faces square", () => {
 	const result = ear.graph.makeEdgesFaces({
-		faces_edges: [[0, 4, 3], [1, 2, 4]],
+		faces_edges: [
+			[0, 4, 3],
+			[1, 2, 4],
+		],
 	});
 	expect(result[0]).toEqual(expect.arrayContaining([0]));
 	expect(result[1]).toEqual(expect.arrayContaining([1]));
@@ -28,7 +38,10 @@ test("edges_faces square", () => {
 
 test("edges_faces", () => {
 	const result = ear.graph.makeEdgesFaces({
-		faces_edges: [[8, 7, 6], [5, 4, 3]],
+		faces_edges: [
+			[8, 7, 6],
+			[5, 4, 3],
+		],
 	});
 	expect(result[0].length).toBe(0);
 	expect(result[1].length).toBe(0);
@@ -43,8 +56,19 @@ test("edges_faces", () => {
 
 test("edges faces direction", () => {
 	const graph = {
-		vertices_coords: [[0, 0], [1, 0], [1, 1], [0, 1]],
-		edges_vertices: [[0, 1], [1, 2], [2, 3], [3, 0], [2, 0]],
+		vertices_coords: [
+			[0, 0],
+			[1, 0],
+			[1, 1],
+			[0, 1],
+		],
+		edges_vertices: [
+			[0, 1],
+			[1, 2],
+			[2, 3],
+			[3, 0],
+			[2, 0],
+		],
 		edges_assignment: ["B", "B", "B", "B", "M"],
 	};
 	// prepare
@@ -56,7 +80,13 @@ test("edges faces direction", () => {
 	expect(edges_faces1[4][0]).toBe(0);
 	expect(edges_faces1[4][1]).toBe(1);
 
-	graph.edges_vertices = [[0, 1], [1, 2], [2, 3], [3, 0], [0, 2]];
+	graph.edges_vertices = [
+		[0, 1],
+		[1, 2],
+		[2, 3],
+		[3, 0],
+		[0, 2],
+	];
 
 	const edges_faces2 = ear.graph.makeEdgesFaces(graph);
 	expect(edges_faces2[4][0]).toBe(1);

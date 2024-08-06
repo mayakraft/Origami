@@ -63,7 +63,7 @@ vertices, edges, faces, boundaries: these can be either an `object` or a `boolea
 - `boolean` with a "false" will turn skip rendering this layer
 - `object` with css-style tags (kebab-case keys) will apply style as attribute tags.
 
-"edges" and "faces" contains special subcategories. Edges can target any of the FOLD-spec edges_assignment classes: mountain, valley, boundary, flat, unassigned. Faces can target front and back, which 
+"edges" and "faces" contains special subcategories. Edges can target any of the FOLD-spec edges_assignment classes: mountain, valley, boundary, flat, unassigned. Faces can target front and back, which
 
 ```javascript
 options = {

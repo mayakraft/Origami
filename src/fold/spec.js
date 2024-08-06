@@ -1,15 +1,9 @@
 /**
  * Rabbit Ear (c) Kraft
  */
-import {
-	EPSILON,
-} from "../math/constant.js";
-import {
-	epsilonEqual,
-} from "../math/compare.js";
-import {
-	doEdgesOverlap,
-} from "../graph/edges/overlap.js";
+import { EPSILON } from "../math/constant.js";
+import { epsilonEqual } from "../math/compare.js";
+import { doEdgesOverlap } from "../graph/edges/overlap.js";
 
 /**
  * FOLD spec: https://github.com/edemaine/FOLD/
@@ -52,31 +46,18 @@ export const foldKeys = {
 		"faces_edges",
 		"faces_faces",
 	],
-	orders: [
-		"edgeOrders",
-		"faceOrders",
-	],
+	orders: ["edgeOrders", "faceOrders"],
 };
 
 /**
  * @description All "file_classes" values according to the FOLD spec
  */
-export const foldFileClasses = [
-	"singleModel",
-	"multiModel",
-	"animation",
-	"diagrams",
-];
+export const foldFileClasses = ["singleModel", "multiModel", "animation", "diagrams"];
 
 /**
  * @description All "frame_classes" values according to the FOLD spec
  */
-export const foldFrameClasses = [
-	"creasePattern",
-	"foldedForm",
-	"graph",
-	"linkage",
-];
+export const foldFrameClasses = ["creasePattern", "foldedForm", "graph", "linkage"];
 
 /**
  * @description All "frame_attributes" values according to the FOLD spec
@@ -121,7 +102,7 @@ export const edgesAssignmentNames = {
 	C: "cut",
 	U: "unassigned",
 };
-Object.keys(edgesAssignmentNames).forEach(key => {
+Object.keys(edgesAssignmentNames).forEach((key) => {
 	edgesAssignmentNames[key.toLowerCase()] = edgesAssignmentNames[key];
 });
 
@@ -197,9 +178,8 @@ export const assignmentIsBoundary = {
  * @param {string} assignment a FOLD edge assignment character
  * @returns {number} fold angle in degrees. M/V are assumed to be flat-folded.
  */
-export const edgeAssignmentToFoldAngle = (assignment) => (
-	assignmentFlatFoldAngle[assignment] || 0
-);
+export const edgeAssignmentToFoldAngle = (assignment) =>
+	assignmentFlatFoldAngle[assignment] || 0;
 
 /**
  * @description Convert a foldAngle to an edge assignment character.
@@ -210,8 +190,12 @@ export const edgeAssignmentToFoldAngle = (assignment) => (
  * @returns {string} a FOLD edge assignment character
  */
 export const edgeFoldAngleToAssignment = (angle) => {
-	if (angle > EPSILON) { return "V"; }
-	if (angle < -EPSILON) { return "M"; }
+	if (angle > EPSILON) {
+		return "V";
+	}
+	if (angle < -EPSILON) {
+		return "M";
+	}
 	return "U";
 };
 
@@ -221,9 +205,8 @@ export const edgeFoldAngleToAssignment = (angle) => {
  * @param {number} angle fold angle in degrees
  * @returns {boolean} true if the fold angle is flat folded
  */
-export const edgeFoldAngleIsFlatFolded = (angle) => (
-	epsilonEqual(-180, angle) || epsilonEqual(180, angle)
-);
+export const edgeFoldAngleIsFlatFolded = (angle) =>
+	epsilonEqual(-180, angle) || epsilonEqual(180, angle);
 
 /**
  * @description Test if a fold angle is flat, which includes unfolded
@@ -231,9 +214,8 @@ export const edgeFoldAngleIsFlatFolded = (angle) => (
  * @param {number} angle fold angle in degrees
  * @returns {boolean} true if the fold angle is flat
  */
-export const edgeFoldAngleIsFlat = (angle) => (
-	epsilonEqual(0, angle) || edgeFoldAngleIsFlatFolded(angle)
-);
+export const edgeFoldAngleIsFlat = (angle) =>
+	epsilonEqual(0, angle) || edgeFoldAngleIsFlatFolded(angle);
 
 /**
  * @description Using edges_foldAngle, determine if a FOLD object
@@ -244,9 +226,13 @@ export const edgeFoldAngleIsFlat = (angle) => (
  * @returns {boolean} are the edges of the graph flat folded?
  */
 export const edgesFoldAngleAreAllFlat = ({ edges_foldAngle }) => {
-	if (!edges_foldAngle) { return true; }
+	if (!edges_foldAngle) {
+		return true;
+	}
 	for (let i = 0; i < edges_foldAngle.length; i += 1) {
-		if (!edgeFoldAngleIsFlat(edges_foldAngle[i])) { return false; }
+		if (!edgeFoldAngleIsFlat(edges_foldAngle[i])) {
+			return false;
+		}
 	}
 	return true;
 };
@@ -257,9 +243,8 @@ export const edgesFoldAngleAreAllFlat = ({ edges_foldAngle }) => {
  * @param {function} matchFunction
  * @returns {string[]} array of matching keys
  */
-const filterKeys = (obj, matchFunction) => Object
-	.keys(obj)
-	.filter(key => matchFunction(key));
+const filterKeys = (obj, matchFunction) =>
+	Object.keys(obj).filter((key) => matchFunction(key));
 
 /**
  * @description Get all keys in an object which begin with a string and are
@@ -269,11 +254,12 @@ const filterKeys = (obj, matchFunction) => Object
  * @param {string} prefix a prefix to match against the keys
  * @returns {string[]} array of matching keys
  */
-export const filterKeysWithPrefix = (obj, prefix) => filterKeys(
-	obj,
-	/** @param {string} s */
-	s => s.substring(0, prefix.length + 1) === `${prefix}_`,
-);
+export const filterKeysWithPrefix = (obj, prefix) =>
+	filterKeys(
+		obj,
+		/** @param {string} s */
+		(s) => s.substring(0, prefix.length + 1) === `${prefix}_`,
+	);
 
 /**
  * @description Get all keys in an object which end with a string and are
@@ -283,11 +269,12 @@ export const filterKeysWithPrefix = (obj, prefix) => filterKeys(
  * @param {string} suffix a suffix to match against the keys
  * @returns {string[]} array of matching keys
  */
-export const filterKeysWithSuffix = (obj, suffix) => filterKeys(
-	obj,
-	/** @param {string} s */
-	s => s.substring(s.length - suffix.length - 1, s.length) === `_${suffix}`,
-);
+export const filterKeysWithSuffix = (obj, suffix) =>
+	filterKeys(
+		obj,
+		/** @param {string} s */
+		(s) => s.substring(s.length - suffix.length - 1, s.length) === `_${suffix}`,
+	);
 
 /**
  * @description Find all keys in an object that contain a _ character,
@@ -298,9 +285,11 @@ export const filterKeysWithSuffix = (obj, suffix) => filterKeys(
 export const getAllPrefixes = (obj) => {
 	const hash = {};
 	Object.keys(obj)
-		.filter(s => s.includes("_"))
-		.map(k => k.substring(0, k.indexOf("_")))
-		.forEach(k => { hash[k] = true; });
+		.filter((s) => s.includes("_"))
+		.map((k) => k.substring(0, k.indexOf("_")))
+		.forEach((k) => {
+			hash[k] = true;
+		});
 	return Object.keys(hash);
 };
 
@@ -313,9 +302,11 @@ export const getAllPrefixes = (obj) => {
 export const getAllSuffixes = (obj) => {
 	const hash = {};
 	Object.keys(obj)
-		.filter(s => s.includes("_"))
-		.map(k => k.substring(k.lastIndexOf("_") + 1, k.length))
-		.forEach(k => { hash[k] = true; });
+		.filter((s) => s.includes("_"))
+		.map((k) => k.substring(k.lastIndexOf("_") + 1, k.length))
+		.forEach((k) => {
+			hash[k] = true;
+		});
 	return Object.keys(hash);
 };
 
@@ -329,13 +320,16 @@ export const getAllSuffixes = (obj) => {
  */
 export const transposeGraphArrays = (graph, geometry_key) => {
 	const matching_keys = filterKeysWithPrefix(graph, geometry_key);
-	if (matching_keys.length === 0) { return []; }
-	const len = Math.max(...matching_keys.map(arr => graph[arr].length));
-	const geometry = Array.from(Array(len))
-		.map(() => ({}));
-	matching_keys
-		.forEach(key => geometry
-			.forEach((_, i) => { geometry[i][key] = graph[key][i]; }));
+	if (matching_keys.length === 0) {
+		return [];
+	}
+	const len = Math.max(...matching_keys.map((arr) => graph[arr].length));
+	const geometry = Array.from(Array(len)).map(() => ({}));
+	matching_keys.forEach((key) =>
+		geometry.forEach((_, i) => {
+			geometry[i][key] = graph[key][i];
+		}),
+	);
 	return geometry;
 };
 
@@ -347,24 +341,26 @@ export const transposeGraphArrays = (graph, geometry_key) => {
  * @param {number} index the index of an element
  * @returns {object} an object with FOLD keys but the values are from this single element
  */
-export const transposeGraphArrayAtIndex = (
-	graph,
-	geometry_key,
-	index,
-) => {
+export const transposeGraphArrayAtIndex = (graph, geometry_key, index) => {
 	const matching_keys = filterKeysWithPrefix(graph, geometry_key);
-	if (matching_keys.length === 0) { return undefined; }
+	if (matching_keys.length === 0) {
+		return undefined;
+	}
 	const geometry = {};
-	matching_keys.forEach((key) => { geometry[key] = graph[key][index]; });
+	matching_keys.forEach((key) => {
+		geometry[key] = graph[key][index];
+	});
 	return geometry;
 };
 
 // used in isFoldObject
-const allFOLDKeys = Object.freeze([]
-	.concat(foldKeys.file)
-	.concat(foldKeys.frame)
-	.concat(foldKeys.graph)
-	.concat(foldKeys.orders));
+const allFOLDKeys = Object.freeze(
+	[]
+		.concat(foldKeys.file)
+		.concat(foldKeys.frame)
+		.concat(foldKeys.graph)
+		.concat(foldKeys.orders),
+);
 
 /**
  * @description Using heuristics by checking the names of the keys
@@ -373,11 +369,10 @@ const allFOLDKeys = Object.freeze([]
  * @returns {number} value between 0 and 1 where
  * 0 means no chance, 1 means 100% chance.
  */
-export const isFoldObject = (object = {}) => (
+export const isFoldObject = (object = {}) =>
 	Object.keys(object).length === 0
 		? 0
-		: allFOLDKeys
-			.filter(key => object[key]).length / Object.keys(object).length);
+		: allFOLDKeys.filter((key) => object[key]).length / Object.keys(object).length;
 
 /**
  * @description Check the coordinates of each vertex and if any of them
@@ -389,8 +384,11 @@ export const isFoldObject = (object = {}) => (
  */
 export const getDimension = ({ vertices_coords }, epsilon = EPSILON) => {
 	for (let i = 0; i < vertices_coords.length; i += 1) {
-		if (vertices_coords[i] && vertices_coords[i].length === 3
-			&& !epsilonEqual(0, vertices_coords[i][2], epsilon)) {
+		if (
+			vertices_coords[i] &&
+			vertices_coords[i].length === 3 &&
+			!epsilonEqual(0, vertices_coords[i][2], epsilon)
+		) {
 			return 3;
 		}
 	}
@@ -406,14 +404,18 @@ export const getDimension = ({ vertices_coords }, epsilon = EPSILON) => {
  * undefined if no vertices exist. number should be 2 or 3 in most cases.
  */
 export const getDimensionQuick = ({ vertices_coords }) => {
-	if (!vertices_coords || !vertices_coords.length) { return undefined; }
+	if (!vertices_coords || !vertices_coords.length) {
+		return undefined;
+	}
 	// return length of first vertex, if it exists
 	if (vertices_coords[0] !== undefined) {
 		return vertices_coords[0].length;
 	}
 	// in case of an array with holes, get the first vertex.
 	const vertex = vertices_coords.filter(() => true).shift();
-	if (!vertex) { return undefined; }
+	if (!vertex) {
+		return undefined;
+	}
 	return vertex.length;
 };
 
@@ -427,25 +429,38 @@ export const getDimensionQuick = ({ vertices_coords }) => {
  * @param {number} [epsilon=1e-6] an optional epsilon
  * @returns {boolean} true if the graph is in a folded state
  */
-export const isFoldedForm = ({
-	vertices_coords, edges_vertices, faces_vertices, faces_edges,
-	frame_classes, file_classes,
-}, epsilon = EPSILON) => {
+export const isFoldedForm = (
+	{
+		vertices_coords,
+		edges_vertices,
+		faces_vertices,
+		faces_edges,
+		frame_classes,
+		file_classes,
+	},
+	epsilon = EPSILON,
+) => {
 	// FOLD spec only describes "foldedForm" to be in the frame_classes,
 	// accounting for mistakes, check both class arrays.
-	if ((frame_classes && frame_classes.includes("foldedForm"))
-		|| (file_classes && file_classes.includes("foldedForm"))) {
+	if (
+		(frame_classes && frame_classes.includes("foldedForm")) ||
+		(file_classes && file_classes.includes("foldedForm"))
+	) {
 		return true;
 	}
-	if ((frame_classes && frame_classes.includes("creasePattern"))
-		|| (file_classes && file_classes.includes("creasePattern"))) {
+	if (
+		(frame_classes && frame_classes.includes("creasePattern")) ||
+		(file_classes && file_classes.includes("creasePattern"))
+	) {
 		return false;
 	}
 	// unfortunately, anything beyond this point cannot be calculated precisely,
 	// or it cannot be calculated precisely without a significant overhead
 
 	// if vertices don't exist, the graph is abstract. return false.
-	if (!vertices_coords) { return false; }
+	if (!vertices_coords) {
+		return false;
+	}
 
 	const dimensions = getDimensionQuick({ vertices_coords });
 
@@ -465,9 +480,15 @@ export const isFoldedForm = ({
 	// iterate over every vertex, check each vertex's Z component, if the
 	// Z value is not 0, consider the graph to be folded.
 	for (let i = 0; i < vertices_coords.length; i += 1) {
-		if (!vertices_coords[i]) { continue; }
-		if (typeof vertices_coords[i][2] !== "number") { continue; }
-		if (!epsilonEqual(vertices_coords[i][2], 0, epsilon)) { return true; }
+		if (!vertices_coords[i]) {
+			continue;
+		}
+		if (typeof vertices_coords[i][2] !== "number") {
+			continue;
+		}
+		if (!epsilonEqual(vertices_coords[i][2], 0, epsilon)) {
+			return true;
+		}
 	}
 
 	// no evidence that the graph is folded.
@@ -485,13 +506,17 @@ export const isFoldedForm = ({
  * @returns {boolean[]} for every edge, is it folded? or does it have
  * the potential to be folded? where "unassigned" is yes.
  */
-export const makeEdgesIsFolded = ({ edges_vertices, edges_foldAngle, edges_assignment }) => {
+export const makeEdgesIsFolded = ({
+	edges_vertices,
+	edges_foldAngle,
+	edges_assignment,
+}) => {
 	if (edges_assignment === undefined) {
 		return edges_foldAngle === undefined
 			? edges_vertices.map(() => true)
-			: edges_foldAngle.map(angle => angle < -EPSILON || angle > EPSILON);
+			: edges_foldAngle.map((angle) => angle < -EPSILON || angle > EPSILON);
 	}
-	return edges_assignment.map(a => assignmentCanBeFolded[a]);
+	return edges_assignment.map((a) => assignmentCanBeFolded[a]);
 };
 const flipAssignmentLookup = { M: "V", m: "v", V: "M", v: "m" };
 
@@ -501,9 +526,7 @@ const flipAssignmentLookup = { M: "V", m: "v", V: "M", v: "m" };
  * @param {string} assign a FOLD edge assignment
  * @returns {string} a FOLD edge assignment
  */
-export const invertAssignment = (assign) => (
-	flipAssignmentLookup[assign] || assign
-);
+export const invertAssignment = (assign) => flipAssignmentLookup[assign] || assign;
 
 /**
  * @description Given a fold graph, make all mountains into valleys
@@ -513,11 +536,12 @@ export const invertAssignment = (assign) => (
  */
 export const invertAssignments = (graph) => {
 	if (graph.edges_assignment) {
-		graph.edges_assignment = graph.edges_assignment
-			.map(a => (flipAssignmentLookup[a] ? flipAssignmentLookup[a] : a));
+		graph.edges_assignment = graph.edges_assignment.map((a) =>
+			flipAssignmentLookup[a] ? flipAssignmentLookup[a] : a,
+		);
 	}
 	if (graph.edges_foldAngle) {
-		graph.edges_foldAngle = graph.edges_foldAngle.map(n => -n);
+		graph.edges_foldAngle = graph.edges_foldAngle.map((n) => -n);
 	}
 	return graph;
 };
@@ -540,19 +564,22 @@ export const invertAssignments = (graph) => {
  */
 export const sortEdgesByAssignment = ({ edges_vertices, edges_assignment = [] }) => {
 	// get an array of all uppercase assignments as strings (B, M, V, F...)
-	const allAssignments = Array
-		.from(new Set(edgesAssignmentValues.map(s => s.toUpperCase())));
+	const allAssignments = Array.from(
+		new Set(edgesAssignmentValues.map((s) => s.toUpperCase())),
+	);
 
 	// for every edge, return that edge's assignment (uppercase), ensuring
 	// that this array matches in length to edges_vertices, and if any
 	// edge assignment is unknown, it is given a "U" (unassigned).
 	const edges_upperAssignment = edges_vertices
 		.map((_, i) => edges_assignment[i] || "U")
-		.map(a => a.toUpperCase());
+		.map((a) => a.toUpperCase());
 
 	// dictionary with assignments as keys and arrays of edge indices as values
 	const assignmentIndices = {};
-	allAssignments.forEach(a => { assignmentIndices[a] = []; });
+	allAssignments.forEach((a) => {
+		assignmentIndices[a] = [];
+	});
 	edges_upperAssignment.forEach((a, i) => assignmentIndices[a].push(i));
 	return assignmentIndices;
 };
@@ -575,8 +602,10 @@ export const getFileMetadata = (FOLD = {}) => {
 	// return all "file_" metadata keys (do not include file_frames)
 	const metadata = {};
 	foldKeys.file
-		.filter(key => key !== "file_frames")
-		.filter(key => FOLD[key] !== undefined)
-		.forEach(key => { metadata[key] = FOLD[key]; });
+		.filter((key) => key !== "file_frames")
+		.filter((key) => FOLD[key] !== undefined)
+		.forEach((key) => {
+			metadata[key] = FOLD[key];
+		});
 	return metadata;
 };

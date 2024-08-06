@@ -1,9 +1,19 @@
 /* SVG (c) Kraft */
-import { str_class, str_arrow, str_tail, str_head, str_path, str_style, str_stroke, str_none, str_object } from '../../../environment/strings.js';
-import NS from '../../../spec/namespace.js';
-import RabbitEarWindow from '../../../environment/window.js';
-import ArrowMethods from './methods.js';
-import { makeArrowOptions } from './options.js';
+import {
+	str_class,
+	str_arrow,
+	str_tail,
+	str_head,
+	str_path,
+	str_style,
+	str_stroke,
+	str_none,
+	str_object,
+} from "../../../environment/strings.js";
+import NS from "../../../spec/namespace.js";
+import RabbitEarWindow from "../../../environment/window.js";
+import ArrowMethods from "./methods.js";
+import { makeArrowOptions } from "./options.js";
 
 /**
  * Rabbit Ear (c) Kraft
@@ -14,7 +24,9 @@ const arrowKeys = Object.keys(makeArrowOptions());
 
 const matchingOptions = (...args) => {
 	for (let a = 0; a < args.length; a += 1) {
-		if (typeof args[a] !== str_object) { continue; }
+		if (typeof args[a] !== str_object) {
+			continue;
+		}
 		const keys = Object.keys(args[a]);
 		for (let i = 0; i < keys.length; i += 1) {
 			if (arrowKeys.includes(keys[i])) {
@@ -28,7 +40,7 @@ const matchingOptions = (...args) => {
 const init = function (parent, ...args) {
 	const element = RabbitEarWindow().document.createElementNS(NS, "g");
 	element.setAttribute(str_class, str_arrow);
-	const paths = ["line", str_tail, str_head].map(key => {
+	const paths = ["line", str_tail, str_head].map((key) => {
 		const path = RabbitEarWindow().document.createElementNS(NS, str_path);
 		path.setAttribute(str_class, `${str_arrow}-${key}`);
 		element.appendChild(path);
@@ -42,8 +54,8 @@ const init = function (parent, ...args) {
 	ArrowMethods.setPoints(element, ...(options.segment || args));
 	if (options) {
 		Object.keys(options)
-			.filter(key => ArrowMethods[key])
-			.forEach(key => ArrowMethods[key](element, options[key]));
+			.filter((key) => ArrowMethods[key])
+			.forEach((key) => ArrowMethods[key](element, options[key]));
 	}
 	return element;
 };

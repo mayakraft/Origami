@@ -53,9 +53,10 @@ test("opxToFold, test file", () => {
 	expect(result.vertices_coords.length).toBe(8);
 	expect(result.edges_vertices.length).toBe(10);
 	expect(result.faces_vertices.length).toBe(3);
-	const boundaries = result.edges_assignment.filter(a => a === "B" || a === "b");
-	expect(boundaries.length > 0 && boundaries.length < result.edges_vertices.length)
-		.toBe(true);
+	const boundaries = result.edges_assignment.filter((a) => a === "B" || a === "b");
+	expect(boundaries.length > 0 && boundaries.length < result.edges_vertices.length).toBe(
+		true,
+	);
 });
 
 test("opxToFold, old OPX file format", () => {
@@ -64,9 +65,10 @@ test("opxToFold, old OPX file format", () => {
 	expect(result.vertices_coords.length).toBe(9);
 	expect(result.edges_vertices.length).toBe(20);
 	expect(result.faces_vertices.length).toBe(12);
-	const boundaries = result.edges_assignment.filter(a => a === "B" || a === "b");
-	expect(boundaries.length > 0 && boundaries.length < result.edges_vertices.length)
-		.toBe(true);
+	const boundaries = result.edges_assignment.filter((a) => a === "B" || a === "b");
+	expect(boundaries.length > 0 && boundaries.length < result.edges_vertices.length).toBe(
+		true,
+	);
 });
 
 test("opxToFold, bird base", () => {
@@ -75,7 +77,8 @@ test("opxToFold, bird base", () => {
 	expect(result.vertices_coords.length).toBe(13);
 	expect(result.edges_vertices.length).toBe(28);
 	expect(result.faces_vertices.length).toBe(16);
-	const boundaries = result.edges_assignment.filter(a => a === "B" || a === "b");
-	expect(boundaries.length > 0 && boundaries.length < result.edges_vertices.length)
-		.toBe(true);
+	const boundaries = result.edges_assignment.filter((a) => a === "B" || a === "b");
+	expect(boundaries.length > 0 && boundaries.length < result.edges_vertices.length).toBe(
+		true,
+	);
 });

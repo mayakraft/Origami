@@ -1,15 +1,9 @@
 /**
  * Rabbit Ear (c) Kraft
  */
-import {
-	count,
-} from "./count.js";
-import {
-	uniqueSortedNumbers,
-} from "../general/array.js";
-import {
-	remapKey,
-} from "./maps.js";
+import { count } from "./count.js";
+import { uniqueSortedNumbers } from "../general/array.js";
+import { remapKey } from "./maps.js";
 
 /**
  * @param {FOLD} graph
@@ -28,7 +22,9 @@ const makeIndexMap = (graph, key, removeIndices) => {
 			i += 1;
 			walk += 1;
 		}
-		if (i < arrayLength) { indexMap[i] = j; }
+		if (i < arrayLength) {
+			indexMap[i] = j;
+		}
 	}
 	return indexMap;
 };

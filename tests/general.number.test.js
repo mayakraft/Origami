@@ -1,8 +1,7 @@
 import { expect, test } from "vitest";
 import ear from "../src/index.js";
 
-const equalTest = (a, b) => expect(JSON.stringify(a))
-	.toBe(JSON.stringify(b));
+const equalTest = (a, b) => expect(JSON.stringify(a)).toBe(JSON.stringify(b));
 
 test("cleanNumber", () => {
 	// this is the most decimal places javascript uses

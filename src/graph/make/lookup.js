@@ -14,16 +14,19 @@
 const makePairsMap = (array, subsetIndices) => {
 	/** @type {{ [key: string]: number }} */
 	const map = {};
-	const indices = !subsetIndices
-		? array.map((_, i) => i)
-		: subsetIndices;
-	indices
-		.forEach(i => array[i]
-			.map((_, j, arr) => [0, 1]
-				.map(offset => (j + offset) % arr.length)
-				.map(n => arr[n])
-				.join(" "))
-			.forEach(key => { map[key] = i; }));
+	const indices = !subsetIndices ? array.map((_, i) => i) : subsetIndices;
+	indices.forEach((i) =>
+		array[i]
+			.map((_, j, arr) =>
+				[0, 1]
+					.map((offset) => (j + offset) % arr.length)
+					.map((n) => arr[n])
+					.join(" "),
+			)
+			.forEach((key) => {
+				map[key] = i;
+			}),
+	);
 	return map;
 };
 
@@ -39,9 +42,8 @@ const makePairsMap = (array, subsetIndices) => {
  * @returns {{[key: string]: number}} object mapping a space-separated
  * vertex pair to an edge index
  */
-export const makeVerticesToEdge = ({ edges_vertices }, edges) => (
-	makePairsMap(edges_vertices, edges)
-);
+export const makeVerticesToEdge = ({ edges_vertices }, edges) =>
+	makePairsMap(edges_vertices, edges);
 
 /**
  * @description Make an object which answers the question: "which face
@@ -55,9 +57,8 @@ export const makeVerticesToEdge = ({ edges_vertices }, edges) => (
  * @returns {{[key: string]: number}} object mapping a space-separated
  * vertex pair to a face index
  */
-export const makeVerticesToFace = ({ faces_vertices }, faces) => (
-	makePairsMap(faces_vertices, faces)
-);
+export const makeVerticesToFace = ({ faces_vertices }, faces) =>
+	makePairsMap(faces_vertices, faces);
 
 /**
  * @description Make an object which answers the question: "which face
@@ -71,6 +72,5 @@ export const makeVerticesToFace = ({ faces_vertices }, faces) => (
  * @returns {{[key: string]: number}} object mapping a space-separated
  * edge pair to a face index
  */
-export const makeEdgesToFace = ({ faces_edges }, faces) => (
-	makePairsMap(faces_edges, faces)
-);
+export const makeEdgesToFace = ({ faces_edges }, faces) =>
+	makePairsMap(faces_edges, faces);

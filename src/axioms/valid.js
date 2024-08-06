@@ -26,9 +26,7 @@ import {
 	validateAxiom6,
 	validateAxiom7,
 } from "./validate.js";
-import {
-	uniqueLineToVecLine,
-} from "../math/convert.js";
+import { uniqueLineToVecLine } from "../math/convert.js";
 
 /**
  * @param {FOLD} graph a FOLD graph, folded or crease pattern
@@ -82,13 +80,13 @@ export const validAxiom2 = (graph, point1, point2) => {
  */
 export const validNormalAxiom3 = (graph, line1, line2) => {
 	const solutionsUnique = normalAxiom3(line1, line2);
-  const solutions = solutionsUnique.map(uniqueLineToVecLine);
+	const solutions = solutionsUnique.map(uniqueLineToVecLine);
 	validateAxiom3(
 		graph,
 		[solutions[0], solutions[1]],
 		uniqueLineToVecLine(line1),
 		uniqueLineToVecLine(line2),
-	).forEach((valid, i) => valid ? undefined : delete solutionsUnique[i]);
+	).forEach((valid, i) => (valid ? undefined : delete solutionsUnique[i]));
 	return solutionsUnique;
 };
 
@@ -100,8 +98,9 @@ export const validNormalAxiom3 = (graph, line1, line2) => {
  */
 export const validAxiom3 = (graph, line1, line2) => {
 	const solutions = axiom3(line1, line2);
-	validateAxiom3(graph, solutions, line1, line2)
-		.forEach((valid, i) => valid ? undefined : delete solutions[i]);
+	validateAxiom3(graph, solutions, line1, line2).forEach((valid, i) =>
+		valid ? undefined : delete solutions[i],
+	);
 	return solutions;
 };
 
@@ -113,11 +112,7 @@ export const validAxiom3 = (graph, line1, line2) => {
  */
 export const validNormalAxiom4 = (graph, line, point) => {
 	const solutions = normalAxiom4(line, point);
-	const isValid = validateAxiom4(
-		graph,
-		uniqueLineToVecLine(line),
-		point,
-	);
+	const isValid = validateAxiom4(graph, uniqueLineToVecLine(line), point);
 	return solutions.filter((_, i) => isValid[i]);
 };
 
@@ -148,7 +143,7 @@ export const validNormalAxiom5 = (graph, line, point1, point2) => {
 		uniqueLineToVecLine(line),
 		point1,
 		point2,
-	).forEach((valid, i) => valid ? undefined : delete solutions[i]);
+	).forEach((valid, i) => (valid ? undefined : delete solutions[i]));
 	return solutions;
 };
 
@@ -161,8 +156,9 @@ export const validNormalAxiom5 = (graph, line, point1, point2) => {
  */
 export const validAxiom5 = (graph, line, point1, point2) => {
 	const solutions = axiom5(line, point1, point2);
-	validateAxiom5(graph, solutions, line, point1, point2)
-		.forEach((valid, i) => valid ? undefined : delete solutions[i]);
+	validateAxiom5(graph, solutions, line, point1, point2).forEach((valid, i) =>
+		valid ? undefined : delete solutions[i],
+	);
 	return solutions;
 };
 
@@ -183,7 +179,7 @@ export const validNormalAxiom6 = (graph, line1, line2, point1, point2) => {
 		uniqueLineToVecLine(line2),
 		point1,
 		point2,
-	).forEach((valid, i) => valid ? undefined : delete solutions[i]);
+	).forEach((valid, i) => (valid ? undefined : delete solutions[i]));
 	return solutions;
 };
 
@@ -197,8 +193,9 @@ export const validNormalAxiom6 = (graph, line1, line2, point1, point2) => {
  */
 export const validAxiom6 = (graph, line1, line2, point1, point2) => {
 	const solutions = axiom6(line1, line2, point1, point2);
-	validateAxiom6(graph, solutions, line1, line2, point1, point2)
-		.forEach((valid, i) => valid ? undefined : delete solutions[i]);
+	validateAxiom6(graph, solutions, line1, line2, point1, point2).forEach((valid, i) =>
+		valid ? undefined : delete solutions[i],
+	);
 	return solutions;
 };
 
@@ -219,7 +216,7 @@ export const validNormalAxiom7 = (graph, line1, line2, point) => {
 		uniqueLineToVecLine(line1),
 		uniqueLineToVecLine(line2),
 		point,
-	).forEach((valid, i) => valid ? undefined : delete solutions[i]);
+	).forEach((valid, i) => (valid ? undefined : delete solutions[i]));
 	return solutions;
 };
 
@@ -234,7 +231,8 @@ export const validNormalAxiom7 = (graph, line1, line2, point) => {
  */
 export const validAxiom7 = (graph, line1, line2, point) => {
 	const solutions = axiom7(line1, line2, point);
-	validateAxiom7(graph, solutions, line1, line2, point)
-		.forEach((valid, i) => valid ? undefined : delete solutions[i]);
+	validateAxiom7(graph, solutions, line1, line2, point).forEach((valid, i) =>
+		valid ? undefined : delete solutions[i],
+	);
 	return solutions;
 };

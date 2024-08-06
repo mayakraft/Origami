@@ -15,18 +15,17 @@ import { sortPointsAlongVector } from "../../general/sort.js";
  * the vertices will be sorted
  * @returns {number[]} indices of vertices, in sorted order
  */
-export const sortVerticesCounterClockwise = ({ vertices_coords }, vertices, vertex) => (
+export const sortVerticesCounterClockwise = ({ vertices_coords }, vertices, vertex) =>
 	vertices
-		.map(v => vertices_coords[v])
-		.map(coord => subtract(coord, vertices_coords[vertex]))
-		.map(vec => Math.atan2(vec[1], vec[0]))
+		.map((v) => vertices_coords[v])
+		.map((coord) => subtract(coord, vertices_coords[vertex]))
+		.map((vec) => Math.atan2(vec[1], vec[0]))
 		// optional line, this makes the cycle loop start/end along the +X axis
-		.map(angle => (angle > -EPSILON ? angle : angle + Math.PI * 2))
+		.map((angle) => (angle > -EPSILON ? angle : angle + Math.PI * 2))
 		.map((a, i) => ({ a, i }))
 		.sort((a, b) => a.a - b.a)
-		.map(el => el.i)
-		.map(i => vertices[i])
-);
+		.map((el) => el.i)
+		.map((i) => vertices[i]);
 
 /**
  * @description sort a subset of vertices from a graph along a vector.
@@ -36,9 +35,8 @@ export const sortVerticesCounterClockwise = ({ vertices_coords }, vertices, vert
  * @param {number[]} vector a vector along which to sort vertices
  * @returns {number[]} indices of vertices, in sorted order
  */
-export const sortVerticesAlongVector = ({ vertices_coords }, vertices, vector) => (
+export const sortVerticesAlongVector = ({ vertices_coords }, vertices, vector) =>
 	sortPointsAlongVector(
-		vertices.map(v => vertices_coords[v]),
+		vertices.map((v) => vertices_coords[v]),
 		vector,
-	).map(i => vertices[i])
-);
+	).map((i) => vertices[i]);

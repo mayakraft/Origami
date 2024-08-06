@@ -1,24 +1,12 @@
 /**
  * Rabbit Ear (c) Kraft
  */
-import {
-	validateTypes,
-} from "./validateTypes.js";
-import {
-	validateReferences,
-} from "./validateReferences.js";
-import {
-	validateReflexive,
-} from "./validateReflexive.js";
-import {
-	validateWinding,
-} from "./validateWinding.js";
-import {
-	validateAssignments,
-} from "./validateAssignments.js";
-import {
-	validateOrders,
-} from "./validateOrders.js";
+import { validateTypes } from "./validateTypes.js";
+import { validateReferences } from "./validateReferences.js";
+import { validateReflexive } from "./validateReflexive.js";
+import { validateWinding } from "./validateWinding.js";
+import { validateAssignments } from "./validateAssignments.js";
+import { validateOrders } from "./validateOrders.js";
 
 /**
  * @notes
@@ -32,13 +20,13 @@ import {
  * @param {FOLD} graph a FOLD object
  * @returns {string[]} array of error messages. an empty array means no errors.
  */
-export const validate = (graph) => (validateTypes(graph)
-	.concat(validateReferences(graph))
-	.concat(validateReflexive(graph))
-	.concat(validateWinding(graph))
-	.concat(validateAssignments(graph))
-	.concat(validateOrders(graph))
-);
+export const validate = (graph) =>
+	validateTypes(graph)
+		.concat(validateReferences(graph))
+		.concat(validateReflexive(graph))
+		.concat(validateWinding(graph))
+		.concat(validateAssignments(graph))
+		.concat(validateOrders(graph));
 
 // const extraVerticesTest = (graph, epsilon) => {
 // 	const errors = [];

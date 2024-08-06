@@ -24,13 +24,18 @@ import Messages from "./messages.js";
 const windowContainer = { window: undefined };
 
 // if we are in the browser, by default use the browser's "window".
-if (isBrowser) { windowContainer.window = window; }
+if (isBrowser) {
+	windowContainer.window = window;
+}
 
 /**
  * @description create the window.document object, if it does not exist.
  */
-const buildDocument = (newWindow) => new newWindow.DOMParser()
-	.parseFromString("<!DOCTYPE html><title>.</title>", "text/html");
+const buildDocument = (newWindow) =>
+	new newWindow.DOMParser().parseFromString(
+		"<!DOCTYPE html><title>.</title>",
+		"text/html",
+	);
 
 /**
  * @description This method allows the app to run in both a browser
@@ -41,7 +46,9 @@ const buildDocument = (newWindow) => new newWindow.DOMParser()
  */
 export const setWindow = (newWindow) => {
 	// make sure window has a document. xmldom does not, and requires it be built.
-	if (!newWindow.document) { newWindow.document = buildDocument(newWindow); }
+	if (!newWindow.document) {
+		newWindow.document = buildDocument(newWindow);
+	}
 	windowContainer.window = newWindow;
 	return windowContainer.window;
 };

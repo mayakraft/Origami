@@ -2,9 +2,7 @@
  * Rabbit Ear (c) Kraft
  */
 import window from "../../environment/window.js";
-import {
-	getRootParent,
-} from "../../svg/general/dom.js";
+import { getRootParent } from "../../svg/general/dom.js";
 
 /**
  * @description Convert a style element, CSSStyleSheet, into a nested
@@ -13,24 +11,29 @@ import {
  * @returns {object} dictionary representation of a style element
  */
 export const parseCSSStyleSheet = (sheet) => {
-	if (!sheet.cssRules) { return {}; }
+	if (!sheet.cssRules) {
+		return {};
+	}
 	const stylesheets = {};
 	// convert the array of type {CSSRule[]} to an object
 	// with the key:value being the key and the contents of that rule.
 	for (let i = 0; i < sheet.cssRules.length; i += 1) {
 		const cssRules = sheet.cssRules[i];
-		if (cssRules.constructor.name !== "CSSStyleRule") { continue; }
+		if (cssRules.constructor.name !== "CSSStyleRule") {
+			continue;
+		}
 		/** @type {any} CSSStyleRule */
 		const cssStyleRule = cssRules;
 		// if (cssRules.type !== 1) { continue; }
 		const selectorList = cssStyleRule.selectorText
 			.split(/,/gm)
 			.filter(Boolean)
-			.map(str => str.trim());
+			.map((str) => str.trim());
 		const style = {};
-		Object.values(cssStyleRule.style)
-			.forEach(key => { style[key] = cssStyleRule.style[key]; });
-		selectorList.forEach(selector => {
+		Object.values(cssStyleRule.style).forEach((key) => {
+			style[key] = cssStyleRule.style[key];
+		});
+		selectorList.forEach((selector) => {
 			stylesheets[selector] = style;
 		});
 	}
@@ -51,7 +54,9 @@ export const parseCSSStyleSheet = (sheet) => {
 export const parseStyleElement = (style) => {
 	/** @type {CSSStyleSheet|undefined} */
 	const styleSheet = "sheet" in style ? style.sheet : undefined;
-	if (styleSheet) { return parseCSSStyleSheet(styleSheet); }
+	if (styleSheet) {
+		return parseCSSStyleSheet(styleSheet);
+	}
 	const rootParent = getRootParent(style);
 	const isHTMLBound = rootParent.constructor === window().HTMLDocument;
 	if (!isHTMLBound) {
@@ -60,9 +65,10 @@ export const parseStyleElement = (style) => {
 		if (prevParent != null) {
 			prevParent.removeChild(style);
 		}
-		const body = window().document.body != null
-			? window().document.body
-			: window().document.createElement("body");
+		const body =
+			window().document.body != null
+				? window().document.body
+				: window().document.createElement("body");
 		body.appendChild(style);
 		// parse style sheet.
 		const parsedStyle = parseCSSStyleSheet(styleSheet);
@@ -85,14 +91,12 @@ export const parseStyleElement = (style) => {
 export const getStylesheetStyle = (key, nodeName, attributes, sheets = []) => {
 	const classes = attributes.class
 		? attributes.class
-			.split(/\s/)
-			.filter(Boolean)
-			.map(i => i.trim())
-			.map(str => `.${str}`)
+				.split(/\s/)
+				.filter(Boolean)
+				.map((i) => i.trim())
+				.map((str) => `.${str}`)
 		: [];
-	const id = attributes.id
-		? `#${attributes.id}`
-		: null;
+	const id = attributes.id ? `#${attributes.id}` : null;
 	// look for a matching id in the style sheets
 	if (id) {
 		for (let s = 0; s < sheets.length; s += 1) {

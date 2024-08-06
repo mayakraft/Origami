@@ -1,10 +1,7 @@
 /**
  * Rabbit Ear (c) Kraft
  */
-import {
-	includeR,
-	includeS,
-} from "../math/compare.js";
+import { includeR, includeS } from "../math/compare.js";
 import {
 	normalize2,
 	dot2,
@@ -16,9 +13,7 @@ import {
 	flip2,
 	rotate90,
 } from "../math/vector.js";
-import {
-	clipLineConvexPolygon,
-} from "../math/clip.js";
+import { clipLineConvexPolygon } from "../math/clip.js";
 import {
 	intersectLineLine,
 	// intersectConvexPolygonLine,
@@ -34,9 +29,7 @@ import {
  */
 const getLineMidpointInPolygon = (polygon, line) => {
 	const segment = clipLineConvexPolygon(polygon, line);
-	return segment === undefined
-		? undefined
-		: midpoint2(segment[0], segment[1]);
+	return segment === undefined ? undefined : midpoint2(segment[0], segment[1]);
 };
 
 /**
@@ -57,9 +50,7 @@ const getLineMidpointInPolygon = (polygon, line) => {
  */
 export const perpendicularBalancedSegment = (polygon, line, point) => {
 	// if provided, use the point as the origin, otherwise use the line midpoint
-	const origin = point === undefined
-		? getLineMidpointInPolygon(polygon, line)
-		: point;
+	const origin = point === undefined ? getLineMidpointInPolygon(polygon, line) : point;
 
 	// the vector of our line is simply the perpendicular
 	const vector = rotate90(line.vector); // rotate270
@@ -72,7 +63,7 @@ export const perpendicularBalancedSegment = (polygon, line, point) => {
 	}
 
 	const shortest = clip
-		.map(pt => distance2(origin, pt))
+		.map((pt) => distance2(origin, pt))
 		.sort((a, b) => a - b)
 		.shift();
 
@@ -82,10 +73,7 @@ export const perpendicularBalancedSegment = (polygon, line, point) => {
 
 	// our segment stretches in both directions from the origin
 	// by an equal amount
-	return [
-		add2(origin, flip2(scaled)),
-		add2(origin, scaled),
-	];
+	return [add2(origin, flip2(scaled)), add2(origin, scaled)];
 };
 
 /**
@@ -98,7 +86,7 @@ export const perpendicularBalancedSegment = (polygon, line, point) => {
  */
 export const betweenTwoSegments = (foldLine, lines, segments) => {
 	// two midpoints, the midpoint of each of the two segments
-	const midpoints = segments.map(seg => midpoint2(seg[0], seg[1]));
+	const midpoints = segments.map((seg) => midpoint2(seg[0], seg[1]));
 
 	// construct a line through the two midpoints
 	// const midpointLine = pointsToLine(...midpoints);
@@ -111,7 +99,7 @@ export const betweenTwoSegments = (foldLine, lines, segments) => {
 	// the midpoint between the two segment's midpoints.
 	const perpendicular = { vector: rotate90(foldLine.vector), origin };
 
-	return lines.map(line => intersectLineLine(line, perpendicular).point);
+	return lines.map((line) => intersectLineLine(line, perpendicular).point);
 };
 
 /**
@@ -119,19 +107,19 @@ export const betweenTwoSegments = (foldLine, lines, segments) => {
  */
 export const betweenTwoIntersectingSegments = (lines, intersect, foldLine, boundary) => {
 	// the input lines as vectors, and the same vectors flipped around
-	const paramVectors = lines.map(l => l.vector);
+	const paramVectors = lines.map((l) => l.vector);
 	const flippedVectors = paramVectors.map(flip2);
 
 	// four rays, extending outwards from the intersection point,
 	// tracing the path of each of the two input lines.
 	const paramRays = paramVectors
 		.concat(flippedVectors)
-		.map(vector => ({ vector, origin: intersect }));
+		.map((vector) => ({ vector, origin: intersect }));
 
 	// for each ray, apply the dot and cross product with the foldLine.
 	// to be used in the upcoming section.
-	const dots = paramRays.map(ray => dot2(ray.vector, foldLine.vector));
-	const crosses = paramRays.map(ray => cross2(ray.vector, foldLine.vector));
+	const dots = paramRays.map((ray) => dot2(ray.vector, foldLine.vector));
+	const crosses = paramRays.map((ray) => cross2(ray.vector, foldLine.vector));
 
 	// we know the two "lines" intersect, and the "foldLine" passes through this
 	// intersection and is an angle bisector between the two lines,
@@ -139,49 +127,38 @@ export const betweenTwoIntersectingSegments = (lines, intersect, foldLine, bound
 	// each one in one of the four quadrants formed by the axis of the foldLine.
 	// We can find exactly which ray is in which quadrant by consulting
 	// their dot and cross products.
-	const a1 = paramRays
-		.filter((ray, i) => dots[i] > 0 && crosses[i] > 0)
-		.shift();
-	const a2 = paramRays
-		.filter((ray, i) => dots[i] > 0 && crosses[i] < 0)
-		.shift();
-	const b1 = paramRays
-		.filter((ray, i) => dots[i] < 0 && crosses[i] > 0)
-		.shift();
-	const b2 = paramRays
-		.filter((ray, i) => dots[i] < 0 && crosses[i] < 0)
-		.shift();
+	const a1 = paramRays.filter((ray, i) => dots[i] > 0 && crosses[i] > 0).shift();
+	const a2 = paramRays.filter((ray, i) => dots[i] > 0 && crosses[i] < 0).shift();
+	const b1 = paramRays.filter((ray, i) => dots[i] < 0 && crosses[i] > 0).shift();
+	const b2 = paramRays.filter((ray, i) => dots[i] < 0 && crosses[i] < 0).shift();
 
 	// intersect each of the four rays with the polygon, returning a list
 	// of four points, and we know the order of these points now.
-	const rayClips = [a1, a2, b1, b2].map(ray => clipLineConvexPolygon(
-		boundary,
-		ray,
-		includeS,
-		includeR,
-	));
+	const rayClips = [a1, a2, b1, b2].map((ray) =>
+		clipLineConvexPolygon(boundary, ray, includeS, includeR),
+	);
 
 	// just added
-	if (rayClips.includes(undefined)) { return; }
+	if (rayClips.includes(undefined)) {
+		return;
+	}
 
-	const rayEndpoints = rayClips.map(clips => clips.shift()); // ).shift().shift());
+	const rayEndpoints = rayClips.map((clips) => clips.shift()); // ).shift().shift());
 
 	// we can now build two arrows between the four points, however,
 	// we still need to... do something
-	const rayLengths = rayEndpoints.map(pt => distance2(pt, intersect));
+	const rayLengths = rayEndpoints.map((pt) => distance2(pt, intersect));
 
-	const arrow1Start = (rayLengths[0] < rayLengths[1]
-		? rayEndpoints[0]
-		: rayEndpoints[1]);
-	const arrow1End = (rayLengths[0] < rayLengths[1]
-		? add2(a2.origin, scale2(normalize2(a2.vector), rayLengths[0]))
-		: add2(a1.origin, scale2(normalize2(a1.vector), rayLengths[1])));
-	const arrow2Start = (rayLengths[2] < rayLengths[3]
-		? rayEndpoints[2]
-		: rayEndpoints[3]);
-	const arrow2End = (rayLengths[2] < rayLengths[3]
-		? add2(b2.origin, scale2(normalize2(b2.vector), rayLengths[2]))
-		: add2(b1.origin, scale2(normalize2(b1.vector), rayLengths[3])));
+	const arrow1Start = rayLengths[0] < rayLengths[1] ? rayEndpoints[0] : rayEndpoints[1];
+	const arrow1End =
+		rayLengths[0] < rayLengths[1]
+			? add2(a2.origin, scale2(normalize2(a2.vector), rayLengths[0]))
+			: add2(a1.origin, scale2(normalize2(a1.vector), rayLengths[1]));
+	const arrow2Start = rayLengths[2] < rayLengths[3] ? rayEndpoints[2] : rayEndpoints[3];
+	const arrow2End =
+		rayLengths[2] < rayLengths[3]
+			? add2(b2.origin, scale2(normalize2(b2.vector), rayLengths[2]))
+			: add2(b1.origin, scale2(normalize2(b1.vector), rayLengths[3]));
 
 	return [
 		[arrow1Start, arrow1End],

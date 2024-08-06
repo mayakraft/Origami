@@ -1,8 +1,8 @@
 /* SVG (c) Kraft */
-import '../../environment/window.js';
-import TransformMethods from './shared/transforms.js';
-import methods from './shared/urls.js';
-import * as dom from './shared/dom.js';
+import "../../environment/window.js";
+import TransformMethods from "./shared/transforms.js";
+import methods from "./shared/urls.js";
+import * as dom from "./shared/dom.js";
 
 /**
  * Rabbit Ear (c) Kraft

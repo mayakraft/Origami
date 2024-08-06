@@ -12,7 +12,7 @@ const ordersTest = (orders, name = "orders") => {
 	// orders between two faces that are actually the same face
 	const sameFaceOrders = orders
 		.map(([a, b], i) => (a === b ? [a, b, i] : undefined))
-		.filter(a => a !== undefined)
+		.filter((a) => a !== undefined)
 		.map(([a, b, i]) => `${name} between the same face ${a}, ${b} at index ${i}`);
 	const pairHash = {};
 	const duplicateOrders = orders

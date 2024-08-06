@@ -1,9 +1,7 @@
 /**
  * Rabbit Ear (c) Kraft
  */
-import {
-	EPSILON,
-} from "../../math/constant.js";
+import { EPSILON } from "../../math/constant.js";
 import {
 	dot,
 	dot3,
@@ -13,38 +11,19 @@ import {
 	flip3,
 	parallelNormalized,
 } from "../../math/vector.js";
-import {
-	makePolygonNonCollinear3,
-} from "../../math/polygon.js";
-import {
-	multiplyMatrix4Vector3,
-} from "../../math/matrix4.js";
+import { makePolygonNonCollinear3 } from "../../math/polygon.js";
+import { multiplyMatrix4Vector3 } from "../../math/matrix4.js";
 import {
 	matrix4FromQuaternion,
 	quaternionFromTwoVectors,
 } from "../../math/quaternion.js";
-import {
-	overlapConvexPolygons,
-} from "../../math/overlap.js";
-import {
-	clusterScalars,
-} from "../../general/cluster.js";
-import {
-	connectedComponents,
-} from "../connectedComponents.js";
-import {
-	invertArrayToFlatMap,
-	invertFlatToArrayMap,
-} from "../maps.js";
-import {
-	makeFacesFaces,
-} from "../make/facesFaces.js";
-import {
-	makeFacesNormal,
-} from "../normals.js";
-import {
-	selfRelationalArraySubset,
-} from "../subgraph.js";
+import { overlapConvexPolygons } from "../../math/overlap.js";
+import { clusterScalars } from "../../general/cluster.js";
+import { connectedComponents } from "../connectedComponents.js";
+import { invertArrayToFlatMap, invertFlatToArrayMap } from "../maps.js";
+import { makeFacesFaces } from "../make/facesFaces.js";
+import { makeFacesNormal } from "../normals.js";
+import { selfRelationalArraySubset } from "../subgraph.js";
 
 /**
  * @description Cluster the faces of a graph into groups of face indices where
@@ -67,10 +46,7 @@ import {
  * - faces_winding: for every face within its plane, is the face's normal
  * aligned with the plane's normal (true) or flipped 180 degrees (false).
  */
-export const getFacesPlane = (
-	{ vertices_coords, faces_vertices },
-	epsilon = EPSILON,
-) => {
+export const getFacesPlane = ({ vertices_coords, faces_vertices }, epsilon = EPSILON) => {
 	// face normals will be always 3D. These vectors are normalized.
 	const faces_normal = makeFacesNormal({ vertices_coords, faces_vertices });
 
@@ -97,8 +73,7 @@ export const getFacesPlane = (
 	const normalClustersFaces = invertFlatToArrayMap(facesNormalMatchCluster);
 
 	// for each cluster, choose one normal, this normal is now associated with the cluster.
-	const normalClustersNormal = normalClustersFaces
-		.map(faces => faces_normal[faces[0]]);
+	const normalClustersNormal = normalClustersFaces.map((faces) => faces_normal[faces[0]]);
 
 	// coplanar faces are clustered together even if their normals are flipped.
 	// for each face, is this face's normal aligned (true) with the cluster's
@@ -106,24 +81,26 @@ export const getFacesPlane = (
 	// "faces_winding" can be a flat array as faces are only in one plane.
 	/** @type {boolean[]} */
 	const faces_winding = [];
-	normalClustersFaces.forEach((faces, i) => faces.forEach(f => {
-		faces_winding[f] = dot3(faces_normal[f], normalClustersNormal[i]) > 0;
-	}));
+	normalClustersFaces.forEach((faces, i) =>
+		faces.forEach((f) => {
+			faces_winding[f] = dot3(faces_normal[f], normalClustersNormal[i]) > 0;
+		}),
+	);
 
 	// using each cluster's shared normal, find the plane (dot prod)
 	// for each face. make facesOneVertex always 3D.
-	const facesOneVertex = faces_vertices
-		.map(fv => vertices_coords[fv[0]])
-		.map(resize3);
-	const normalClustersFacesDot = normalClustersFaces
-		.map((faces, i) => faces
-			.map(f => dot3(normalClustersNormal[i], facesOneVertex[f])));
+	const facesOneVertex = faces_vertices.map((fv) => vertices_coords[fv[0]]).map(resize3);
+	const normalClustersFacesDot = normalClustersFaces.map((faces, i) =>
+		faces.map((f) => dot3(normalClustersNormal[i], facesOneVertex[f])),
+	);
 
 	// for every cluster of a shared normal, further divide into clusters where
 	// each inner cluster contains faces which share the same plane
-	const clustersClusters = normalClustersFacesDot
-		.map((dots, i) => clusterScalars(dots)
-			.map(cluster => cluster.map(index => normalClustersFaces[i][index])));
+	const clustersClusters = normalClustersFacesDot.map((dots, i) =>
+		clusterScalars(dots).map((cluster) =>
+			cluster.map((index) => normalClustersFaces[i][index]),
+		),
+	);
 
 	// flatten the data one level.
 	// there is no need to return these as nested clusters.
@@ -132,15 +109,14 @@ export const getFacesPlane = (
 
 	// use "resize3" to create a clone of every vector. no overlapping pointers
 	const planes_normal = clustersClusters
-		.flatMap((cluster, i) => cluster
-			.map(() => normalClustersNormal[i]))
+		.flatMap((cluster, i) => cluster.map(() => normalClustersNormal[i]))
 		.map(resize3);
 
 	// the plane's origin will be the point in the plane
 	// nearest to the world origin.
 	const planes_origin = planes_faces
-		.map(faces => faces[0])
-		.map(face => facesOneVertex[face])
+		.map((faces) => faces[0])
+		.map((face) => facesOneVertex[face])
 		.map((point, i) => dot3(planes_normal[i], point))
 		.map((mag, i) => scale3(planes_normal[i], mag));
 
@@ -163,10 +139,11 @@ export const getFacesPlane = (
 	// the quaternion constructor will be undefined, in which case we manually
 	// build a rotation matrix that rotates 180 degrees around the X axis.
 	// 180 degree rotate around the X axis, or general rotation matrix
-	const planes_transform = planes
-		.map(({ normal }) => (Math.abs(dot(normal, targetVector) + 1) < epsilon
+	const planes_transform = planes.map(({ normal }) =>
+		Math.abs(dot(normal, targetVector) + 1) < epsilon
 			? [1, 0, 0, 0, 0, -1, 0, 0, 0, 0, -1, 0, 0, 0, 0, 1]
-			: matrix4FromQuaternion(quaternionFromTwoVectors(normal, targetVector))));
+			: matrix4FromQuaternion(quaternionFromTwoVectors(normal, targetVector)),
+	);
 
 	// computing the translation vector as a single matrix * vector operation,
 	// then overwriting it into the column vector of the rotation matrix
@@ -230,16 +207,8 @@ export const getCoplanarAdjacentOverlappingFaces = (
 	// get our initial groups of faces which share a common plane in 3D.
 	// upcoming, we will further subgroup each plane's groups of faces into
 	// those which are connected and/or overlap geometrically.
-	const {
-		planes,
-		planes_faces,
-		planes_transform,
-		faces_plane,
-		faces_winding,
-	} = getFacesPlane(
-		{ vertices_coords, faces_vertices },
-		epsilon,
-	);
+	const { planes, planes_faces, planes_transform, faces_plane, faces_winding } =
+		getFacesPlane({ vertices_coords, faces_vertices }, epsilon);
 
 	// make sure we are using 3D points for this next part
 	const vertices_coords3D = vertices_coords.map(resize3);
@@ -248,16 +217,19 @@ export const getCoplanarAdjacentOverlappingFaces = (
 	// reverse the winding order, much easier than transforming a 180 rotation.
 	const faces_polygon = faces_vertices
 		.map((verts, f) => (faces_winding[f] ? verts : verts.slice().reverse()))
-		.map(verts => verts.map(v => vertices_coords3D[v]))
-		.map(polygon => makePolygonNonCollinear3(polygon, epsilon))
-		.map((polygon, f) => polygon
-			.map(point => multiplyMatrix4Vector3(planes_transform[faces_plane[f]], point))
-			.map(resize2));
+		.map((verts) => verts.map((v) => vertices_coords3D[v]))
+		.map((polygon) => makePolygonNonCollinear3(polygon, epsilon))
+		.map((polygon, f) =>
+			polygon
+				.map((point) => multiplyMatrix4Vector3(planes_transform[faces_plane[f]], point))
+				.map(resize2),
+		);
 
 	// for each plane group, create a faces_faces which only includes
 	// those faces inside each group, these faces_faces arrays have holes.
-	const planes_facesFaces = planes_faces
-		.map(faces => selfRelationalArraySubset(faces_faces, faces));
+	const planes_facesFaces = planes_faces.map((faces) =>
+		selfRelationalArraySubset(faces_faces, faces),
+	);
 
 	// for each plane, group its faces into an array of subgroups, each subgroup
 	// contains only faces which are connected to each other through the graph.
@@ -269,8 +241,9 @@ export const getCoplanarAdjacentOverlappingFaces = (
 	const planes_faces_connectedGroup = planes_facesFaces.map(connectedComponents);
 
 	// this contains: for each plane, for each group, a list of its connected faces.
-	const planes_connectedGroups_faces = planes_faces_connectedGroup
-		.map(faces => invertFlatToArrayMap(faces));
+	const planes_connectedGroups_faces = planes_faces_connectedGroup.map((faces) =>
+		invertFlatToArrayMap(faces),
+	);
 
 	// now we have, for every plane, groups of faces where inside each group
 	// we know that these faces are connected because they are connected via
@@ -285,19 +258,21 @@ export const getCoplanarAdjacentOverlappingFaces = (
 
 	// this contains: for every plane, for every face, a list of other coplanar
 	// faces from another group which are a candidate for testing overlap.
-	const planes_faces_possibleOverlapFaces = planes_faces_connectedGroup
-		.map(faces_group => {
+	const planes_faces_possibleOverlapFaces = planes_faces_connectedGroup.map(
+		(faces_group) => {
 			const faces = faces_group.map((_, i) => i);
-			return faces_group.map(groupIndex => faces
-				.filter(face => faces_group[face] !== groupIndex));
-		});
+			return faces_group.map((groupIndex) =>
+				faces.filter((face) => faces_group[face] !== groupIndex),
+			);
+		},
+	);
 
 	// inside each plane, for every overlappingGroup, store a list of other
 	// group indices from the same plane which overlap this group. Shared
 	// group indices mean these groups can be merged.
-	const planes_overlappingGroups = planes_connectedGroups_faces
-		.map(connectedGroups_faces => connectedGroups_faces
-			.map(() => []));
+	const planes_overlappingGroups = planes_connectedGroups_faces.map(
+		(connectedGroups_faces) => connectedGroups_faces.map(() => []),
+	);
 
 	planes_faces_possibleOverlapFaces.forEach((faces_possibleOverlapFaces, p) => {
 		// within this plane group, store pairs of group indices ("a b" and "b a")
@@ -312,33 +287,34 @@ export const getCoplanarAdjacentOverlappingFaces = (
 		// information between groups in two places:
 		// - planes_overlappingGroups this will be used later to merge groups
 		// - overlappingGroupsKeys lookup table to prevent doing duplicate work.
-		faces_possibleOverlapFaces
-			.forEach((otherFaces, face) => otherFaces
-				.forEach(otherFace => {
-					// convert faces into their respective groups they inhabit
-					const groups = [face, otherFace]
-						.map(f => planes_faces_connectedGroup[p][f]);
+		faces_possibleOverlapFaces.forEach((otherFaces, face) =>
+			otherFaces.forEach((otherFace) => {
+				// convert faces into their respective groups they inhabit
+				const groups = [face, otherFace].map((f) => planes_faces_connectedGroup[p][f]);
 
-					// if we have already discovered these groups overlap, skip
-					const groupsKey1 = groups.join(" ");
-					if (overlappingGroupsKeys[groupsKey1]) { return; }
+				// if we have already discovered these groups overlap, skip
+				const groupsKey1 = groups.join(" ");
+				if (overlappingGroupsKeys[groupsKey1]) {
+					return;
+				}
 
-					// run the overlap method
-					const overlap = overlapConvexPolygons(
-						faces_polygon[face],
-						faces_polygon[otherFace],
-						epsilon,
-					);
-					if (overlap) {
-						// store the result of the overlap in the hash and the usable array.
-						// this reverses the groups array in place, but it's fine.
-						const groupsKey2 = groups.reverse().join(" ");
-						overlappingGroupsKeys[groupsKey1] = true;
-						overlappingGroupsKeys[groupsKey2] = true;
-						planes_overlappingGroups[p][groups[0]].push(groups[1]);
-						planes_overlappingGroups[p][groups[1]].push(groups[0]);
-					}
-				}));
+				// run the overlap method
+				const overlap = overlapConvexPolygons(
+					faces_polygon[face],
+					faces_polygon[otherFace],
+					epsilon,
+				);
+				if (overlap) {
+					// store the result of the overlap in the hash and the usable array.
+					// this reverses the groups array in place, but it's fine.
+					const groupsKey2 = groups.reverse().join(" ");
+					overlappingGroupsKeys[groupsKey1] = true;
+					overlappingGroupsKeys[groupsKey2] = true;
+					planes_overlappingGroups[p][groups[0]].push(groups[1]);
+					planes_overlappingGroups[p][groups[1]].push(groups[0]);
+				}
+			}),
+		);
 	});
 
 	// prevent duplicate entries for every group's group. but, this is not
@@ -351,19 +327,23 @@ export const getCoplanarAdjacentOverlappingFaces = (
 
 	// for every plane, for every new cluster, an list of the group indices
 	// from "connectedGroups" that are included in this new cluster.
-	const planes_clusters_groupIndices = planes_overlappingGroups
-		.map(set_set => invertFlatToArrayMap(connectedComponents(set_set)));
+	const planes_clusters_groupIndices = planes_overlappingGroups.map((set_set) =>
+		invertFlatToArrayMap(connectedComponents(set_set)),
+	);
 
 	// relate a new cluster to the original plane it inhabits
-	const clusters_plane = planes_clusters_groupIndices
-		.flatMap((arrays, i) => arrays.map(() => i));
+	const clusters_plane = planes_clusters_groupIndices.flatMap((arrays, i) =>
+		arrays.map(() => i),
+	);
 
 	const planes_clusters = invertFlatToArrayMap(clusters_plane);
 
-	const clusters_faces = planes_clusters_groupIndices
-		.flatMap((clusters_groupIndices, p) => clusters_groupIndices
-			.map(groupIndices => groupIndices
-				.flatMap(g => planes_connectedGroups_faces[p][g])));
+	const clusters_faces = planes_clusters_groupIndices.flatMap(
+		(clusters_groupIndices, p) =>
+			clusters_groupIndices.map((groupIndices) =>
+				groupIndices.flatMap((g) => planes_connectedGroups_faces[p][g]),
+			),
+	);
 
 	const faces_cluster = invertArrayToFlatMap(clusters_faces);
 

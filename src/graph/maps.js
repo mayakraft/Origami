@@ -1,10 +1,7 @@
 /**
  * Rabbit Ear (c) Kraft
  */
-import {
-	filterKeysWithSuffix,
-	filterKeysWithPrefix,
-} from "../fold/spec.js";
+import { filterKeysWithSuffix, filterKeysWithPrefix } from "../fold/spec.js";
 
 /**
  * @description Invert an array of integer values where
@@ -15,7 +12,9 @@ import {
  */
 export const invertFlatMap = (map) => {
 	const inv = [];
-	map.forEach((n, i) => { inv[n] = i; });
+	map.forEach((n, i) => {
+		inv[n] = i;
+	});
 	return inv;
 };
 
@@ -28,7 +27,11 @@ export const invertFlatMap = (map) => {
  */
 export const invertArrayToFlatMap = (map) => {
 	const inv = [];
-	map.forEach((arr, i) => arr.forEach(n => { inv[n] = i; }));
+	map.forEach((arr, i) =>
+		arr.forEach((n) => {
+			inv[n] = i;
+		}),
+	);
 	return inv;
 };
 
@@ -42,7 +45,9 @@ export const invertArrayToFlatMap = (map) => {
 export const invertFlatToArrayMap = (map) => {
 	const inv = [];
 	map.forEach((n, i) => {
-		if (inv[n] === undefined) { inv[n] = []; }
+		if (inv[n] === undefined) {
+			inv[n] = [];
+		}
 		inv[n].push(i);
 	});
 	return inv;
@@ -57,10 +62,14 @@ export const invertFlatToArrayMap = (map) => {
  */
 export const invertArrayMap = (map) => {
 	const inv = [];
-	map.forEach((arr, i) => arr.forEach(m => {
-		if (inv[m] === undefined) { inv[m] = []; }
-		inv[m].push(i);
-	}));
+	map.forEach((arr, i) =>
+		arr.forEach((m) => {
+			if (inv[m] === undefined) {
+				inv[m] = [];
+			}
+			inv[m].push(i);
+		}),
+	);
 	return inv;
 };
 
@@ -72,9 +81,15 @@ export const invertArrayMap = (map) => {
  * @returns {number[]} one nextmap reflecting the sum of changes
  */
 export const mergeFlatNextmaps = (...maps) => {
-	if (maps.length === 0) { return []; }
+	if (maps.length === 0) {
+		return [];
+	}
 	const solution = maps[0].map((_, i) => i);
-	maps.forEach(map => solution.forEach((s, i) => { solution[i] = map[s]; }));
+	maps.forEach((map) =>
+		solution.forEach((s, i) => {
+			solution[i] = map[s];
+		}),
+	);
 	return solution;
 };
 
@@ -86,15 +101,19 @@ export const mergeFlatNextmaps = (...maps) => {
  * @returns {number[][]} one nextmap reflecting the sum of changes
  */
 export const mergeNextmaps = (...maps) => {
-	if (maps.length === 0) { return []; }
+	if (maps.length === 0) {
+		return [];
+	}
 	/** @type {any[]} */
 	const solution = maps[0].map((_, i) => [i]);
-	maps.forEach(map => {
-		solution.forEach((s, i) => s
-			.forEach((indx, j) => { solution[i][j] = map[indx]; }));
+	maps.forEach((map) => {
+		solution.forEach((s, i) =>
+			s.forEach((indx, j) => {
+				solution[i][j] = map[indx];
+			}),
+		);
 		solution.forEach((arr, i) => {
-			solution[i] = arr.flat()
-				.filter(a => a !== undefined);
+			solution[i] = arr.flat().filter((a) => a !== undefined);
 		});
 	});
 	return solution;
@@ -108,10 +127,12 @@ export const mergeNextmaps = (...maps) => {
  * @returns {number[]} one backmap reflecting the sum of changes
  */
 export const mergeFlatBackmaps = (...maps) => {
-	if (maps.length === 0) { return []; }
+	if (maps.length === 0) {
+		return [];
+	}
 	let solution = maps[0].map((_, i) => i);
-	maps.forEach(map => {
-		const next = map.map(n => solution[n]);
+	maps.forEach((map) => {
+		const next = map.map((n) => solution[n]);
 		solution = next;
 	});
 	return solution;
@@ -126,16 +147,18 @@ export const mergeFlatBackmaps = (...maps) => {
  */
 export const mergeBackmaps = (...maps) => {
 	// const cat = (a, b) => a.concat(b)
-	if (maps.length === 0) { return []; }
+	if (maps.length === 0) {
+		return [];
+	}
 	// let solution = maps[0].reduce((a, b) => a.concat(b), []).map((_, i) => [i]);
 	let solution = maps[0].flat().map((_, i) => [i]);
-	maps.forEach(map => {
+	maps.forEach((map) => {
 		const next = [];
 		map.forEach((el, j) => {
 			if (typeof el === "number") {
 				next[j] = solution[el];
 			} else {
-				next[j] = el.map(n => solution[n]).reduce((a, b) => a.concat(b), []);
+				next[j] = el.map((n) => solution[n]).reduce((a, b) => a.concat(b), []);
 			}
 		});
 		solution = next;
@@ -158,7 +181,7 @@ export const remapKey = (graph, key, indexMap) => {
 	// non-bijective maps, the first encounter will be kept, skipping duplicates.
 	const invertedMap = [];
 	indexMap.forEach((n, i) => {
-		invertedMap[n] = (invertedMap[n] === undefined ? i : invertedMap[n]);
+		invertedMap[n] = invertedMap[n] === undefined ? i : invertedMap[n];
 	});
 	// if a key was not included in indexMap for whatever reason, it will be
 	// registered as "undefined". we can't just assume these are errors and
@@ -166,22 +189,31 @@ export const remapKey = (graph, key, indexMap) => {
 
 	// update every component that points to vertices_coords
 	// these arrays do not change their size, only their contents
-	filterKeysWithSuffix(graph, key)
-		.forEach(sKey => graph[sKey]
-			.forEach((_, ii) => graph[sKey][ii]
-				.forEach((v, jj) => { graph[sKey][ii][jj] = indexMap[v]; })));
+	filterKeysWithSuffix(graph, key).forEach((sKey) =>
+		graph[sKey].forEach((_, ii) =>
+			graph[sKey][ii].forEach((v, jj) => {
+				graph[sKey][ii][jj] = indexMap[v];
+			}),
+		),
+	);
 
 	// set the top-level arrays
-	filterKeysWithPrefix(graph, key).forEach(prefix => {
-		graph[prefix] = invertedMap.map(old => graph[prefix][old]);
+	filterKeysWithPrefix(graph, key).forEach((prefix) => {
+		graph[prefix] = invertedMap.map((old) => graph[prefix][old]);
 	});
 
 	if (key === "faces" && graph.faceOrders) {
-		graph.faceOrders = graph.faceOrders
-			.map(([a, b, order]) => [indexMap[a], indexMap[b], order]);
+		graph.faceOrders = graph.faceOrders.map(([a, b, order]) => [
+			indexMap[a],
+			indexMap[b],
+			order,
+		]);
 	}
 	if (key === "edges" && graph.edgeOrders) {
-		graph.edgeOrders = graph.edgeOrders
-			.map(([a, b, order]) => [indexMap[a], indexMap[b], order]);
+		graph.edgeOrders = graph.edgeOrders.map(([a, b, order]) => [
+			indexMap[a],
+			indexMap[b],
+			order,
+		]);
 	}
 };

@@ -9,7 +9,7 @@ test("array with undefined", () => {
 			[undefined, 3, 0, 1],
 			[undefined, 4, 0, 2],
 			[undefined, 1, 0, 3],
-		]
+		],
 	};
 
 	// replacing face 0 with two new faces (added to the end)
@@ -157,7 +157,7 @@ test("populated graph, removing components, null entry in edges_vertices", () =>
 			[10, 5, 6],
 			[15, 16, 13, 14],
 			[11, 7, 14, undefined, 9, undefined],
-			[undefined, 12, 8, 10, undefined, 16]
+			[undefined, 12, 8, 10, undefined, 16],
 		],
 		vertices_faces: [
 			[0, 1, 2, 3, undefined],
@@ -172,8 +172,23 @@ test("populated graph, removing components, null entry in edges_vertices", () =>
 			[undefined, 6, 7, 3, 2, undefined],
 		],
 		edges_vertices: [
-			[0, 1], [undefined, 2], [2, 3], [3, 4], [4, 5], [5, 6], [6, 0], [8, 3],
-			[9, 5], [8, 1], [9, 6], [8, 2], [9, 4], [7, 0], [7, 8], [7, 3], [7, 9]
+			[0, 1],
+			[undefined, 2],
+			[2, 3],
+			[3, 4],
+			[4, 5],
+			[5, 6],
+			[6, 0],
+			[8, 3],
+			[9, 5],
+			[8, 1],
+			[9, 6],
+			[8, 2],
+			[9, 4],
+			[7, 0],
+			[7, 8],
+			[7, 3],
+			[7, 9],
 		],
 		edges_faces: [
 			[0],
@@ -195,11 +210,25 @@ test("populated graph, removing components, null entry in edges_vertices", () =>
 			[2, undefined],
 		],
 		edges_assignment: [
-			"B", "B", "B", "B", "B", "B", "B", "V", "V", "M", "M", "F", "F", "F", "F", "F", "F",
+			"B",
+			"B",
+			"B",
+			"B",
+			"B",
+			"B",
+			"B",
+			"V",
+			"V",
+			"M",
+			"M",
+			"F",
+			"F",
+			"F",
+			"F",
+			"F",
+			"F",
 		],
-		edges_foldAngle: [
-			0, 0, 0, 0, 0, 0, 0, 180, 180, -180, -180, 0, 0, 0, 0, 0, 0,
-		],
+		edges_foldAngle: [0, 0, 0, 0, 0, 0, 0, 180, 180, -180, -180, 0, 0, 0, 0, 0, 0],
 		faces_vertices: [
 			[0, 1, 8],
 			[0, 8, 7],
@@ -244,8 +273,24 @@ test("populated graph, removing components, null entry in edges_vertices", () =>
 });
 
 const testGraph = () => ({
-	vertices_coords: [[1, 1], [2, 2], [3, 3], [4, 4], [5, 5], [6, 6], [7, 7]],
-	edges_vertices: [[0, 1], [1, 2], [2, 3], [3, 4], [4, 5], [5, 6], [6, 0]],
+	vertices_coords: [
+		[1, 1],
+		[2, 2],
+		[3, 3],
+		[4, 4],
+		[5, 5],
+		[6, 6],
+		[7, 7],
+	],
+	edges_vertices: [
+		[0, 1],
+		[1, 2],
+		[2, 3],
+		[3, 4],
+		[4, 5],
+		[5, 6],
+		[6, 0],
+	],
 	edges_string: ["a", "b", "c", "d", "e", "f", "g"],
 	faces_vertices: [[0, 1, 2, 3, 4, 5, 6]],
 });
@@ -261,7 +306,16 @@ test("few params", () => {
 	expect(res1.length).toBe(1);
 	expect(res1[0]).toBe(undefined);
 
-	const res2 = ear.graph.remove({ abc_def: [[1, 2, 3], [4, 5, 6]] }, "abc", [0]);
+	const res2 = ear.graph.remove(
+		{
+			abc_def: [
+				[1, 2, 3],
+				[4, 5, 6],
+			],
+		},
+		"abc",
+		[0],
+	);
 	expect(res2.length).toBe(2);
 	expect(res2[0]).toBe(undefined);
 	expect(res2[1]).toBe(0);

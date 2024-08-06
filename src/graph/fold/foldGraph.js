@@ -1,52 +1,23 @@
 /**
  * Rabbit Ear (c) Kraft
  */
-import {
-	EPSILON,
-} from "../../math/constant.js";
-import {
-	includeL,
-	includeR,
-	includeS,
-} from "../../math/compare.js";
-import {
-	pointsToLine2,
-} from "../../math/convert.js";
-import {
-	resize2,
-} from "../../math/vector.js";
-import {
-	clone,
-} from "../../general/clone.js";
-import {
-	assignmentFlatFoldAngle,
-	invertAssignment,
-} from "../../fold/spec.js";
-import {
-	makeVerticesCoordsFolded,
-} from "../vertices/folded.js";
-import {
-	getFaceUnderPoint,
-} from "../overlap.js";
-import {
-	makeFacesWinding,
-} from "../faces/winding.js";
-import {
-	splitGraphWithLineAndPoints,
-} from "../split/splitGraph.js";
-import {
-	transferPointInFaceBetweenGraphs,
-} from "../transfer.js";
-import {
-	makeEdgesFacesUnsorted,
-} from "../make/edgesFaces.js";
-import {
-	makeEdgesFoldAngle,
-} from "../make/edgesFoldAngle.js";
+import { EPSILON } from "../../math/constant.js";
+import { includeL } from "../../math/compare.js";
+import { resize2 } from "../../math/vector.js";
+import { clone } from "../../general/clone.js";
+import { assignmentFlatFoldAngle, invertAssignment } from "../../fold/spec.js";
+import { makeVerticesCoordsFolded } from "../vertices/folded.js";
+import { getFaceUnderPoint } from "../overlap.js";
+import { makeFacesWinding } from "../faces/winding.js";
+import { splitGraphWithLineAndPoints } from "../split/splitGraph.js";
+import { transferPointInFaceBetweenGraphs } from "../transfer.js";
+import { makeEdgesFacesUnsorted } from "../make/edgesFaces.js";
+import { makeEdgesFoldAngle } from "../make/edgesFoldAngle.js";
 import {
 	recalculatePointAlongEdge,
 	reassignCollinearEdges,
-	updateFaceOrders,
+	removeInvalidFaceOrders,
+	makeSimpleFoldFaceOrders,
 } from "./general.js";
 
 /**
@@ -59,7 +30,7 @@ import {
  *     new: number[],
  *     map: (number|number[])[],
  *     collinear: number[],
- *     reassign: number[],
+ *     reassigned: number[],
  *   },
  *   faces?: {
  *     new: number[],
@@ -145,8 +116,9 @@ export const foldGraph = (
 	);
 
 	// new faces, used for the return object, and used to update faceOrders
-	const newFaces = Array.from(new Set(splitGraphResult.edges.new
-		.flatMap(e => graph.edges_faces[e])));
+	const newFaces = Array.from(
+		new Set(splitGraphResult.edges.new.flatMap((e) => graph.edges_faces[e])),
+	);
 
 	// now that the split operation is complete and new faces have been built,
 	// capture the winding of the faces while still in folded form.
@@ -181,16 +153,17 @@ export const foldGraph = (
 	// the folded-form space. the splitGraph method result contains
 	// information on how these points were made in folded form space,
 	// transfer these points into cp space, via the paramters that created them.
-	const splitGraphVerticesSource = splitGraphResult.vertices.source
-		.map((intersect, vertex) => ({ ...intersect, vertex }));
+	const splitGraphVerticesSource = splitGraphResult.vertices.source.map(
+		(intersect, vertex) => ({ ...intersect, vertex }),
+	);
 
 	// these points lie somewhere in the inside of a face. use trilateration
 	// to move the point from the same location in the folded face to the cp face.
 	splitGraphVerticesSource
-		.map(el => ("point" in el && "face" in el && "faces" in el && "vertex" in el
-			? el
-			: undefined))
-		.filter(a => a !== undefined)
+		.map((el) =>
+			"point" in el && "face" in el && "faces" in el && "vertex" in el ? el : undefined,
+		)
+		.filter((a) => a !== undefined)
 		// .forEach(({ point, face, faces, vertex }) => {
 		.forEach(({ point, faces, vertex }) => {
 			// "face" relates to the graph before splitGraphWithLineAndPoints was called.
@@ -208,11 +181,11 @@ export const foldGraph = (
 	// these points were made along an edge, instead of using trilateration,
 	// we can use the edge vector intersection parameter for more precision.
 	splitGraphVerticesSource
-		.map(el => ("vertices" in el && "vertex" in el && "b" in el ? el : undefined))
-		.filter(a => a !== undefined)
+		.map((el) => ("vertices" in el && "vertex" in el && "b" in el ? el : undefined))
+		.filter((a) => a !== undefined)
 		.forEach(({ b, vertices, vertex }) => {
 			graph.vertices_coords[vertex] = recalculatePointAlongEdge(
-				vertices.map(v => graph.vertices_coords[v]).map(resize2),
+				vertices.map((v) => graph.vertices_coords[v]).map(resize2),
 				b,
 			);
 		});
@@ -223,11 +196,10 @@ export const foldGraph = (
 	// "faces": the indices of the edge's new faces in the graph after being split
 	// use "faces" to grab the edge's face, look up the winding of this face, and
 	// assign either the assignment or the inverted assignment accordingly.
-	const edgesAttributes = splitGraphResult.edges.source
-		.map(({ faces }) => ({
-			assign: faces_winding[faces[0]] ? assignment : oppositeAssignment,
-			angle: faces_winding[faces[0]] ? foldAngle : oppositeFoldAngle,
-		}));
+	const edgesAttributes = splitGraphResult.edges.source.map(({ faces }) => ({
+		assign: faces_winding[faces[0]] ? assignment : oppositeAssignment,
+		angle: faces_winding[faces[0]] ? foldAngle : oppositeFoldAngle,
+	}));
 
 	// only apply the assignment and fold angle if the graph contains these
 	// arrays, this way, a simple flat-folded graph won't be forced to
@@ -267,18 +239,23 @@ export const foldGraph = (
 	// This now needs to be cleaned up in one very important way:
 	// - Of the pair B and C, only one now overlaps with N. we have to
 	// identify which this is and remove the other one.
+	removeInvalidFaceOrders(
+		graph,
+		{ ...graph, vertices_coords: vertices_coordsFoldedNew },
+		{ vector, origin },
+		newFaces,
+	);
+
+	// TODO: this can now be extended into a non simple flat folded method, like
+	// a reverse fold or sink.
 	// Additionally:
 	// - Now, in the special case where the new crease assignment is "V" or "M"
 	// and it's a flat fold, not 3D, we can create new faceOrders between
 	// the new neighbors that were formed by the split crease.
-	updateFaceOrders(
-		graph,
-		{ ...graph, vertices_coords: vertices_coordsFoldedNew },
-		{ vector, origin },
-		foldAngle,
-		[...splitGraphResult.edges.new, ...reassigned],
-		newFaces,
-	);
+	makeSimpleFoldFaceOrders(graph, foldAngle, [
+		...splitGraphResult.edges.new,
+		...reassigned,
+	]);
 
 	// "reassign" contains a subset of existing collinear edges to the fold line.
 	// Let's say you would like to modify the graph after a fold to convert a
@@ -295,7 +272,7 @@ export const foldGraph = (
 			map: splitGraphResult.edges.map,
 			new: splitGraphResult.edges.new,
 			collinear,
-			reassign: reassigned,
+			reassigned,
 		},
 		faces: {
 			map: splitGraphResult.faces.map,
@@ -303,93 +280,3 @@ export const foldGraph = (
 		},
 	};
 };
-
-/**
-* @description Crease a fold line through a folded origami model.
-* This method takes in and returns a crease pattern but performs the fold
-* on the folded form; this approach maintains better precision especially
-* in the case of repeated calls to fold an origami model.
- * @param {FOLD} graph a FOLD object
- * @param {VecLine2} line the fold line
- * @param {{
- *   assignment?: string,
- *   foldAngle?: number,
- *   vertices_coordsFolded?: [number, number][]|[number, number, number][],
- * }} options including the new edge assignment and fold angle, and the
- * folded vertices_coords
- * @param {number} [epsilon=1e-6]
- * @returns {FoldGraphEvent} an object summarizing the changes to the graph
- */
-export const foldLine = (
-	graph,
-	line,
-	{ assignment = "F", foldAngle, vertices_coordsFolded } = {},
-	epsilon = EPSILON,
-) => (
-	foldGraph(
-		graph,
-		line,
-		includeL,
-		{ points: [], assignment, foldAngle, vertices_coordsFolded },
-		epsilon,
-	));
-
-/**
-* @description Crease a fold ray through a folded origami model.
-* This method takes in and returns a crease pattern but performs the fold
-* on the folded form; this approach maintains better precision especially
-* in the case of repeated calls to fold an origami model.
- * @param {FOLD} graph a FOLD object
- * @param {VecLine2} ray the fold line as a ray
- * @param {{
- *   assignment?: string,
- *   foldAngle?: number,
- *   vertices_coordsFolded?: [number, number][]|[number, number, number][],
- * }} options including the new edge assignment and fold angle, and the
- * folded vertices_coords
- * @param {number} [epsilon=1e-6]
- * @returns {FoldGraphEvent} an object summarizing the changes to the graph
- */
-export const foldRay = (
-	graph,
-	ray,
-	{ assignment = "F", foldAngle, vertices_coordsFolded } = {},
-	epsilon = EPSILON,
-) => (
-	foldGraph(
-		graph,
-		ray,
-		includeR,
-		{ points: [ray.origin], assignment, foldAngle, vertices_coordsFolded },
-		epsilon,
-	));
-
-/**
-* @description Crease a fold segment through a folded origami model.
-* This method takes in and returns a crease pattern but performs the fold
-* on the folded form; this approach maintains better precision especially
-* in the case of repeated calls to fold an origami model.
- * @param {FOLD} graph a FOLD object
- * @param {[[number, number], [number, number]]} segment the fold segment
- * @param {{
- *   assignment?: string,
- *   foldAngle?: number,
- *   vertices_coordsFolded?: [number, number][]|[number, number, number][],
- * }} options including the new edge assignment and fold angle, and the
- * folded vertices_coords
- * @param {number} [epsilon=1e-6]
- * @returns {FoldGraphEvent} an object summarizing the changes to the graph
- */
-export const foldSegment = (
-	graph,
-	segment,
-	{ assignment = "F", foldAngle, vertices_coordsFolded } = {},
-	epsilon = EPSILON,
-) => (
-	foldGraph(
-		graph,
-		pointsToLine2(segment[0], segment[1]),
-		includeS,
-		{ points: segment, assignment, foldAngle, vertices_coordsFolded },
-		epsilon,
-	));

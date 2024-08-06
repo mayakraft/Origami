@@ -12,10 +12,8 @@ test("rect", () => {
 	expect(rect.getAttribute("height")).toBe("4");
 
 	const rect2 = ear.svg.rect(3, 4);
-	expect(rect2.getAttribute("y") === null || rect2.getAttribute("y") === "")
-		.toBe(true);
-	expect(rect2.getAttribute("y") === null || rect2.getAttribute("y") === "")
-		.toBe(true);
+	expect(rect2.getAttribute("y") === null || rect2.getAttribute("y") === "").toBe(true);
+	expect(rect2.getAttribute("y") === null || rect2.getAttribute("y") === "").toBe(true);
 	expect(rect2.getAttribute("width")).toBe("3");
 	expect(rect2.getAttribute("height")).toBe("4");
 });
@@ -48,8 +46,7 @@ test("rect, args, negative width height", () => {
 	expect(rect5.getAttribute("height")).toBe("220");
 	const rect6 = ear.svg.rect(-320, 220);
 	expect(rect6.getAttribute("x")).toBe("-320");
-	expect(rect6.getAttribute("y") === null || rect6.getAttribute("y") === "")
-		.toBe(true);
+	expect(rect6.getAttribute("y") === null || rect6.getAttribute("y") === "").toBe(true);
 	expect(rect6.getAttribute("width")).toBe("320");
 	expect(rect6.getAttribute("height")).toBe("220");
 });

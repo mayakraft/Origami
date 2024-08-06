@@ -1,7 +1,7 @@
 /* SVG (c) Kraft */
-import NS from '../../spec/namespace.js';
-import RabbitEarWindow from '../../environment/window.js';
-import { makeCDATASection } from '../../general/cdata.js';
+import NS from "../../spec/namespace.js";
+import RabbitEarWindow from "../../environment/window.js";
+import { makeCDATASection } from "../../general/cdata.js";
 
 /**
  * Rabbit Ear (c) Kraft

@@ -12,8 +12,16 @@ import ear from "../src/index.js";
 
 test("populate with isolated vertex", () => {
 	const graph = ear.graph({
-		vertices_coords: [[0, 0], [1, 0], [2, 0], [3, 0]],
-		edges_vertices: [[0, 1], [1, 2]],
+		vertices_coords: [
+			[0, 0],
+			[1, 0],
+			[2, 0],
+			[3, 0],
+		],
+		edges_vertices: [
+			[0, 1],
+			[1, 2],
+		],
 		edges_foldAngle: [0, 0],
 		edges_assignment: ["U", "U"],
 	});
@@ -37,7 +45,10 @@ test("populate with isolated vertex", () => {
 
 test("populate with assignment and fold angle", () => {
 	const graph1 = ear.graph({
-		vertices_coords: [[0, 0], [1, 0]],
+		vertices_coords: [
+			[0, 0],
+			[1, 0],
+		],
 		edges_vertices: [[0, 1]],
 		edges_assignment: ["M", "V", "U", "F", "B", "X"],
 	});
@@ -48,7 +59,10 @@ test("populate with assignment and fold angle", () => {
 	expect(graph1.edges_foldAngle[5]).toBe(0);
 
 	const graph2 = ear.graph({
-		vertices_coords: [[0, 0], [1, 0]],
+		vertices_coords: [
+			[0, 0],
+			[1, 0],
+		],
 		edges_vertices: [[0, 1]],
 		edges_foldAngle: [-180, 180, 0, 0, 0, 0],
 	});
@@ -61,7 +75,10 @@ test("populate with assignment and fold angle", () => {
 
 test("component edges with no vertex data", () => {
 	const graph = ear.graph({
-		edges_faces: [[0, 1], [3, 0]],
+		edges_faces: [
+			[0, 1],
+			[3, 0],
+		],
 		edges_foldAngle: [0, 0],
 	});
 
@@ -74,8 +91,19 @@ test("component edges with no vertex data", () => {
 
 test("one-fold populate, no faces rebuilt", () => {
 	const graph = ear.graph({
-		vertices_coords: [[0, 0], [1, 0], [1, 1], [0, 1]],
-		edges_vertices: [[0, 1], [1, 2], [2, 3], [3, 0], [1, 3]],
+		vertices_coords: [
+			[0, 0],
+			[1, 0],
+			[1, 1],
+			[0, 1],
+		],
+		edges_vertices: [
+			[0, 1],
+			[1, 2],
+			[2, 3],
+			[3, 0],
+			[1, 3],
+		],
 	});
 	graph.populate();
 	expect(graph.vertices_coords.length).toBe(4);
@@ -95,8 +123,19 @@ test("one-fold populate, no faces rebuilt", () => {
 
 test("one-fold populate, rebuild faces", () => {
 	const graph = ear.graph({
-		vertices_coords: [[0, 0], [1, 0], [1, 1], [0, 1]],
-		edges_vertices: [[0, 1], [1, 2], [2, 3], [3, 0], [1, 3]],
+		vertices_coords: [
+			[0, 0],
+			[1, 0],
+			[1, 1],
+			[0, 1],
+		],
+		edges_vertices: [
+			[0, 1],
+			[1, 2],
+			[2, 3],
+			[3, 0],
+			[1, 3],
+		],
 	});
 	graph.populate({ faces: true });
 	expect(graph.vertices_coords.length).toBe(4);
@@ -116,8 +155,19 @@ test("one-fold populate, rebuild faces", () => {
 
 test("one-fold populate, with assignments", () => {
 	const graph = ear.graph({
-		vertices_coords: [[0, 0], [1, 0], [1, 1], [0, 1]],
-		edges_vertices: [[0, 1], [1, 2], [2, 3], [3, 0], [1, 3]],
+		vertices_coords: [
+			[0, 0],
+			[1, 0],
+			[1, 1],
+			[0, 1],
+		],
+		edges_vertices: [
+			[0, 1],
+			[1, 2],
+			[2, 3],
+			[3, 0],
+			[1, 3],
+		],
 		edges_assignment: ["B", "B", "B", "B", "V"],
 	});
 	graph.populate({ faces: true });
@@ -139,9 +189,31 @@ test("one-fold populate, with assignments", () => {
 test("populate kite base", () => {
 	const kite = {
 		file_spec: 1.1,
-		vertices_coords: [[0, 0], [0.414, 0], [1, 0], [1, 0.586], [1, 1], [0, 1]],
-		edges_vertices: [[0, 1], [1, 2], [2, 3], [3, 4], [4, 5], [5, 0], [5, 1], [3, 5], [5, 2]],
-		faces_vertices: [[0, 1, 5], [1, 2, 5], [2, 3, 5], [3, 4, 5]],
+		vertices_coords: [
+			[0, 0],
+			[0.414, 0],
+			[1, 0],
+			[1, 0.586],
+			[1, 1],
+			[0, 1],
+		],
+		edges_vertices: [
+			[0, 1],
+			[1, 2],
+			[2, 3],
+			[3, 4],
+			[4, 5],
+			[5, 0],
+			[5, 1],
+			[3, 5],
+			[5, 2],
+		],
+		faces_vertices: [
+			[0, 1, 5],
+			[1, 2, 5],
+			[2, 3, 5],
+			[3, 4, 5],
+		],
 	};
 
 	const graph = ear.graph(kite);
@@ -161,10 +233,29 @@ test("populate kite base", () => {
 
 test("FOLD core populate, no assignments", () => {
 	const blintz = {
-		vertices_coords: [[0, 0], [0.5, 0], [1, 0], [1, 0.5], [1, 1], [0.5, 1], [0, 1], [0, 0.5]],
+		vertices_coords: [
+			[0, 0],
+			[0.5, 0],
+			[1, 0],
+			[1, 0.5],
+			[1, 1],
+			[0.5, 1],
+			[0, 1],
+			[0, 0.5],
+		],
 		edges_vertices: [
-			[0, 1], [1, 2], [2, 3], [3, 4], [4, 5], [5, 6],
-			[6, 7], [7, 0], [1, 3], [3, 5], [5, 7], [7, 1],
+			[0, 1],
+			[1, 2],
+			[2, 3],
+			[3, 4],
+			[4, 5],
+			[5, 6],
+			[6, 7],
+			[7, 0],
+			[1, 3],
+			[3, 5],
+			[5, 7],
+			[7, 1],
 		],
 	};
 	ear.graph.populate(blintz);
@@ -183,13 +274,31 @@ test("FOLD core populate, no assignments", () => {
 	expect(blintz.edges_length === undefined).toBe(true);
 });
 
-
 test("FOLD core populate", () => {
 	const blintz = {
-		vertices_coords: [[0, 0], [0.5, 0], [1, 0], [1, 0.5], [1, 1], [0.5, 1], [0, 1], [0, 0.5]],
+		vertices_coords: [
+			[0, 0],
+			[0.5, 0],
+			[1, 0],
+			[1, 0.5],
+			[1, 1],
+			[0.5, 1],
+			[0, 1],
+			[0, 0.5],
+		],
 		edges_vertices: [
-			[0, 1], [1, 2], [2, 3], [3, 4], [4, 5], [5, 6],
-			[6, 7], [7, 0], [1, 3], [3, 5], [5, 7], [7, 1],
+			[0, 1],
+			[1, 2],
+			[2, 3],
+			[3, 4],
+			[4, 5],
+			[5, 6],
+			[6, 7],
+			[7, 0],
+			[1, 3],
+			[3, 5],
+			[5, 7],
+			[7, 1],
 		],
 		edges_assignment: ["B", "B", "B", "B", "B", "B", "B", "B", "V", "V", "V", "V"],
 	};
@@ -217,10 +326,16 @@ test("populate a complete graph", () => {
 
 	// clone turned all "undefined" into "null". change these back
 	Object.keys(clone)
-		.filter(arr => clone[arr][0] != null && clone[arr][0].constructor === Array)
-		.forEach(key => clone[key].forEach((arr, i) => arr.forEach((value, j) => {
-			if (value === null) { clone[key][i][j] = undefined; }
-		})))
+		.filter((arr) => clone[arr][0] != null && clone[arr][0].constructor === Array)
+		.forEach((key) =>
+			clone[key].forEach((arr, i) =>
+				arr.forEach((value, j) => {
+					if (value === null) {
+						clone[key][i][j] = undefined;
+					}
+				}),
+			),
+		);
 
 	// delete all fields, leaving behind:
 	// vertices_coords, vertices_vertices, edges_vertices, faces_vertices

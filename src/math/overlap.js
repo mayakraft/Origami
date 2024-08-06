@@ -1,20 +1,9 @@
 /**
  * Rabbit Ear (c) Kraft
  */
-import {
-	EPSILON,
-} from "./constant.js";
-import {
-	exclude,
-	includeL,
-} from "./compare.js";
-import {
-	dot2,
-	magSquared,
-	cross2,
-	subtract2,
-	rotate90,
-} from "./vector.js";
+import { EPSILON } from "./constant.js";
+import { exclude, includeL } from "./compare.js";
+import { dot2, magSquared, cross2, subtract2, rotate90 } from "./vector.js";
 
 /**
  * @description check if a point lies collinear along a line,
@@ -38,7 +27,9 @@ export const overlapLinePoint = (
 	const lineMagSq = magSquared(vector);
 	const lineMag = Math.sqrt(lineMagSq);
 	// the line is degenerate
-	if (lineMag < epsilon) { return false; }
+	if (lineMag < epsilon) {
+		return false;
+	}
 	/** @type {[number, number]} */
 	const vecScaled = [vector[0] / lineMag, vector[1] / lineMag];
 	const cross = cross2(p2p, vecScaled);
@@ -72,8 +63,8 @@ export const overlapConvexPolygonPoint = (
 		.map(([a, b]) => cross2(a, b));
 	const sign = Math.sign(t.reduce((a, b) => a + b, 0));
 	const overlap = t
-		.map(n => n * sign)
-		.map(side => polyDomain(side, epsilon))
+		.map((n) => n * sign)
+		.map((side) => polyDomain(side, epsilon))
 		.map((s, _, arr) => s === arr[0])
 		.reduce((prev, curr) => prev && curr, true);
 	return { overlap, t };
@@ -105,18 +96,20 @@ export const overlapConvexPolygons = (poly1, poly2, epsilon = EPSILON) => {
 			// numberline is centered around zero. if the test passes, this polygon's
 			// projections will be entirely above or below 0.
 			const projected = polyB
-				.map(point => subtract2(point, origin))
-				.map(v => dot2(vector, v));
+				.map((point) => subtract2(point, origin))
+				.map((v) => dot2(vector, v));
 			// is the first polygon on the positive or negative side?
 			const other_test_point = polyA[(i + 2) % polyA.length];
 			const side_a = dot2(vector, subtract2(other_test_point, origin));
 			const side = side_a > 0; // use 0. not epsilon
 			// is the second polygon on whichever side of 0 that the first isn't?
 			const one_sided = projected
-				.map(dotProd => (side ? dotProd < epsilon : dotProd > -epsilon))
+				.map((dotProd) => (side ? dotProd < epsilon : dotProd > -epsilon))
 				.reduce((a, b) => a && b, true);
 			// if true, we found a dividing axis
-			if (one_sided) { return false; }
+			if (one_sided) {
+				return false;
+			}
 		}
 	}
 	return true;
@@ -135,8 +128,7 @@ export const overlapBoundingBoxes = (box1, box2, epsilon = EPSILON) => {
 	const dimensions = Math.min(box1.min.length, box2.min.length);
 	for (let d = 0; d < dimensions; d += 1) {
 		// if one minimum is above the other's maximum, or visa versa
-		if (box1.min[d] > box2.max[d] + epsilon
-			|| box1.max[d] < box2.min[d] - epsilon) {
+		if (box1.min[d] > box2.max[d] + epsilon || box1.max[d] < box2.min[d] - epsilon) {
 			return false;
 		}
 	}

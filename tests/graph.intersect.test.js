@@ -112,20 +112,19 @@ test("intersectLine through vertex and edge", () => {
 });
 
 test("intersectLineAndPoints, randlett-flapping-bird", () => {
-	const foldfile = fs.readFileSync("./tests/files/fold/randlett-flapping-bird.fold", "utf-8");
+	const foldfile = fs.readFileSync(
+		"./tests/files/fold/randlett-flapping-bird.fold",
+		"utf-8",
+	);
 	const fold = JSON.parse(foldfile);
 	const graph = ear.graph.getFramesByClassName(fold, "creasePattern")[0];
 
 	const line = { vector: [-1, 1], origin: [0.25, 0.25] };
 
-	const {
-		vertices,
-		edges,
-		faces,
-	} = ear.graph.intersectLineAndPoints(graph, line);
+	const { vertices, edges, faces } = ear.graph.intersectLineAndPoints(graph, line);
 
-	expect(vertices.filter(a => a)).toHaveLength(2);
-	expect(edges.filter(a => a)).toHaveLength(3);
+	expect(vertices.filter((a) => a)).toHaveLength(2);
+	expect(edges.filter((a) => a)).toHaveLength(3);
 	// everything checks out here.
 	expect(faces).toMatchObject([
 		{
@@ -152,7 +151,8 @@ test("intersectLineAndPoints, randlett-flapping-bird", () => {
 		{
 			edges: [{ edge: 17 }], // a:, b:, point:,
 			vertices: [{ a: 0.25, vertex: 5 }],
-			points: [] },
+			points: [],
+		},
 		{ edges: [], vertices: [], points: [] },
 		{ edges: [], vertices: [], points: [] },
 		{ edges: [], vertices: [], points: [] },
@@ -173,17 +173,23 @@ test("intersectLineAndPoints, randlett-flapping-bird", () => {
 });
 
 test("filterCollinearFacesData, randlett-flapping-bird", () => {
-	const foldfile = fs.readFileSync("./tests/files/fold/randlett-flapping-bird.fold", "utf-8");
+	const foldfile = fs.readFileSync(
+		"./tests/files/fold/randlett-flapping-bird.fold",
+		"utf-8",
+	);
 	const fold = JSON.parse(foldfile);
 	const graph = ear.graph.getFramesByClassName(fold, "creasePattern")[0];
 	const line = { vector: [1, 1], origin: [0, 0] };
 	const intersect = ear.graph.intersectLineAndPoints(graph, line);
 
-	expect(intersect.vertices.filter(a => a)).toHaveLength(4);
-	expect(intersect.edges.filter(a => a)).toHaveLength(0);
-	expect(intersect.faces.filter(({ edges, vertices, points }) => !(
-		edges.length === 0 && vertices.length === 0 && points.length === 0
-	))).toHaveLength(14);
+	expect(intersect.vertices.filter((a) => a)).toHaveLength(4);
+	expect(intersect.edges.filter((a) => a)).toHaveLength(0);
+	expect(
+		intersect.faces.filter(
+			({ edges, vertices, points }) =>
+				!(edges.length === 0 && vertices.length === 0 && points.length === 0),
+		),
+	).toHaveLength(14);
 
 	ear.graph.filterCollinearFacesData(graph, intersect);
 
@@ -192,9 +198,12 @@ test("filterCollinearFacesData, randlett-flapping-bird", () => {
 	// 14 faces becomes 6 faces:
 	// 3 on either side. these are faces which have one vertex collinear
 	// to the fold line (not a pair of vertices). no face has a pair of vertices.
-	expect(intersect.vertices.filter(a => a)).toHaveLength(4);
-	expect(intersect.edges.filter(a => a)).toHaveLength(0);
-	expect(intersect.faces.filter(({ edges, vertices, points }) => !(
-		edges.length === 0 && vertices.length === 0 && points.length === 0
-	))).toHaveLength(6);
+	expect(intersect.vertices.filter((a) => a)).toHaveLength(4);
+	expect(intersect.edges.filter((a) => a)).toHaveLength(0);
+	expect(
+		intersect.faces.filter(
+			({ edges, vertices, points }) =>
+				!(edges.length === 0 && vertices.length === 0 && points.length === 0),
+		),
+	).toHaveLength(6);
 });

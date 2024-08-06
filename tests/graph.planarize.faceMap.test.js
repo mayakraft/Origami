@@ -16,17 +16,18 @@ const makeBruteForceFaceMap = (oldGraph, newGraph, nextmap) => {
 	const backmap = ear.graph.invertArrayMap(nextmap);
 	const faces_centerPlanar = ear.graph.makeFacesCenterQuick(newGraph);
 	const faces_polygonFolded = ear.graph.makeFacesPolygon(oldGraph);
-	const bruteForceBackmap = faces_centerPlanar
-		.map(center => faces_polygonFolded
-			.map((poly, f2) => (ear.math.overlapConvexPolygonPoint(poly, center).overlap
-				? f2
-				: undefined))
-			.filter(a => a !== undefined));
+	const bruteForceBackmap = faces_centerPlanar.map((center) =>
+		faces_polygonFolded
+			.map((poly, f2) =>
+				ear.math.overlapConvexPolygonPoint(poly, center).overlap ? f2 : undefined,
+			)
+			.filter((a) => a !== undefined),
+	);
 	return {
 		backmap,
 		bruteForceBackmap,
-	}
-}
+	};
+};
 
 test("planarize face map, brute force, flapping-bird", () => {
 	const FOLD = fs.readFileSync("./tests/files/fold/randlett-flapping-bird.fold", "utf-8");
@@ -34,13 +35,12 @@ test("planarize face map, brute force, flapping-bird", () => {
 	const folded = ear.graph.getFramesByClassName(fold, "foldedForm")[0];
 	const {
 		result,
-		changes: { faces: { map } },
+		changes: {
+			faces: { map },
+		},
 	} = ear.graph.planarizeVerbose(folded);
 
-	const {
-		backmap,
-		bruteForceBackmap,
-	} = makeBruteForceFaceMap(folded, result, map);
+	const { backmap, bruteForceBackmap } = makeBruteForceFaceMap(folded, result, map);
 
 	expect(backmap).toMatchObject(bruteForceBackmap);
 });
@@ -51,13 +51,12 @@ test("planarize face map, brute force, kabuto", () => {
 	const folded = ear.graph.getFramesByClassName(fold, "foldedForm")[0];
 	const {
 		result,
-		changes: { faces: { map } },
+		changes: {
+			faces: { map },
+		},
 	} = ear.graph.planarizeVerbose(folded);
 
-	const {
-		backmap,
-		bruteForceBackmap,
-	} = makeBruteForceFaceMap(folded, result, map);
+	const { backmap, bruteForceBackmap } = makeBruteForceFaceMap(folded, result, map);
 
 	expect(backmap).toMatchObject(bruteForceBackmap);
 });
@@ -71,13 +70,12 @@ test("planarize face map, brute force, crane", () => {
 	};
 	const {
 		result,
-		changes: { faces: { map } },
+		changes: {
+			faces: { map },
+		},
 	} = ear.graph.planarizeVerbose(folded);
 
-	const {
-		backmap,
-		bruteForceBackmap,
-	} = makeBruteForceFaceMap(folded, result, map);
+	const { backmap, bruteForceBackmap } = makeBruteForceFaceMap(folded, result, map);
 
 	expect(backmap).toMatchObject(bruteForceBackmap);
 });
@@ -91,13 +89,12 @@ test("planarize face map, brute force, kraft-bird", () => {
 	};
 	const {
 		result,
-		changes: { faces: { map } },
+		changes: {
+			faces: { map },
+		},
 	} = ear.graph.planarizeVerbose(folded);
 
-	const {
-		backmap,
-		bruteForceBackmap,
-	} = makeBruteForceFaceMap(folded, result, map);
+	const { backmap, bruteForceBackmap } = makeBruteForceFaceMap(folded, result, map);
 
 	expect(backmap).toMatchObject(bruteForceBackmap);
 });

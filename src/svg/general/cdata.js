@@ -1,5 +1,5 @@
 /* SVG (c) Kraft */
-import RabbitEarWindow from '../environment/window.js';
+import RabbitEarWindow from "../environment/window.js";
 
 /**
  * Rabbit Ear (c) Kraft
@@ -12,8 +12,9 @@ import RabbitEarWindow from '../environment/window.js';
  * @param {string} text the text content to be placed inside the CData
  * @returns {CDATASection} a CDATA containing the given text.
  */
-const makeCDATASection = (text) => (new (RabbitEarWindow()).DOMParser())
-	.parseFromString("<root></root>", "text/xml")
-	.createCDATASection(text);
+const makeCDATASection = (text) =>
+	new (RabbitEarWindow().DOMParser)()
+		.parseFromString("<root></root>", "text/xml")
+		.createCDATASection(text);
 
 export { makeCDATASection };

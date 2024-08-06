@@ -67,7 +67,7 @@ test("axiom 5", () => {
 test("axiom 6", () => {
 	const params = {
 		points: [
-			[0.30, 0.86],
+			[0.3, 0.86],
 			[0.14, 0.07],
 		],
 		lines: [
@@ -100,18 +100,20 @@ test("axiom 6 with 3 results", () => {
 		pointA,
 		pointB,
 	);
-	const lines = [{
-		origin: [0.8535533905932738, 0.14644660940672635],
-		vector: [0.16910197872576288, -0.9855985596534887],
-	},
-	{
-		origin: [0.14644660940672627, 0.8535533905932738],
-		vector: [0.9855985596534889, -0.16910197872576277],
-	},
-	{
-		origin: [0.4999999999999999, 0.4999999999999999],
-		vector: [0.7071067811865475, -0.7071067811865475],
-	}];
+	const lines = [
+		{
+			origin: [0.8535533905932738, 0.14644660940672635],
+			vector: [0.16910197872576288, -0.9855985596534887],
+		},
+		{
+			origin: [0.14644660940672627, 0.8535533905932738],
+			vector: [0.9855985596534889, -0.16910197872576277],
+		},
+		{
+			origin: [0.4999999999999999, 0.4999999999999999],
+			vector: [0.7071067811865475, -0.7071067811865475],
+		},
+	];
 	for (let i = 0; i < lines.length; i += 1) {
 		expect(res[i].vector[0]).toBeCloseTo(lines[i].vector[0]);
 		expect(res[i].vector[1]).toBeCloseTo(lines[i].vector[1]);
@@ -121,26 +123,28 @@ test("axiom 6 with 3 results", () => {
 });
 
 test("axiom 6 with 2 results", () => {
-	const vectorA = [1.00, 0.00];
-	const originA = [0.00, 1.00];
-	const vectorB = [1.00, 0.00];
-	const originB = [0.00, 0.00];
-	const pointA = [0.90, 0.10];
-	const pointB = [0.10, 0.90];
+	const vectorA = [1.0, 0.0];
+	const originA = [0.0, 1.0];
+	const vectorB = [1.0, 0.0];
+	const originB = [0.0, 0.0];
+	const pointA = [0.9, 0.1];
+	const pointB = [0.1, 0.9];
 	const res = ear.axiom.axiom6(
 		{ vector: vectorA, origin: originA },
 		{ vector: vectorB, origin: originB },
 		pointA,
 		pointB,
 	);
-	const lines = [{
-		origin: [-0.0625, 0.0846405430584631],
-		vector: [0.8044504602885519, 0.5940197445721286],
-	},
-	{
-		origin: [-0.06249999999999996, 0.41535945694153714],
-		vector: [0.9888677651443275, 0.14879698605302136],
-	}];
+	const lines = [
+		{
+			origin: [-0.0625, 0.0846405430584631],
+			vector: [0.8044504602885519, 0.5940197445721286],
+		},
+		{
+			origin: [-0.06249999999999996, 0.41535945694153714],
+			vector: [0.9888677651443275, 0.14879698605302136],
+		},
+	];
 	for (let i = 0; i < lines.length; i += 1) {
 		expect(res[i].vector[0]).toBeCloseTo(lines[i].vector[0]);
 		expect(res[i].vector[1]).toBeCloseTo(lines[i].vector[1]);

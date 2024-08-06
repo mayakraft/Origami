@@ -26,8 +26,7 @@ test("magnitude", () => {
 test("mag sq", () => {
 	expect(ear.math.magSquared([1, 1, 1, 1])).toBe(4);
 	expect(ear.math.magSquared([])).toBe(0);
-	expect(ear.math.magSquared([1, -2, 3]))
-		.toBe((1 ** 2) + (2 ** 2) + (3 ** 2));
+	expect(ear.math.magSquared([1, -2, 3])).toBe(1 ** 2 + 2 ** 2 + 3 ** 2);
 	expect(ear.math.magSquared([-100])).toBe(100 * 100);
 });
 
@@ -192,18 +191,9 @@ test("average function", () => {
 	expect(ear.math.average(0, 1, 2).length).toBe(0);
 	expect(ear.math.average([], [], []).length).toBe(0);
 	// correct
-	testEqual(
-		[3.75, 4.75],
-		ear.math.average([4, 1], [5, 6], [4, 6], [2, 6]),
-	);
-	testEqual(
-		[4, 5, 3],
-		ear.math.average([1, 2, 3], [4, 5, 6], [7, 8]),
-	);
-	testEqual(
-		[4, 5, 6],
-		ear.math.average([1, 2, 3], [4, 5, 6], [7, 8, 9]),
-	);
+	testEqual([3.75, 4.75], ear.math.average([4, 1], [5, 6], [4, 6], [2, 6]));
+	testEqual([4, 5, 3], ear.math.average([1, 2, 3], [4, 5, 6], [7, 8]));
+	testEqual([4, 5, 6], ear.math.average([1, 2, 3], [4, 5, 6], [7, 8, 9]));
 });
 
 test("average2", () => {
@@ -273,7 +263,7 @@ test("parallel", () => {
 	expect(ear.math.parallel([1, 0], [1, 0.0014143])).toBe(false);
 	// this is the parallel test using cross product
 	expect(ear.math.parallel2([1, 0], [1, 0.0000009])).toBe(true);
-	expect(ear.math.parallel2([1, 0], [1, 0.0000010])).toBe(false);
+	expect(ear.math.parallel2([1, 0], [1, 0.000001])).toBe(false);
 });
 
 test("parallelNormalized", () => {

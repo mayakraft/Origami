@@ -1,12 +1,8 @@
 /**
  * Rabbit Ear (c) Kraft
  */
-import {
-	EPSILON,
-} from "../math/constant.js";
-import {
-	epsilonEqual,
-} from "../math/compare.js";
+import { EPSILON } from "../math/constant.js";
+import { epsilonEqual } from "../math/compare.js";
 
 /**
  * @description Given a list of any type, return a copy of the array
@@ -31,11 +27,13 @@ export const uniqueElements = (array) => Array.from(new Set(array));
  */
 export const nonUniqueElements = (array) => {
 	const count = {};
-	array.forEach(el => {
-		if (count[el] === undefined) { count[el] = 0; }
+	array.forEach((el) => {
+		if (count[el] === undefined) {
+			count[el] = 0;
+		}
 		count[el] += 1;
 	});
-	return array.filter(el => count[el] > 1);
+	return array.filter((el) => count[el] > 1);
 };
 
 /**
@@ -47,7 +45,9 @@ export const nonUniqueElements = (array) => {
  */
 export const uniqueSortedNumbers = (array) => {
 	const hash = {};
-	array.forEach(n => { hash[n] = true; });
+	array.forEach((n) => {
+		hash[n] = true;
+	});
 	return Object.keys(hash).map(parseFloat);
 };
 
@@ -61,7 +61,9 @@ export const uniqueSortedNumbers = (array) => {
  */
 export const epsilonUniqueSortedNumbers = (array, epsilon = EPSILON) => {
 	const numbers = array.slice().sort((a, b) => a - b);
-	if (numbers.length < 2) { return numbers; }
+	if (numbers.length < 2) {
+		return numbers;
+	}
 	const keep = [true];
 	for (let i = 1; i < numbers.length; i += 1) {
 		keep[i] = !epsilonEqual(numbers[i], numbers[i - 1], epsilon);
@@ -83,14 +85,18 @@ export const arrayIntersection = (array1, array2) => {
 	// create a lookup table for all values in array2, where the number
 	// of appearances is stored as the hash value.
 	const hash = {};
-	array2.forEach(value => { hash[value] = 0; });
-	array2.forEach(value => { hash[value] += 1; });
+	array2.forEach((value) => {
+		hash[value] = 0;
+	});
+	array2.forEach((value) => {
+		hash[value] += 1;
+	});
 
 	// for every item in array1, modify the lookup table each time we encounter
 	// a value from both arrays by decrementing the appearance counter by one.
 	// filter out any array1 values if the counter is 0,
 	// or it does not appear in array2.
-	return array1.filter(value => {
+	return array1.filter((value) => {
 		if (hash[value] > 0) {
 			hash[value] -= 1;
 			return true;
@@ -107,12 +113,10 @@ export const arrayIntersection = (array1, array2) => {
  * @param {number} newStartIndex the current index to become the new 0 index.
  * @returns {any[]} a copy of the original array, rotated.
  */
-export const rotateCircularArray = (array, newStartIndex) => (
+export const rotateCircularArray = (array, newStartIndex) =>
 	newStartIndex <= 0
 		? array
-		: array
-			.slice(newStartIndex)
-			.concat(array.slice(0, newStartIndex)));
+		: array.slice(newStartIndex).concat(array.slice(0, newStartIndex));
 
 /**
  * @description A circular array (data wraps around) requires 2 indices
@@ -164,7 +168,9 @@ export const setDifferenceSortedNumbers = (a, b) => {
 	const result = [];
 	let ai = 0;
 	let bi = 0;
-	if (!b.length) { return a.slice(); }
+	if (!b.length) {
+		return a.slice();
+	}
 	while (ai < a.length && bi < b.length) {
 		if (a[ai] === b[bi]) {
 			ai += 1;
@@ -192,7 +198,9 @@ export const setDifferenceSortedEpsilonNumbers = (a, b, epsilon = EPSILON) => {
 	const result = [];
 	let ai = 0;
 	let bi = 0;
-	if (!b.length) { return a.slice(); }
+	if (!b.length) {
+		return a.slice();
+	}
 	while (ai < a.length && bi < b.length) {
 		if (epsilonEqual(a[ai], b[bi], epsilon)) {
 			ai += 1;
@@ -216,13 +224,16 @@ export const setDifferenceSortedEpsilonNumbers = (a, b, epsilon = EPSILON) => {
  * or undefined if the array has no length.
  */
 export const arrayMinimumIndex = (array, map) => {
-	if (!array.length) { return undefined; }
-	const arrayValues = typeof map === "function"
-		? array.map(value => map(value))
-		: array;
+	if (!array.length) {
+		return undefined;
+	}
+	const arrayValues =
+		typeof map === "function" ? array.map((value) => map(value)) : array;
 	let index = 0;
 	arrayValues.forEach((value, i, arr) => {
-		if (value < arr[index]) { index = i; }
+		if (value < arr[index]) {
+			index = i;
+		}
 	});
 	return index;
 };
@@ -237,13 +248,16 @@ export const arrayMinimumIndex = (array, map) => {
  * or undefined if the array has no length.
  */
 export const arrayMaximumIndex = (array, map) => {
-	if (!array.length) { return undefined; }
-	const arrayValues = typeof map === "function"
-		? array.map(value => map(value))
-		: array;
+	if (!array.length) {
+		return undefined;
+	}
+	const arrayValues =
+		typeof map === "function" ? array.map((value) => map(value)) : array;
 	let index = 0;
 	arrayValues.forEach((value, i, arr) => {
-		if (value > arr[index]) { index = i; }
+		if (value > arr[index]) {
+			index = i;
+		}
 	});
 	return index;
 };
@@ -261,9 +275,11 @@ export const arrayMaximumIndex = (array, map) => {
  */
 export const mergeArraysWithHoles = (...arrays) => {
 	const flattened = [];
-	arrays.forEach(array => array.forEach((value, i) => {
-		flattened[i] = value;
-	}));
+	arrays.forEach((array) =>
+		array.forEach((value, i) => {
+			flattened[i] = value;
+		}),
+	);
 	return flattened;
 };
 
@@ -278,13 +294,13 @@ export const mergeArraysWithHoles = (...arrays) => {
  */
 export const clustersToReflexiveArrays = (clusters) => {
 	const result = [];
-	clusters.flat().forEach(i => { result[i] = []; });
-	clusters
-		.flatMap(chooseTwoPairs)
-		.forEach(([a, b]) => {
-			result[a].push(b);
-			result[b].push(a);
-		});
+	clusters.flat().forEach((i) => {
+		result[i] = [];
+	});
+	clusters.flatMap(chooseTwoPairs).forEach(([a, b]) => {
+		result[a].push(b);
+		result[b].push(a);
+	});
 	return result;
 };
 
@@ -297,10 +313,12 @@ export const clustersToReflexiveArrays = (clusters) => {
  * @returns {boolean[][]} for every top level array, an array that contains
  * true values at every index of a number in the array.
  */
-export const arrayArrayToLookupArray = (array_array) => array_array
-	.map(array => {
+export const arrayArrayToLookupArray = (array_array) =>
+	array_array.map((array) => {
 		const lookup = [];
-		array.forEach(i => { lookup[i] = true; });
+		array.forEach((i) => {
+			lookup[i] = true;
+		});
 		return lookup;
 	});
 
@@ -312,7 +330,7 @@ export const arrayArrayToLookupArray = (array_array) => array_array
  * @returns {number[][]} for every top level array, an array that contains
  * the indices with truthy values.
  */
-export const lookupArrayToArrayArray = (lookupArray) => lookupArray
-	.map(array => array
-		.map((overlap, i) => (overlap ? i : undefined))
-		.filter(a => a !== undefined));
+export const lookupArrayToArrayArray = (lookupArray) =>
+	lookupArray.map((array) =>
+		array.map((overlap, i) => (overlap ? i : undefined)).filter((a) => a !== undefined),
+	);

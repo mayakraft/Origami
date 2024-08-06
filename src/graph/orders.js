@@ -1,30 +1,13 @@
 /**
  * Rabbit Ear (c) Kraft
  */
-import {
-	dot,
-	resize3,
-} from "../math/vector.js";
-import {
-	uniqueSortedNumbers,
-} from "../general/array.js";
-import {
-	makeFacesNormal,
-} from "./normals.js";
-import {
-	topologicalSort,
-} from "./directedGraph.js";
-import {
-	makeVerticesVerticesUnsorted,
-} from "./make/verticesVertices.js";
-import {
-	connectedComponents,
-} from "./connectedComponents.js";
-import {
-	invertFlatMap,
-	invertFlatToArrayMap,
-	invertArrayToFlatMap,
-} from "./maps.js";
+import { dot, resize3 } from "../math/vector.js";
+import { uniqueSortedNumbers } from "../general/array.js";
+import { makeFacesNormal } from "./normals.js";
+import { topologicalSort } from "./directedGraph.js";
+import { makeVerticesVerticesUnsorted } from "./make/verticesVertices.js";
+import { connectedComponents } from "./connectedComponents.js";
+import { invertFlatMap, invertFlatToArrayMap, invertArrayToFlatMap } from "./maps.js";
 // import {
 // 	makeFacesWinding,
 // } from "../graph/faces/winding.js";
@@ -55,9 +38,10 @@ import {
  */
 export const faceOrdersSubset = (faceOrders, faces) => {
 	const facesHash = {};
-	faces.forEach(f => { facesHash[f] = true; });
-	return faceOrders
-		.filter(order => facesHash[order[0]] && facesHash[order[1]]);
+	faces.forEach((f) => {
+		facesHash[f] = true;
+	});
+	return faceOrders.filter((order) => facesHash[order[0]] && facesHash[order[1]]);
 };
 
 /**
@@ -72,12 +56,15 @@ export const faceOrdersSubset = (faceOrders, faces) => {
  * }} clusters_faces, for every cluster, a list of faces
  */
 export const overlappingFaceOrdersClusters = ({ faceOrders }) => {
-	const faces_cluster = connectedComponents(makeVerticesVerticesUnsorted({
-		edges_vertices: faceOrders.map(([a, b]) => [a, b]),
-	}));
+	const faces_cluster = connectedComponents(
+		makeVerticesVerticesUnsorted({
+			edges_vertices: faceOrders.map(([a, b]) => [a, b]),
+		}),
+	);
 	const clusters_faces = invertFlatToArrayMap(faces_cluster);
-	const clusters_faceOrders = clusters_faces
-		.map(faces => faceOrdersSubset(faceOrders, faces));
+	const clusters_faceOrders = clusters_faces.map((faces) =>
+		faceOrdersSubset(faceOrders, faces),
+	);
 	return {
 		clusters_faces,
 		clusters_faceOrders,
@@ -102,7 +89,9 @@ export const faceOrdersToDirectedEdges = (
 	{ vertices_coords, faces_vertices, faceOrders, faces_normal },
 	rootFace,
 ) => {
-	if (!faceOrders || !faceOrders.length) { return []; }
+	if (!faceOrders || !faceOrders.length) {
+		return [];
+	}
 	if (!faces_normal) {
 		// eslint-disable-next-line no-param-reassign
 		faces_normal = makeFacesNormal({ vertices_coords, faces_vertices });
@@ -113,15 +102,16 @@ export const faceOrdersToDirectedEdges = (
 
 	// we need to pick one face which determines the linearization direction.
 	// if the user supplied rootFace is not in "faces", ignore it.
-	const normal = rootFace !== undefined && faces.includes(rootFace)
-		? faces_normal[rootFace]
-		: faces_normal[faces[0]];
+	const normal =
+		rootFace !== undefined && faces.includes(rootFace)
+			? faces_normal[rootFace]
+			: faces_normal[faces[0]];
 
 	// create a lookup. for every face, does its normal match the normal
 	// we just chose to represent the linearization direction?
 	/** @type {{[key: number]: boolean}} */
 	const facesNormalMatch = {};
-	faces.forEach(f => {
+	faces.forEach((f) => {
 		// normal will likely be near +1 or -1, no need to bother with epsilon here
 		facesNormalMatch[f] = dot(faces_normal[f], normal) > 0;
 	});
@@ -129,10 +119,11 @@ export const faceOrdersToDirectedEdges = (
 	// this pair states face [0] is above face [1]. according to the +1 -1 order,
 	// and whether or not the reference face [1] normal is flipped. (xor either)
 	/** @type {[number, number][]} */
-	return faceOrders
-		.map(order => ((order[2] === -1) !== (!facesNormalMatch[order[1]]) // a ^ b
+	return faceOrders.map((order) =>
+		(order[2] === -1) !== !facesNormalMatch[order[1]] // a ^ b
 			? [order[0], order[1]]
-			: [order[1], order[0]]));
+			: [order[1], order[0]],
+	);
 };
 
 /**
@@ -160,19 +151,30 @@ export const faceOrdersToDirectedEdges = (
 export const linearizeFaceOrders = (
 	{ vertices_coords, faces_vertices, faceOrders, faces_normal },
 	rootFace,
-) => (topologicalSort(faceOrdersToDirectedEdges({
-	vertices_coords, faces_vertices, faceOrders, faces_normal,
-}, rootFace)));
+) =>
+	topologicalSort(
+		faceOrdersToDirectedEdges(
+			{
+				vertices_coords,
+				faces_vertices,
+				faceOrders,
+				faces_normal,
+			},
+			rootFace,
+		),
+	);
 
 /**
  * todo: assuming faces_vertices instead of faces_edges
  * @returns {number[]} layers_face
  */
 const fillInMissingFaces = ({ faces_vertices }, faces_layer) => {
-	if (!faces_vertices) { return faces_layer; }
+	if (!faces_vertices) {
+		return faces_layer;
+	}
 	const missingFaces = faces_vertices
 		.map((_, i) => i)
-		.filter(i => faces_layer[i] == null);
+		.filter((i) => faces_layer[i] == null);
 	return missingFaces.concat(invertFlatMap(faces_layer));
 };
 
@@ -192,18 +194,16 @@ const fillInMissingFaces = ({ faces_vertices }, faces_layer) => {
  * @returns {number[]} layers_face, for every layer (key),
  * which face (value) inhabits it.
  */
-export const linearize2DFaces = ({
-	vertices_coords, faces_vertices, faceOrders, faces_layer, faces_normal,
-}, rootFace) => {
+export const linearize2DFaces = (
+	{ vertices_coords, faces_vertices, faceOrders, faces_layer, faces_normal },
+	rootFace,
+) => {
 	if (!faces_normal) {
 		// eslint-disable-next-line no-param-reassign
 		faces_normal = makeFacesNormal({ vertices_coords, faces_vertices });
 	}
 	if (faceOrders) {
-		const linearization = linearizeFaceOrders(
-			{ faceOrders, faces_normal },
-			rootFace,
-		);
+		const linearization = linearizeFaceOrders({ faceOrders, faces_normal }, rootFace);
 		return !linearization
 			? []
 			: fillInMissingFaces({ faces_vertices }, invertFlatMap(linearization));
@@ -229,7 +229,10 @@ export const linearize2DFaces = ({
  * each object with properties "vector" and "layer".
  */
 export const nudgeFacesWithFaceOrders = ({
-	vertices_coords, faces_vertices, faceOrders, faces_normal: facesNormal,
+	vertices_coords,
+	faces_vertices,
+	faceOrders,
+	faces_normal: facesNormal,
 }) => {
 	const faces_normal = facesNormal
 		? facesNormal.map(resize3)
@@ -239,28 +242,32 @@ export const nudgeFacesWithFaceOrders = ({
 	// are connections between faces according to faceOrders
 	// using this representation, find the disjoint sets of faces,
 	// those which are isolated from each other according to layer orders
-	const {
-		clusters_faces,
-		clusters_faceOrders,
-	} = overlappingFaceOrdersClusters({ faceOrders });
+	const { clusters_faces, clusters_faceOrders } = overlappingFaceOrdersClusters({
+		faceOrders,
+	});
 
 	// if a cluster contains a cycle, it's entry will be undefined.
-	const clusters_layers_face = clusters_faceOrders
-		.map(orders => linearizeFaceOrders({ faceOrders: orders, faces_normal }));
+	const clusters_layers_face = clusters_faceOrders.map((orders) =>
+		linearizeFaceOrders({ faceOrders: orders, faces_normal }),
+	);
 
 	// if one of the clusters contains a cycle, even though some
 	// clusters may be valid, exit early.
-	if (clusters_layers_face.includes(undefined)) { return undefined; }
+	if (clusters_layers_face.includes(undefined)) {
+		return undefined;
+	}
 
-	const clusters_normals = clusters_faces.map(faces => faces_normal[faces[0]]);
+	const clusters_normals = clusters_faces.map((faces) => faces_normal[faces[0]]);
 	/** @type {{ vector: [number, number, number], layer: number }[]} */
 	const faces_nudge = [];
-	clusters_layers_face.forEach((set, i) => set.forEach((face, index) => {
-		faces_nudge[face] = {
-			vector: clusters_normals[i],
-			layer: index,
-		};
-	}));
+	clusters_layers_face.forEach((set, i) =>
+		set.forEach((face, index) => {
+			faces_nudge[face] = {
+				vector: clusters_normals[i],
+				layer: index,
+			};
+		}),
+	);
 	return faces_nudge;
 };
 
@@ -299,7 +306,12 @@ export const nudgeFacesWithFacesLayer = ({ faces_layer }) => {
  * @returns {number[]} a faces_layer object, describing,
  * for each face (key) which layer the face inhabits (value)
  */
-export const makeFacesLayer = ({ vertices_coords, faces_vertices, faceOrders, faces_normal }) => {
+export const makeFacesLayer = ({
+	vertices_coords,
+	faces_vertices,
+	faceOrders,
+	faces_normal,
+}) => {
 	if (!faces_normal) {
 		// eslint-disable-next-line no-param-reassign
 		faces_normal = makeFacesNormal({ vertices_coords, faces_vertices });
@@ -314,9 +326,8 @@ export const makeFacesLayer = ({ vertices_coords, faces_vertices, faceOrders, fa
  * @param {number[]} faces_layer a faces_layer array
  * @returns {number[]} a new faces_layer array
  */
-export const flipFacesLayer = (faces_layer) => invertArrayToFlatMap(
-	invertFlatToArrayMap(faces_layer).reverse(),
-);
+export const flipFacesLayer = (faces_layer) =>
+	invertArrayToFlatMap(invertFlatToArrayMap(faces_layer).reverse());
 
 // export const faceOrdersToFacesLayer = (graph) => {
 // 	return topologicalOrder({ faceOrders, faces_normal }, faces);

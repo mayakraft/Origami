@@ -1,8 +1,8 @@
 /* SVG (c) Kraft */
-import makeCoordinates from '../../../arguments/makeCoordinates.js';
-import makeCurvePath from './makeCurvePath.js';
-import getCurveEndpoints from './getCurveEndpoints.js';
-import TransformMethods from '../shared/transforms.js';
+import makeCoordinates from "../../../arguments/makeCoordinates.js";
+import makeCurvePath from "./makeCurvePath.js";
+import getCurveEndpoints from "./getCurveEndpoints.js";
+import TransformMethods from "../shared/transforms.js";
 
 /**
  * Rabbit Ear (c) Kraft

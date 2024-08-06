@@ -41,14 +41,7 @@ const tortilla_tortilla_valid_states = ["11", "22"];
 
 // const tortilla_face_valid_states = [];
 // (A,B) (B,C) (C,A)
-const transitivity_valid_states = [
-	"112",
-	"121",
-	"122",
-	"211",
-	"212",
-	"221",
-];
+const transitivity_valid_states = ["112", "121", "122", "211", "212", "221"];
 
 /**
  * @description Find a solution for a state. Solutions will be either:
@@ -68,13 +61,15 @@ const transitivity_valid_states = [
  */
 const setState = (states, t, key) => {
 	// convert the key into an array of integers (0, 1, 2)
-	const characters = Array.from(key).map(char => parseInt(char, 10));
+	const characters = Array.from(key).map((char) => parseInt(char, 10));
 
 	// filter out the keys which do not below in this set.
 	// the reason we aren't doing this ahead of time is because it requires
 	// parsing each character, which we are already doing here.
 	// only keys with the number of "0"s matching the number "t" are allowed.
-	if (characters.filter(x => x === 0).length !== t) { return; }
+	if (characters.filter((x) => x === 0).length !== t) {
+		return;
+	}
 
 	// initialize the result to false (no solution possible).
 	// eslint-disable-next-line no-param-reassign
@@ -92,7 +87,9 @@ const setState = (states, t, key) => {
 		const roundModifications = [];
 
 		// look at the unknown layers only (where the character is zero)
-		if (characters[i] !== 0) { continue; }
+		if (characters[i] !== 0) {
+			continue;
+		}
 
 		// in place of the unknowns, try each of the possible states (1, 2)
 		for (let x = 1; x <= 2; x += 1) {
@@ -156,9 +153,7 @@ const makeLookupEntry = (valid_states) => {
 	// the states are sorted into arrays of objects, where keys are sorted by
 	// how many 0s they contain (index [0]: no zeros, index [1]: 1 zero...)
 	/** @type {{[key: string]: (boolean | [number, number])}[]} */
-	const states = Array
-		.from(Array(chooseCount + 1))
-		.map(() => ({}));
+	const states = Array.from(Array(chooseCount + 1)).map(() => ({}));
 
 	// this array initializer will create all permutations of 1s and 2s (no zeros)
 	// all strings having the length of chooseCount. (ie. for 6: 111112, 212221)
@@ -166,12 +161,20 @@ const makeLookupEntry = (valid_states) => {
 	// initialize all keys to "false" for now.
 	Array.from(Array(2 ** chooseCount))
 		.map((_, i) => i.toString(2))
-		.map(str => Array.from(str).map(n => parseInt(n, 10) + 1).join(""))
-		.map(str => (`11111${str}`).slice(-chooseCount))
-		.forEach(key => { states[0][key] = false; });
+		.map((str) =>
+			Array.from(str)
+				.map((n) => parseInt(n, 10) + 1)
+				.join(""),
+		)
+		.map((str) => `11111${str}`.slice(-chooseCount))
+		.forEach((key) => {
+			states[0][key] = false;
+		});
 
 	// set all valid cases to be "true" (indicating the solution is possible)
-	valid_states.forEach(s => { states[0][s] = true; });
+	valid_states.forEach((s) => {
+		states[0][s] = true;
+	});
 
 	// now we fill in the rest of the states. In a similar manner as before,
 	// create all permuations, length of chooseCount, but this time include
@@ -182,10 +185,12 @@ const makeLookupEntry = (valid_states) => {
 	// too much, however they will get filtered out inside setState.
 	Array.from(Array(chooseCount))
 		.map((_, i) => i + 1)
-		.map(t => Array.from(Array(3 ** chooseCount))
-			.map((_, i) => i.toString(3))
-			.map(str => (`000000${str}`).slice(-chooseCount))
-			.forEach(key => setState(states, t, key)));
+		.map((t) =>
+			Array.from(Array(3 ** chooseCount))
+				.map((_, i) => i.toString(3))
+				.map((str) => `000000${str}`.slice(-chooseCount))
+				.forEach((key) => setState(states, t, key)),
+		);
 
 	// gather all solutions together into one object.
 	/** @type {{[key: string]: Readonly<(boolean | [number, number])>}} */
@@ -193,8 +198,10 @@ const makeLookupEntry = (valid_states) => {
 
 	// recursively freeze result, this is intended to be an immutable reference
 	Object.keys(lookup)
-		.filter(key => typeof lookup[key] === "object")
-		.forEach(key => { lookup[key] = Object.freeze(lookup[key]); });
+		.filter((key) => typeof lookup[key] === "object")
+		.forEach((key) => {
+			lookup[key] = Object.freeze(lookup[key]);
+		});
 	return Object.freeze(lookup);
 };
 

@@ -2,27 +2,13 @@
  * Rabbit Ear (c) Kraft
  */
 import Messages from "../../environment/messages.js";
-import {
-	EPSILON,
-} from "../../math/constant.js";
-import {
-	overlapLinePoint,
-} from "../../math/overlap.js";
-import {
-	intersectLineLine,
-} from "../../math/intersect.js";
-import {
-} from "../../math/vector.js";
-import {
-	sortVerticesCounterClockwise,
-} from "../vertices/sort.js";
-import {
-	makeVerticesToEdge,
-} from "../make/lookup.js";
-import {
-	includeL,
-	excludeS,
-} from "../../math/compare.js";
+import { EPSILON } from "../../math/constant.js";
+import { overlapLinePoint } from "../../math/overlap.js";
+import { intersectLineLine } from "../../math/intersect.js";
+import {} from "../../math/vector.js";
+import { sortVerticesCounterClockwise } from "../vertices/sort.js";
+import { makeVerticesToEdge } from "../make/lookup.js";
+import { includeL, excludeS } from "../../math/compare.js";
 import {
 	magnitude2,
 	normalize2,
@@ -40,38 +26,16 @@ import {
 	multiplyMatrices2,
 	makeMatrix2Reflect,
 } from "../../math/matrix2.js";
-import {
-	edgeAssignmentToFoldAngle,
-} from "../../fold/spec.js";
-import {
-	mergeNextmaps,
-	mergeBackmaps,
-	invertFlatMap,
-} from "../maps.js";
-import {
-	makeFacesMatrix2,
-} from "../faces/matrix.js";
-import {
-	makeVerticesCoordsFoldedFromMatrix2,
-} from "../vertices/folded.js";
-import {
-	makeVerticesEdgesUnsorted,
-} from "../make/verticesEdges.js";
-import {
-	getFaceUnderPoint,
-} from "../overlap.js";
-import {
-	makeFacesWindingFromMatrix2,
-} from "../faces/winding.js";
-import {
-	populate,
-} from "../populate.js";
-import {
-	splitEdge,
-} from "../split/splitEdge.js";
-import {
-	remove,
-} from "../remove.js";
+import { edgeAssignmentToFoldAngle } from "../../fold/spec.js";
+import { mergeNextmaps, mergeBackmaps, invertFlatMap } from "../maps.js";
+import { makeFacesMatrix2 } from "../faces/matrix.js";
+import { makeVerticesCoordsFoldedFromMatrix2 } from "../vertices/folded.js";
+import { makeVerticesEdgesUnsorted } from "../make/verticesEdges.js";
+import { getFaceUnderPoint } from "../overlap.js";
+import { makeFacesWindingFromMatrix2 } from "../faces/winding.js";
+import { populate } from "../populate.js";
+import { splitEdge } from "../split/splitEdge.js";
+import { remove } from "../remove.js";
 
 /**
  * This file contains the first ever implementation of a folding algorithm,
@@ -101,62 +65,73 @@ import {
  * @returns {object|undefined} "vertices" and "edges" keys, indices of the
  * components which intersect the line. or undefined if no intersection
  */
-const intersectConvexFaceLine = ({
-	vertices_coords, edges_vertices, faces_vertices, faces_edges,
-}, face, { vector, origin }, epsilon = EPSILON) => {
+const intersectConvexFaceLine = (
+	{ vertices_coords, edges_vertices, faces_vertices, faces_edges },
+	face,
+	{ vector, origin },
+	epsilon = EPSILON,
+) => {
 	const vertices_coords2 = vertices_coords.map(resize2);
 	// give us back the indices in the faces_vertices[face] array
 	// we can count on these being sorted (important later)
 	const face_vertices_indices = faces_vertices[face]
-		.map(v => vertices_coords2[v])
-		.map(coord => overlapLinePoint({ vector, origin }, coord, () => true, epsilon))
+		.map((v) => vertices_coords2[v])
+		.map((coord) => overlapLinePoint({ vector, origin }, coord, () => true, epsilon))
 		.map((overlap, i) => (overlap ? i : undefined))
-		.filter(i => i !== undefined);
+		.filter((i) => i !== undefined);
 	// o-----o---o  we have to test against cases like this, where more than two
 	// |         |  vertices lie along one line.
 	// o---------o
-	const vertices = face_vertices_indices.map(i => faces_vertices[face][i]);
+	const vertices = face_vertices_indices.map((i) => faces_vertices[face][i]);
 	// concat a duplication of the array where the second array's vertices'
 	// indices' are all increased by the faces_vertices[face].length.
 	// ask every neighbor pair if they are 1 away from each other, if so, the line
 	// lies along an outside edge of the convex poly, return "no intersection".
 	// the concat is needed to detect neighbors across the end-beginning loop.
 	const vertices_are_neighbors = face_vertices_indices
-		.concat(face_vertices_indices.map(i => i + faces_vertices[face].length))
+		.concat(face_vertices_indices.map((i) => i + faces_vertices[face].length))
 		.map((n, i, arr) => arr[i + 1] - n === 1)
 		.reduce((a, b) => a || b, false);
 	// if vertices are neighbors
 	// because convex polygon, if collinear vertices lie along an edge,
 	// it must be an outside edge. this case returns no intersection.
-	if (vertices_are_neighbors) { return undefined; }
-	if (vertices.length > 1) { return { vertices, edges: [] }; }
+	if (vertices_are_neighbors) {
+		return undefined;
+	}
+	if (vertices.length > 1) {
+		return { vertices, edges: [] };
+	}
 	// run the line-segment intersection on every side of the face polygon
 	const edges = faces_edges[face]
-		.map(edge => edges_vertices[edge]
-			.map(v => vertices_coords2[v]))
-		.map(seg => intersectLineLine(
-			{ vector, origin },
-			{ vector: subtract2(seg[1], seg[0]), origin: seg[0] },
-			includeL,
-			excludeS,
-			epsilon,
-		).point).map((coords, face_edge_index) => ({
+		.map((edge) => edges_vertices[edge].map((v) => vertices_coords2[v]))
+		.map(
+			(seg) =>
+				intersectLineLine(
+					{ vector, origin },
+					{ vector: subtract2(seg[1], seg[0]), origin: seg[0] },
+					includeL,
+					excludeS,
+					epsilon,
+				).point,
+		)
+		.map((coords, face_edge_index) => ({
 			coords,
 			edge: faces_edges[face][face_edge_index],
 		}))
 		// remove edges with no intersection
-		.filter(el => el.coords !== undefined)
+		.filter((el) => el.coords !== undefined)
 		// remove edges which share a vertex with a previously found vertex.
 		// these edges are because the intersection is near a vertex but also
 		// intersects the edge very close to the end.
-		.filter(el => !(vertices
-			.map(v => edges_vertices[el.edge].includes(v))
-			.reduce((a, b) => a || b, false)));
+		.filter(
+			(el) =>
+				!vertices
+					.map((v) => edges_vertices[el.edge].includes(v))
+					.reduce((a, b) => a || b, false),
+		);
 	// only return the case with 2 intersections. for example, only 1 vertex
 	// intersection implies outside the polygon, collinear with one vertex.
-	return (edges.length + vertices.length === 2
-		? { vertices, edges }
-		: undefined);
+	return edges.length + vertices.length === 2 ? { vertices, edges } : undefined;
 };
 
 /**
@@ -182,22 +157,26 @@ const splitCircularArray = (array, indices) => {
  * @param {number} face the face that will be replaced by these 2 new
  * @param {number[]} vertices (in the face) that split the face into 2 sides
  */
-const make_faces = ({
-	edges_vertices, faces_vertices, faces_edges,
-}, face, vertices) => {
+const make_faces = ({ edges_vertices, faces_vertices, faces_edges }, face, vertices) => {
 	// the indices of the two vertices inside the face_vertices array.
 	// this is where we will split the face into two.
-	const indices = vertices.map(el => faces_vertices[face].indexOf(el));
-	const faces = splitCircularArray(faces_vertices[face], indices)
-		.map(fv => ({ faces_vertices: fv, faces_edges: [] }));
+	const indices = vertices.map((el) => faces_vertices[face].indexOf(el));
+	const faces = splitCircularArray(faces_vertices[face], indices).map((fv) => ({
+		faces_vertices: fv,
+		faces_edges: [],
+	}));
 	if (faces_edges) {
 		// table to build faces_edges
 		const vertices_to_edge = makeVerticesToEdge({ edges_vertices });
 		faces
-			.map(this_face => this_face.faces_vertices
-				.map((fv, i, arr) => `${fv} ${arr[(i + 1) % arr.length]}`)
-				.map(key => vertices_to_edge[key]))
-			.forEach((face_edges, i) => { faces[i].faces_edges = face_edges; });
+			.map((this_face) =>
+				this_face.faces_vertices
+					.map((fv, i, arr) => `${fv} ${arr[(i + 1) % arr.length]}`)
+					.map((key) => vertices_to_edge[key]),
+			)
+			.forEach((face_edges, i) => {
+				faces[i].faces_edges = face_edges;
+			});
 	}
 	return faces;
 };
@@ -209,12 +188,14 @@ const make_faces = ({
  */
 const build_faces = (graph, face, vertices) => {
 	// new face indices at the end of the list
-	const faces = [0, 1].map(i => graph.faces_vertices.length + i);
+	const faces = [0, 1].map((i) => graph.faces_vertices.length + i);
 	// construct new face data for faces_vertices, faces_edges
 	// add them to the graph
-	make_faces(graph, face, vertices)
-		.forEach((newface, i) => Object.keys(newface)
-			.forEach((key) => { graph[key][faces[i]] = newface[key]; }));
+	make_faces(graph, face, vertices).forEach((newface, i) =>
+		Object.keys(newface).forEach((key) => {
+			graph[key][faces[i]] = newface[key];
+		}),
+	);
 	return faces;
 };
 
@@ -231,7 +212,7 @@ const make_edge = ({ vertices_coords }, vertices, face) => {
 	// coords reversed for "vector", so index [0] comes last in subtract
 	const new_edge_coords = vertices
 		.slice() // todo: i just added this without testing
-		.map(v => vertices_coords[v])
+		.map((v) => vertices_coords[v])
 		.reverse();
 
 	return {
@@ -255,8 +236,10 @@ const rebuild_edge = (graph, face, vertices) => {
 	const new_edge = make_edge(graph, vertices, face);
 	// ignoring any keys that aren't a part of our graph, add the new edge
 	Object.keys(new_edge)
-		.filter(key => graph[key] !== undefined)
-		.forEach((key) => { graph[key][edge] = new_edge[key]; });
+		.filter((key) => graph[key] !== undefined)
+		.forEach((key) => {
+			graph[key][edge] = new_edge[key];
+		});
 	return edge;
 };
 
@@ -286,7 +269,7 @@ const split_at_intersections = (graph, { vertices, edges }) => {
 		map = map ? mergeNextmaps(map, res.edges.map) : res.edges.map;
 		return res;
 	});
-	vertices.push(...split_results.map(res => res.vertex));
+	vertices.push(...split_results.map((res) => res.vertex));
 	// if two edges were split, the second one contains a "remove" key that was
 	// based on the mid-operation graph, update this value to match the graph
 	// before any changes occurred.
@@ -295,7 +278,7 @@ const split_at_intersections = (graph, { vertices, edges }) => {
 	// only part of the code we need to test. cumulative backmap merge.
 	// this was written without any testing, as convex polygons never have
 	// more than 2 intersections
-	split_results.forEach(res => {
+	split_results.forEach((res) => {
 		res.edges.remove = bkmap ? bkmap[res.edges.remove] : res.edges.remove;
 		const inverted = invertFlatMap(res.edges.map);
 		bkmap = bkmap ? mergeBackmaps(bkmap, inverted) : inverted;
@@ -304,7 +287,7 @@ const split_at_intersections = (graph, { vertices, edges }) => {
 		vertices,
 		edges: {
 			map,
-			remove: split_results.map(res => res.edges.remove),
+			remove: split_results.map((res) => res.edges.remove),
 		},
 	};
 };
@@ -316,9 +299,10 @@ const split_at_intersections = (graph, { vertices, edges }) => {
  * @param {object} FOLD object
  * @param {number} edge index of the newly-added edge
  */
-const update_vertices_vertices = ({
-	vertices_coords, vertices_vertices, edges_vertices,
-}, edge) => {
+const update_vertices_vertices = (
+	{ vertices_coords, vertices_vertices, edges_vertices },
+	edge,
+) => {
 	const v0 = edges_vertices[edge][0];
 	const v1 = edges_vertices[edge][1];
 	vertices_vertices[v0] = sortVerticesCounterClockwise(
@@ -334,28 +318,31 @@ const update_vertices_vertices = ({
 };
 
 /**
-* @param {FOLD} graph a FOLD object. modified in place.
-* @param {number} edge
+ * @param {FOLD} graph a FOLD object. modified in place.
+ * @param {number} edge
  * vertices_vertices was just run before this method. use it.
  * vertices_edges should be up to date, except for the addition
  * of this one new edge at both ends of
  */
-const update_vertices_edges = ({
-	edges_vertices, vertices_edges, vertices_vertices,
-}, edge) => {
+const update_vertices_edges = (
+	{ edges_vertices, vertices_edges, vertices_vertices },
+	edge,
+) => {
 	// the expensive way, rebuild all arrays
 	// graph.vertices_edges = makeVerticesEdges(graph);
-	if (!vertices_edges || !vertices_vertices) { return; }
+	if (!vertices_edges || !vertices_vertices) {
+		return;
+	}
 	const vertices = edges_vertices[edge];
 	// for each of the two vertices, check its vertices_vertices for the
 	// index of the opposite vertex. this is the edge. return its position
 	// in the vertices_vertices to be used to insert into vertices_edges.
 	vertices
-		.map(v => vertices_vertices[v])
-		.map((vert_vert, i) => vert_vert
-			.indexOf(vertices[(i + 1) % vertices.length]))
-		.forEach((radial_index, i) => vertices_edges[vertices[i]]
-			.splice(radial_index, 0, edge));
+		.map((v) => vertices_vertices[v])
+		.map((vert_vert, i) => vert_vert.indexOf(vertices[(i + 1) % vertices.length]))
+		.forEach((radial_index, i) =>
+			vertices_edges[vertices[i]].splice(radial_index, 0, edge),
+		);
 };
 /**
  * @description search inside vertices_faces for an occurence
@@ -368,16 +355,16 @@ const update_vertices_faces = (graph, old_face, new_faces) => {
 	// use the new faces_vertices data (built in the previous method) to get
 	// a list of the new faces to be added to this vertex's vertices_faces.
 	const vertices_replacement_faces = {};
-	new_faces
-		.forEach(f => graph.faces_vertices[f]
-			.forEach(v => {
-				if (!vertices_replacement_faces[v]) {
-					vertices_replacement_faces[v] = [];
-				}
-				vertices_replacement_faces[v].push(f);
-			}));
+	new_faces.forEach((f) =>
+		graph.faces_vertices[f].forEach((v) => {
+			if (!vertices_replacement_faces[v]) {
+				vertices_replacement_faces[v] = [];
+			}
+			vertices_replacement_faces[v].push(f);
+		}),
+	);
 	// these vertices need updating
-	graph.faces_vertices[old_face].forEach(v => {
+	graph.faces_vertices[old_face].forEach((v) => {
 		const index = graph.vertices_faces[v].indexOf(old_face);
 		const replacements = vertices_replacement_faces[v];
 		if (index === -1 || !replacements) {
@@ -399,15 +386,17 @@ const update_edges_faces = (graph, old_face, new_edge, new_faces) => {
 	// a list of the new faces to be added to this edge's edges_faces.
 	// most will be length of 1, except the edge which split the face will be 2.
 	const edges_replacement_faces = {};
-	new_faces
-		.forEach(f => graph.faces_edges[f]
-			.forEach(e => {
-				if (!edges_replacement_faces[e]) { edges_replacement_faces[e] = []; }
-				edges_replacement_faces[e].push(f);
-			}));
+	new_faces.forEach((f) =>
+		graph.faces_edges[f].forEach((e) => {
+			if (!edges_replacement_faces[e]) {
+				edges_replacement_faces[e] = [];
+			}
+			edges_replacement_faces[e].push(f);
+		}),
+	);
 	// these edges need updating
 	const edges = [...graph.faces_edges[old_face], new_edge];
-	edges.forEach(e => {
+	edges.forEach((e) => {
 		// these are the faces which should be inserted into this edge's
 		// edges_faces array, we just need to find the old index to replace.
 		const replacements = edges_replacement_faces[e];
@@ -415,7 +404,9 @@ const update_edges_faces = (graph, old_face, new_edge, new_faces) => {
 		// these will be the indices containing a reference to the old face.
 		const indices = [];
 		for (let i = 0; i < graph.edges_faces[e].length; i += 1) {
-			if (graph.edges_faces[e][i] === old_face) { indices.push(i); }
+			if (graph.edges_faces[e][i] === old_face) {
+				indices.push(i);
+			}
 		}
 		if (indices.length === 0 || !replacements) {
 			throw new Error(Messages.convexFace);
@@ -426,7 +417,7 @@ const update_edges_faces = (graph, old_face, new_edge, new_faces) => {
 		// that here we will replace both references to the pair of the new
 		// faces which the edge now divides.
 		// remove the old indices.
-		indices.reverse().forEach(index => graph.edges_faces[e].splice(index, 1));
+		indices.reverse().forEach((index) => graph.edges_faces[e].splice(index, 1));
 		// in both cases when "indices" is length 1 or 2, get just one index
 		// at which to insert the new reference(s).
 		const index = indices[indices.length - 1];
@@ -445,11 +436,13 @@ const update_edges_faces = (graph, old_face, new_edge, new_faces) => {
 const update_faces_faces = ({ faces_vertices, faces_faces }, old_face, new_faces) => {
 	// this is presuming that new_faces have their updated faces_vertices by now
 	const incident_faces = faces_faces[old_face];
-	const new_faces_vertices = new_faces.map(f => faces_vertices[f]);
+	const new_faces_vertices = new_faces.map((f) => faces_vertices[f]);
 	// for each of the incident faces (to the old face), set one of two
 	// indices, one of the two new faces. this is the new incident face.
-	const incident_face_face = incident_faces.map(f => {
-		if (f === undefined || f === null) { return undefined; }
+	const incident_face_face = incident_faces.map((f) => {
+		if (f === undefined || f === null) {
+			return undefined;
+		}
 		const incident_face_vertices = faces_vertices[f];
 		const score = [0, 0];
 		for (let n = 0; n < new_faces_vertices.length; n += 1) {
@@ -461,8 +454,12 @@ const update_faces_faces = ({ faces_vertices, faces_faces }, old_face, new_faces
 			}
 			score[n] = count;
 		}
-		if (score[0] >= 2) { return new_faces[0]; }
-		if (score[1] >= 2) { return new_faces[1]; }
+		if (score[0] >= 2) {
+			return new_faces[0];
+		}
+		if (score[1] >= 2) {
+			return new_faces[1];
+		}
 		return undefined;
 	});
 	// prepare the new faces' face_faces empty arrays, filled with one
@@ -473,7 +470,9 @@ const update_faces_faces = ({ faces_vertices, faces_faces }, old_face, new_faces
 	// 2 things, fill the new face's arrays and update each of the
 	// incident faces to point to the correct of the two new faces.
 	incident_faces.forEach((f, i) => {
-		if (f === undefined || f === null) { return; }
+		if (f === undefined || f === null) {
+			return;
+		}
 		for (let j = 0; j < faces_faces[f].length; j += 1) {
 			if (faces_faces[f][j] === old_face) {
 				faces_faces[f][j] = incident_face_face[i];
@@ -498,7 +497,9 @@ export const splitFaceWithLine = (graph, face, line, epsilon) => {
 	// survey face for any intersections which cross directly over a vertex
 	const intersect = intersectConvexFaceLine(graph, face, line, epsilon);
 	// if no intersection exists, return undefined.
-	if (intersect === undefined) { return undefined; }
+	if (intersect === undefined) {
+		return undefined;
+	}
 	// this result will be appended to (vertices, edges) and returned by this method.
 	const result = split_at_intersections(graph, intersect);
 	// this modifies the graph by only adding an edge between existing vertices
@@ -519,7 +520,9 @@ export const splitFaceWithLine = (graph, face, line, epsilon) => {
 	const faces_map = remove(graph, "faces", [face]);
 	// the graph is now complete, however our return object needs updating.
 	// shift our new face indices since these relate to the graph before remove().
-	faces.forEach((_, i) => { faces[i] = faces_map[faces[i]]; });
+	faces.forEach((_, i) => {
+		faces[i] = faces_map[faces[i]];
+	});
 	// we had to run "remove" with the new faces added. to return the change info,
 	// we need to adjust the map to exclude these faces.
 	faces_map.splice(-2);
@@ -562,25 +565,32 @@ const make_face_side = (vector, origin, face_center, face_winding) => {
  * discrepencies) don't use this method, it's only being used
  * for faces which lie completely on one side or the other.
  */
-const make_face_center = (graph, face) => (!graph.faces_vertices[face]
-	? [0, 0]
-	: graph.faces_vertices[face]
-		.map(v => graph.vertices_coords[v])
-		.reduce((a, b) => [a[0] + b[0], a[1] + b[1]], [0, 0])
-		.map(el => el / graph.faces_vertices[face].length));
+const make_face_center = (graph, face) =>
+	!graph.faces_vertices[face]
+		? [0, 0]
+		: graph.faces_vertices[face]
+				.map((v) => graph.vertices_coords[v])
+				.reduce((a, b) => [a[0] + b[0], a[1] + b[1]], [0, 0])
+				.map((el) => el / graph.faces_vertices[face].length);
 
 const unfolded_assignment = {
-	F: true, f: true, U: true, u: true,
+	F: true,
+	f: true,
+	U: true,
+	u: true,
 };
 const opposite_lookup = {
-	M: "V", m: "V", V: "M", v: "M",
+	M: "V",
+	m: "V",
+	V: "M",
+	v: "M",
 };
 
 /**
  * @description for a mountain or valley, return the opposite.
  * in the case of any other crease (boundary, flat, ...) return the input.
  */
-const get_opposite_assignment = assign => opposite_lookup[assign] || assign;
+const get_opposite_assignment = (assign) => opposite_lookup[assign] || assign;
 
 /**
  * @description shallow copy these entries for one face in the graph.
@@ -610,19 +620,23 @@ const foldFacesLayer = (faces_layer, faces_folding) => {
 	const new_faces_layer = [];
 	// filter face indices into two arrays, those folding and not folding
 	const arr = faces_layer.map((_, i) => i);
-	const folding = arr.filter(i => faces_folding[i]);
-	const not_folding = arr.filter(i => !faces_folding[i]);
+	const folding = arr.filter((i) => faces_folding[i]);
+	const not_folding = arr.filter((i) => !faces_folding[i]);
 	// sort all the non-folding indices by their current layer, bottom to top,
 	// give each face index a new layering index.
 	// compress whatever current layer numbers down into [0...n]
 	not_folding
 		.sort((a, b) => faces_layer[a] - faces_layer[b])
-		.forEach((face, i) => { new_faces_layer[face] = i; });
+		.forEach((face, i) => {
+			new_faces_layer[face] = i;
+		});
 	// sort the folding faces in reverse order (flip them), compress their
 	// layers down into [0...n] and and set each face to this layer index
 	folding
 		.sort((a, b) => faces_layer[b] - faces_layer[a]) // reverse order here
-		.forEach((face, i) => { new_faces_layer[face] = not_folding.length + i; });
+		.forEach((face, i) => {
+			new_faces_layer[face] = not_folding.length + i;
+		});
 	return new_faces_layer;
 };
 
@@ -639,7 +653,9 @@ export const getVerticesCollinearToLine = (
 		const originToPoint = subtract2(point, origin);
 		const mag = magnitude2(originToPoint);
 		// point and origin are the same
-		if (Math.abs(mag) < epsilon) { return true; }
+		if (Math.abs(mag) < epsilon) {
+			return true;
+		}
 		// normalize both vectors, compare dot product
 		const originToPointUnit = scale2(originToPoint, 1 / mag);
 		const dotprod = Math.abs(dot2(originToPointUnit, normalizedLineVec));
@@ -648,8 +664,8 @@ export const getVerticesCollinearToLine = (
 	return vertices_coords
 		.map(pointIsCollinear)
 		.map((a, i) => ({ a, i }))
-		.filter(el => el.a)
-		.map(el => el.i);
+		.filter((el) => el.a)
+		.map((el) => el.i);
 };
 
 /**
@@ -675,13 +691,15 @@ export const getEdgesCollinearToLine = (
 		epsilon,
 	);
 	const edgesCollinearCount = edges_vertices.map(() => 0);
-	verticesCollinear
-		.forEach(vertex => vertices_edges[vertex]
-			.forEach(edge => { edgesCollinearCount[edge] += 1; }));
+	verticesCollinear.forEach((vertex) =>
+		vertices_edges[vertex].forEach((edge) => {
+			edgesCollinearCount[edge] += 1;
+		}),
+	);
 	return edgesCollinearCount
 		.map((count, i) => ({ count, i }))
-		.filter(el => el.count === 2)
-		.map(el => el.i);
+		.filter((el) => el.count === 2)
+		.map((el) => el.i);
 };
 
 /**
@@ -726,27 +744,26 @@ export const flatFold = (
 	// splitting (removing 1 face, adding 2) inside "splitFaceWithLine", the remove
 	// method will automatically shift indices for arrays starting with "faces_".
 	// we will remove these arrays at the end of this method.
-	graph.faces_center = graph.faces_vertices
-		.map((_, i) => make_face_center(graph, i));
+	graph.faces_center = graph.faces_vertices.map((_, i) => make_face_center(graph, i));
 	// faces_matrix is built from the crease pattern, but reflects
 	// the faces in their folded state.
 	if (!graph.faces_matrix2) {
-		graph.faces_matrix2 = makeFacesMatrix2(
-			graph,
-			[getFaceUnderPoint(graph, origin, vector)],
-		);
+		graph.faces_matrix2 = makeFacesMatrix2(graph, [
+			getFaceUnderPoint(graph, origin, vector),
+		]);
 	}
 	graph.faces_winding = makeFacesWindingFromMatrix2(graph.faces_matrix2);
 	graph.faces_crease = graph.faces_matrix2
 		.map(invertMatrix2)
-		.map(matrix => multiplyMatrix2Line2(matrix, { vector, origin }));
-	graph.faces_side = graph.faces_vertices
-		.map((_, i) => make_face_side(
+		.map((matrix) => multiplyMatrix2Line2(matrix, { vector, origin }));
+	graph.faces_side = graph.faces_vertices.map((_, i) =>
+		make_face_side(
 			graph.faces_crease[i].vector,
 			graph.faces_crease[i].origin,
 			graph.faces_center[i],
 			graph.faces_winding[i],
-		));
+		),
+	);
 	// before we start splitting faces, we have to handle the case where
 	// a flat crease already exists along the fold crease, already splitting
 	// two faces (assignment "F" or "U" only), the splitFaceWithLine method
@@ -758,22 +775,23 @@ export const flatFold = (
 		graph.faces_matrix2,
 	);
 	// get all (folded) edges which lie parallel and overlap the crease line
-	const collinear_edges = getEdgesCollinearToLine({
-		vertices_coords: vertices_coords_folded,
-		edges_vertices: graph.edges_vertices,
-	}, { vector, origin }, epsilon)
-		.filter(e => unfolded_assignment[graph.edges_assignment[e]]);
+	const collinear_edges = getEdgesCollinearToLine(
+		{
+			vertices_coords: vertices_coords_folded,
+			edges_vertices: graph.edges_vertices,
+		},
+		{ vector, origin },
+		epsilon,
+	).filter((e) => unfolded_assignment[graph.edges_assignment[e]]);
 	// get the first valid adjacent face for each edge, get that face's winding,
 	// which determines the crease assignment, and assign it to the edge
 	collinear_edges
-		.map(e => graph.edges_faces[e].find(f => f != null))
-		.map(f => graph.faces_winding[f])
-		.map(winding => (winding ? assignment : opposite_assignment))
+		.map((e) => graph.edges_faces[e].find((f) => f != null))
+		.map((f) => graph.faces_winding[f])
+		.map((winding) => (winding ? assignment : opposite_assignment))
 		.forEach((assign, e) => {
 			graph.edges_assignment[collinear_edges[e]] = assign;
-			graph.edges_foldAngle[collinear_edges[e]] = edgeAssignmentToFoldAngle(
-				assign,
-			);
+			graph.edges_foldAngle[collinear_edges[e]] = edgeAssignmentToFoldAngle(assign);
 		});
 	// before we start splitting, capture the state of face 0. we will use
 	// it when rebuilding the graph's matrices after all splitting is finished.
@@ -791,7 +809,9 @@ export const flatFold = (
 			// split the polygon (if possible), get back a summary of changes.
 			const change = splitFaceWithLine(graph, i, face.crease, epsilon);
 			// console.log("split convex polygon change", change);
-			if (change === undefined) { return undefined; }
+			if (change === undefined) {
+				return undefined;
+			}
 			// const face_winding = folded.faces_winding[i];
 			// console.log("face change", face, change);
 			// update the assignment of the newly added edge separating the 2 new faces
@@ -803,7 +823,7 @@ export const flatFold = (
 			);
 			// these are the two faces that replaced the removed face after the split
 			const new_faces = change.faces.map[change.faces.remove];
-			new_faces.forEach(f => {
+			new_faces.forEach((f) => {
 				// no need right now to build faces_winding, faces_matrix, ...
 				graph.faces_center[f] = make_face_center(graph, f);
 				graph.faces_side[f] = make_face_side(
@@ -816,29 +836,27 @@ export const flatFold = (
 			});
 			return change;
 		})
-		.filter(a => a !== undefined);
+		.filter((a) => a !== undefined);
 	// all faces have been split. get a summary of changes to the graph.
 	// "faces_map" is actually needed. the others are just included in the return
-	const faces_map = mergeNextmaps(...split_changes.map(el => el.faces.map));
-	const edges_map = mergeNextmaps(...split_changes.map(el => el.edges.map)
-		.filter(a => a !== undefined));
-	const faces_remove = split_changes.map(el => el.faces.remove).reverse();
+	const faces_map = mergeNextmaps(...split_changes.map((el) => el.faces.map));
+	const edges_map = mergeNextmaps(
+		...split_changes.map((el) => el.edges.map).filter((a) => a !== undefined),
+	);
+	const faces_remove = split_changes.map((el) => el.faces.remove).reverse();
 	// const vert_dict = {};
 	// split_changes.forEach(el => el.vertices.forEach(v => { vert_dict[v] = true; }));
 	// const new_vertices = Object.keys(vert_dict).map(s => parseInt(s));
 	// build a new face layer ordering
-	graph.faces_layer = foldFacesLayer(
-		graph.faces_layer,
-		graph.faces_side,
-	);
+	graph.faces_layer = foldFacesLayer(graph.faces_layer, graph.faces_side);
 	// build new face matrices for the folded state. use face 0 as reference
 	// we need its original matrix, and if face 0 was split we need to know
 	// which of its two new faces doesn't move as the new faces matrix
 	// calculation requires we provide the one face that doesn't move.
 	const face0_was_split = faces_map && faces_map[0] && faces_map[0].length === 2;
-	const face0_newIndex = (face0_was_split
-		? faces_map[0].filter(f => graph.faces_side[f]).shift()
-		: 0);
+	const face0_newIndex = face0_was_split
+		? faces_map[0].filter((f) => graph.faces_side[f]).shift()
+		: 0;
 	// only if face 0 lies on the not-flipped side (sidedness is false),
 	// and it wasn't creased-through, can we use its original matrix.
 	// if face 0 lies on the flip side (sidedness is true), or it was split,
@@ -847,22 +865,20 @@ export const flatFold = (
 	let face0_preMatrix = face0.matrix;
 	// only if the assignment is valley or mountain, do this. otherwise skip
 	if (assignment !== opposite_assignment) {
-		face0_preMatrix = (!face0_was_split && !graph.faces_side[0]
-			? face0.matrix
-			: multiplyMatrices2(
-				face0.matrix,
-				makeMatrix2Reflect(
-					face0.crease.vector,
-					face0.crease.origin,
-				),
-			)
-		);
+		face0_preMatrix =
+			!face0_was_split && !graph.faces_side[0]
+				? face0.matrix
+				: multiplyMatrices2(
+						face0.matrix,
+						makeMatrix2Reflect(face0.crease.vector, face0.crease.origin),
+					);
 	}
 	// build our new faces_matrices using face 0 as the starting point,
 	// setting face 0 as the identity matrix, then multiply every
 	// face's matrix by face 0's actual starting matrix
-	graph.faces_matrix2 = makeFacesMatrix2(graph, [face0_newIndex])
-		.map(matrix => multiplyMatrices2(face0_preMatrix, matrix));
+	graph.faces_matrix2 = makeFacesMatrix2(graph, [face0_newIndex]).map((matrix) =>
+		multiplyMatrices2(face0_preMatrix, matrix),
+	);
 	// these are no longer needed. some of them haven't even been fully rebuilt.
 	delete graph.faces_center;
 	delete graph.faces_winding;

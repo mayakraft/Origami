@@ -1,31 +1,14 @@
 /**
  * Rabbit Ear (c) Kraft
  */
-import {
-	EPSILON,
-} from "../../math/constant.js";
-import {
-	invertArrayMap,
-	mergeNextmaps,
-} from "../maps.js";
-import {
-	makePlanarFaces,
-} from "../make/faces.js";
-import {
-	makeEdgesVerticesFromFaces,
-} from "../make/edgesVertices.js";
-import {
-	planarizeCollinearEdges,
-} from "./planarizeCollinearEdges.js";
-import {
-	planarizeOverlaps,
-} from "./planarizeOverlaps.js";
-import {
-	planarizeCollinearVertices,
-} from "./planarizeCollinearVertices.js";
-import {
-	makeFacesMap,
-} from "./makeFacesMap.js";
+import { EPSILON } from "../../math/constant.js";
+import { invertArrayMap, mergeNextmaps } from "../maps.js";
+import { makePlanarFaces } from "../make/faces.js";
+import { makeEdgesVerticesFromFaces } from "../make/edgesVertices.js";
+import { planarizeCollinearEdges } from "./planarizeCollinearEdges.js";
+import { planarizeOverlaps } from "./planarizeOverlaps.js";
+import { planarizeCollinearVertices } from "./planarizeCollinearVertices.js";
+import { makeFacesMap } from "./makeFacesMap.js";
 import { remove } from "../remove.js";
 
 /**
@@ -37,12 +20,16 @@ import { remove } from "../remove.js";
  * @returns {FOLD} an edges_vertices array
  */
 const makeSureEdgesExist = (graph) => {
-	if (graph.edges_vertices) { return graph; }
+	if (graph.edges_vertices) {
+		return graph;
+	}
 	// exit with an empty graph if no faces exist. nothing to planarize
 	// no need to check faces_edges, if there are no edges_vertices then
 	// faces_edges doesn't help us because we would still need to connect
 	// edges to vertices.
-	if (!graph.faces_vertices) { return {}; }
+	if (!graph.faces_vertices) {
+		return {};
+	}
 	return {
 		...graph,
 		edges_vertices: makeEdgesVerticesFromFaces(graph),
@@ -60,12 +47,12 @@ const removeHoles = (graph, facesNextmap) => {
 	const backmap = invertArrayMap(facesNextmap);
 	const removeIndices = graph.faces_vertices
 		.map((_, i) => i)
-		.filter(i => backmap[i] === undefined);
+		.filter((i) => backmap[i] === undefined);
 	return remove(graph, "faces", removeIndices);
-		// .forEach(f => {
-		// 	// delete graph.faces_vertices[f];
-		// 	// delete graph.faces_edges[f];
-		// });
+	// .forEach(f => {
+	// 	// delete graph.faces_vertices[f];
+	// 	// delete graph.faces_edges[f];
+	// });
 };
 
 /**
@@ -103,7 +90,7 @@ export const planarizeEdgesVerbose = (graph, epsilon = EPSILON) => {
 		changes: {
 			vertices: { map: verticesMap2 },
 			edges: { map: edgesMap2 },
-		}
+		},
 	} = planarizeOverlaps(graphNonCollinear, epsilon);
 
 	// third step: remove all degree-2 vertices which lie between
@@ -112,8 +99,8 @@ export const planarizeEdgesVerbose = (graph, epsilon = EPSILON) => {
 		result: planarGraph,
 		changes: {
 			vertices: { map: verticesMap3 },
-			edges: { map: edgesMap3 }
-		}
+			edges: { map: edgesMap3 },
+		},
 	} = planarizeCollinearVertices(graphNoOverlaps, epsilon);
 
 	const vertexNextMap = mergeNextmaps(verticesMap1, verticesMap2, verticesMap3);
@@ -124,7 +111,7 @@ export const planarizeEdgesVerbose = (graph, epsilon = EPSILON) => {
 		changes: {
 			vertices: { map: vertexNextMap },
 			edges: { map: edgeNextMap },
-		}
+		},
 	};
 };
 
@@ -136,20 +123,21 @@ export const planarizeEdgesVerbose = (graph, epsilon = EPSILON) => {
  * @param {number} [epsilon=1e-6] an optional epsilon
  * @returns {FOLD} a planar graph only containing vertex and edge data
  */
-export const planarizeEdges = ({
-	vertices_coords,
-	edges_vertices,
-	edges_assignment,
-	edges_foldAngle,
-}, epsilon = EPSILON) => {
+export const planarizeEdges = (
+	{ vertices_coords, edges_vertices, edges_assignment, edges_foldAngle },
+	epsilon = EPSILON,
+) => {
 	// first step: resolve all collinear and overlapping edges,
 	// after this point, no two edges parallel-overlap each other.
-	const { result: result1 } = planarizeCollinearEdges({
-		vertices_coords,
-		edges_vertices,
-		edges_assignment,
-		edges_foldAngle,
-	}, epsilon);
+	const { result: result1 } = planarizeCollinearEdges(
+		{
+			vertices_coords,
+			edges_vertices,
+			edges_assignment,
+			edges_foldAngle,
+		},
+		epsilon,
+	);
 
 	// second step: resolve all crossing edges,
 	// after this point the graph is planar, no two edges overlap.
@@ -184,13 +172,10 @@ export const planarizeVerbose = (graph, epsilon = EPSILON) => {
 		changes: {
 			vertices: { map: vertexNextMap },
 			edges: { map: edgeNextMap },
-		}
+		},
 	} = planarizeEdgesVerbose(graphWithEdges, epsilon);
 
-	const {
-		faces_vertices,
-		faces_edges,
-	} = makePlanarFaces(result);
+	const { faces_vertices, faces_edges } = makePlanarFaces(result);
 	result.faces_vertices = faces_vertices;
 	result.faces_edges = faces_edges;
 
@@ -212,7 +197,7 @@ export const planarizeVerbose = (graph, epsilon = EPSILON) => {
 			vertices: { map: vertexNextMap },
 			edges: { map: edgeNextMap },
 			faces: { map: faceMap },
-		}
+		},
 	};
 };
 
@@ -247,10 +232,7 @@ export const planarize = (graph, epsilon = EPSILON) => {
 export const planarizeAllFaces = (graph, epsilon = EPSILON) => {
 	const graphWithEdges = makeSureEdgesExist(graph);
 	const result = planarizeEdges(graphWithEdges, epsilon);
-	const {
-		faces_vertices,
-		faces_edges,
-	} = makePlanarFaces(result);
+	const { faces_vertices, faces_edges } = makePlanarFaces(result);
 	result.faces_vertices = faces_vertices;
 	result.faces_edges = faces_edges;
 	return result;

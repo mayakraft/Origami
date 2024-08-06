@@ -1,34 +1,15 @@
 /**
  * Rabbit Ear (c) Kraft
  */
-import {
-	EPSILON,
-} from "../../math/constant.js";
-import {
-	makeVerticesEdgesUnsorted,
-	makeVerticesEdges,
-} from "../make/verticesEdges.js";
-import {
-	makeVerticesVertices,
-} from "../make/verticesVertices.js";
-import {
-	makeVerticesFaces,
-} from "../make/verticesFaces.js";
-import {
-	replace,
-} from "../replace.js";
-import {
-	invertArrayToFlatMap,
-} from "../maps.js";
-import {
-	clusterUnsortedIndices,
-} from "../../general/cluster.js";
-import {
-	getVerticesClusters,
-} from "../vertices/clusters.js";
-import {
-	sweepEdges,
-} from "../sweep.js";
+import { EPSILON } from "../../math/constant.js";
+import { makeVerticesEdgesUnsorted, makeVerticesEdges } from "../make/verticesEdges.js";
+import { makeVerticesVertices } from "../make/verticesVertices.js";
+import { makeVerticesFaces } from "../make/verticesFaces.js";
+import { replace } from "../replace.js";
+import { invertArrayToFlatMap } from "../maps.js";
+import { clusterUnsortedIndices } from "../../general/cluster.js";
+import { getVerticesClusters } from "../vertices/clusters.js";
+import { sweepEdges } from "../sweep.js";
 
 /**
  * @description Get the indices of all duplicate edges by marking the
@@ -46,7 +27,9 @@ import {
  * (3, 4, 8, 12) are all duplicates. (5,7), (9,14) are also duplicates.
  */
 export const duplicateEdges = ({ edges_vertices }) => {
-	if (!edges_vertices) { return []; }
+	if (!edges_vertices) {
+		return [];
+	}
 
 	const hash = {};
 	const duplicates = [];
@@ -56,8 +39,8 @@ export const duplicateEdges = ({ edges_vertices }) => {
 	// unless a match already exists, then add an entry into duplicates where
 	// the index is the edge index, and the value is the matching edge vertex.
 	edges_vertices
-		.map(verts => (verts[0] < verts[1] ? verts : verts.slice().reverse()))
-		.map(pair => pair.join(" "))
+		.map((verts) => (verts[0] < verts[1] ? verts : verts.slice().reverse()))
+		.map((pair) => pair.join(" "))
 		.forEach((key, e) => {
 			if (hash[key] !== undefined) {
 				duplicates[e] = hash[key];
@@ -93,18 +76,20 @@ export const getSimilarEdges = (
 	 * @param {number} b edge index
 	 */
 	const comparison = (a, b) => {
-		const [a0, a1] = edges_vertices[a].map(v => vertices_cluster[v]);
-		const [b0, b1] = edges_vertices[b].map(v => vertices_cluster[v]);
+		const [a0, a1] = edges_vertices[a].map((v) => vertices_cluster[v]);
+		const [b0, b1] = edges_vertices[b].map((v) => vertices_cluster[v]);
 		return (a0 === b0 && a1 === b1) || (a0 === b1 && a1 === b0);
 	};
 
 	const edgeSweep = sweepEdges({
-		vertices_coords, vertices_edges, edges_vertices,
+		vertices_coords,
+		vertices_edges,
+		edges_vertices,
 	});
 
 	return edgeSweep
 		.map(({ start }) => start)
-		.flatMap(edges => clusterUnsortedIndices(edges, comparison));
+		.flatMap((edges) => clusterUnsortedIndices(edges, comparison));
 };
 
 /**
@@ -125,7 +110,7 @@ export const removeDuplicateEdges = (graph, replace_indices) => {
 	if (!replace_indices) {
 		replace_indices = duplicateEdges(graph);
 	}
-	const removeObject = Object.keys(replace_indices).map(n => parseInt(n, 10));
+	const removeObject = Object.keys(replace_indices).map((n) => parseInt(n, 10));
 	const map = replace(graph, "edges", replace_indices);
 
 	// if edges were removed, we need to rebuild vertices_edges and then

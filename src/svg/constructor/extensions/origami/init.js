@@ -1,8 +1,8 @@
 /* SVG (c) Kraft */
-import NS from '../../../spec/namespace.js';
-import RabbitEarWindow from '../../../environment/window.js';
-import lib from '../../../environment/lib.js';
-import { findElementTypeInParents } from '../../../general/dom.js';
+import NS from "../../../spec/namespace.js";
+import RabbitEarWindow from "../../../environment/window.js";
+import lib from "../../../environment/lib.js";
+import { findElementTypeInParents } from "../../../general/dom.js";
 
 /**
  * Rabbit Ear (c) Kraft
@@ -20,9 +20,7 @@ const applyViewBox = (parent, element, graph, options = {}) => {
 	const box = lib.ear.graph.boundingBox(graph) || unitBounds;
 	const svgElement = findElementTypeInParents(parent, "svg");
 	if (svgElement && options && options.viewBox) {
-		const viewBoxValue = [box.min, box.span]
-			.flatMap(p => [p[0], p[1]])
-			.join(" ");
+		const viewBoxValue = [box.min, box.span].flatMap((p) => [p[0], p[1]]).join(" ");
 		svgElement.setAttributeNS(null, "viewBox", viewBoxValue);
 	}
 };

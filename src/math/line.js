@@ -1,13 +1,8 @@
 /**
  * Rabbit Ear (c) Kraft
  */
-import {
-	EPSILON,
-} from "./constant.js";
-import {
-	epsilonEqual,
-	epsilonEqualVectors,
-} from "./compare.js";
+import { EPSILON } from "./constant.js";
+import { epsilonEqual, epsilonEqualVectors } from "./compare.js";
 import {
 	dot,
 	cross2,
@@ -24,9 +19,7 @@ import {
 	parallel2,
 	parallel3,
 } from "./vector.js";
-import {
-	counterClockwiseSubsect2,
-} from "./radial.js";
+import { counterClockwiseSubsect2 } from "./radial.js";
 
 /**
  * @description These clamp functions process lines/rays/segments intersections.
@@ -34,7 +27,7 @@ import {
  * @param {number} dist the length along the vector
  * @returns {number} the clamped input value (line does not clamp)
  */
-export const clampLine = dist => dist;
+export const clampLine = (dist) => dist;
 
 /**
  * @description These clamp functions process lines/rays/segments intersections.
@@ -42,7 +35,7 @@ export const clampLine = dist => dist;
  * @param {number} dist the length along the vector
  * @returns {number} the clamped input value
  */
-export const clampRay = dist => (dist < -EPSILON ? 0 : dist);
+export const clampRay = (dist) => (dist < -EPSILON ? 0 : dist);
 
 /**
  * @description These clamp functions process lines/rays/segments intersections.
@@ -51,8 +44,12 @@ export const clampRay = dist => (dist < -EPSILON ? 0 : dist);
  * @returns {number} the clamped input value
  */
 export const clampSegment = (dist) => {
-	if (dist < -EPSILON) { return 0; }
-	if (dist > 1 + EPSILON) { return 1; }
+	if (dist < -EPSILON) {
+		return 0;
+	}
+	if (dist > 1 + EPSILON) {
+		return 1;
+	}
 	return dist;
 };
 
@@ -86,9 +83,12 @@ export const clampSegment = (dist) => {
  * @returns {boolean} true if the points lies collinear.
  */
 export const collinearPoints = (p0, p1, p2, epsilon = EPSILON) => {
-	const vectors = [[p0, p1], [p1, p2]]
-		.map(pts => subtract(pts[1], pts[0]))
-		.map(vector => normalize(vector));
+	const vectors = [
+		[p0, p1],
+		[p1, p2],
+	]
+		.map((pts) => subtract(pts[1], pts[0]))
+		.map((vector) => normalize(vector));
 	return epsilonEqual(1.0, Math.abs(dot(vectors[0], vectors[1])), epsilon);
 };
 
@@ -103,12 +103,17 @@ export const collinearPoints = (p0, p1, p2, epsilon = EPSILON) => {
  */
 export const collinearBetween = (p0, p1, p2, inclusive = false, epsilon = EPSILON) => {
 	const similar = [p0, p2]
-		.map(p => epsilonEqualVectors(p1, p, epsilon))
+		.map((p) => epsilonEqualVectors(p1, p, epsilon))
 		.reduce((a, b) => a || b, false);
-	if (similar) { return inclusive; }
-	const vectors = [[p0, p1], [p1, p2]]
-		.map(segment => subtract(segment[1], segment[0]))
-		.map(vector => normalize(vector));
+	if (similar) {
+		return inclusive;
+	}
+	const vectors = [
+		[p0, p1],
+		[p1, p2],
+	]
+		.map((segment) => subtract(segment[1], segment[0]))
+		.map((vector) => normalize(vector));
 	return epsilonEqual(1.0, dot(vectors[0], vectors[1]), EPSILON);
 };
 
@@ -119,10 +124,9 @@ export const collinearBetween = (p0, p1, p2, inclusive = false, epsilon = EPSILO
  * @param {number} [epsilon=1e-6] an optional epsilon
  * @returns {boolean} true if the two lines are parallel and collinear
  */
-export const collinearLines2 = (a, b, epsilon = EPSILON) => (
-	parallel2(a.vector, b.vector, epsilon)
-	&& parallel2(a.vector, subtract2(b.origin, a.origin), epsilon)
-);
+export const collinearLines2 = (a, b, epsilon = EPSILON) =>
+	parallel2(a.vector, b.vector, epsilon) &&
+	parallel2(a.vector, subtract2(b.origin, a.origin), epsilon);
 
 /**
  * @description Test if two lines are parallel and collinear in 3D
@@ -131,10 +135,9 @@ export const collinearLines2 = (a, b, epsilon = EPSILON) => (
  * @param {number} [epsilon=1e-6] an optional epsilon
  * @returns {boolean} true if the two lines are parallel and collinear
  */
-export const collinearLines3 = (a, b, epsilon = EPSILON) => (
-	parallel3(a.vector, b.vector, epsilon)
-	&& parallel3(a.vector, subtract3(b.origin, a.origin), epsilon)
-);
+export const collinearLines3 = (a, b, epsilon = EPSILON) =>
+	parallel3(a.vector, b.vector, epsilon) &&
+	parallel3(a.vector, subtract3(b.origin, a.origin), epsilon);
 
 /**
  * @description linear interpolate between two lines
@@ -166,12 +169,12 @@ const parallelPleat = (a, b, count) => {
 	// orient the vectors in the same direction.
 	const aVector = a.vector; // isParallel && dotProd < 0 ? a.vector : a.vector;
 	const bVector = isOpposite ? flip(b.vector) : b.vector;
-	const origins = Array
-		.from(Array(count - 1))
-		.map((_, i) => lerp(a.origin, b.origin, (i + 1) / count));
-	const vectors = Array
-		.from(Array(count - 1))
-		.map((_, i) => lerp(aVector, bVector, (i + 1) / count));
+	const origins = Array.from(Array(count - 1)).map((_, i) =>
+		lerp(a.origin, b.origin, (i + 1) / count),
+	);
+	const vectors = Array.from(Array(count - 1)).map((_, i) =>
+		lerp(aVector, bVector, (i + 1) / count),
+	);
 	/** @type {VecLine2[]} */
 	const lines = vectors.map((vector, i) => ({
 		vector: [vector[0], vector[1]],
@@ -179,7 +182,7 @@ const parallelPleat = (a, b, count) => {
 	}));
 	/** @type {[VecLine2[], VecLine2[]]} */
 	const solution = [lines, lines];
-	solution[(isOpposite ? 0 : 1)] = [];
+	solution[isOpposite ? 0 : 1] = [];
 	return solution;
 };
 
@@ -204,9 +207,16 @@ export const pleat = (a, b, count, epsilon = EPSILON) => {
 	// two sets of pleats will be generated, between either pairs
 	// of interior angles, unless the lines are parallel.
 	/** @type {[[[number, number], [number, number]], [[number, number], [number, number]]]} */
-	const sides = determinant > -epsilon
-		? [[a.vector, b.vector], [flip2(b.vector), a.vector]]
-		: [[b.vector, a.vector], [flip2(a.vector), b.vector]];
+	const sides =
+		determinant > -epsilon
+			? [
+					[a.vector, b.vector],
+					[flip2(b.vector), a.vector],
+				]
+			: [
+					[b.vector, a.vector],
+					[flip2(a.vector), b.vector],
+				];
 	/** @type {[[number, number][], [number, number][]]} */
 	// const pleatVectors = sides
 	// 	.map(pair => counterClockwiseSubsect2(pair[0], pair[1], count));
@@ -220,9 +230,9 @@ export const pleat = (a, b, count, epsilon = EPSILON) => {
 	// or in the case of parallel, a lerp between the two line origins.
 	const origins = Array.from(Array(count - 1)).map(() => intersection);
 
-	const [sideA, sideB] = pleatVectors
-		.map(side => side
-			.map((vector, i) => ({ vector, origin: origins[i] })));
+	const [sideA, sideB] = pleatVectors.map((side) =>
+		side.map((vector, i) => ({ vector, origin: origins[i] })),
+	);
 	return [sideA, sideB];
 };
 
@@ -236,11 +246,13 @@ export const pleat = (a, b, count, epsilon = EPSILON) => {
  * @returns {[VecLine2?, VecLine2?]} an array of lines, objects with "vector" and "origin"
  */
 export const bisectLines2 = (a, b, epsilon = EPSILON) => {
-	const [biA, biB] = pleat(a, b, 2, epsilon).map(arr => arr[0]);
+	const [biA, biB] = pleat(a, b, 2, epsilon).map((arr) => arr[0]);
 	/** @type {[VecLine2, VecLine2]} */
 	const solution = [biA, biB];
 	solution.forEach((val, i) => {
-		if (val === undefined) { delete solution[i]; }
+		if (val === undefined) {
+			delete solution[i];
+		}
 	});
 	return solution;
 };

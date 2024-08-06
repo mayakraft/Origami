@@ -11,19 +11,27 @@ test("argument parsing, line", () => {
 		ear.svg.line([[1, 2, 3, 4]]),
 		ear.svg.line([1, 2], [3, 4]),
 		ear.svg.line({ x: 1, y: 2 }, { x: 3, y: 4 }),
-		ear.svg.line([{ x: 1, y: 2 }, { x: 3, y: 4 }]),
+		ear.svg.line([
+			{ x: 1, y: 2 },
+			{ x: 3, y: 4 },
+		]),
 		ear.svg.line([1, 2, 9], [3, 4, 9]),
-		ear.svg.line([[1, 2, 9], [3, 4, 9]]),
+		ear.svg.line([
+			[1, 2, 9],
+			[3, 4, 9],
+		]),
 		ear.svg.line({ x: 1, y: 2, z: 9 }, { x: 3, y: 4, z: 9 }),
 	];
 	// ear.svg.line([1], [2], [3], [4]),
 	// ear.svg.line([{x:1, y:2}], [{x:3, y:4}]),
 	// ear.svg.line([[{x:1, y:2}], [{x:3, y:4}]]),
 	const result = lines
-		.map(el => ["x1", "y1", "x2", "y2"]
-			.map(attr => el.getAttribute(attr))
-			.map((value, i) => value === String(i + 1))
-			.reduce((a, b) => a && b, true))
+		.map((el) =>
+			["x1", "y1", "x2", "y2"]
+				.map((attr) => el.getAttribute(attr))
+				.map((value, i) => value === String(i + 1))
+				.reduce((a, b) => a && b, true),
+		)
 		.reduce((a, b) => a && b, true);
 	expect(result).toBe(true);
 });
@@ -48,7 +56,10 @@ test("line setters", () => {
 	l.setPoints([[1, 2, 3, 4]]);
 	attrs.forEach((attr, i) => expect(l.getAttribute(attr)).toBe(String([1, 2, 3, 4][i])));
 
-	l.setPoints([[1, 2], [3, 4]]);
+	l.setPoints([
+		[1, 2],
+		[3, 4],
+	]);
 	attrs.forEach((attr, i) => expect(l.getAttribute(attr)).toBe(String([1, 2, 3, 4][i])));
 	expect(l.attributes.length).toBe(4);
 

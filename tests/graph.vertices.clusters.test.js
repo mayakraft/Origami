@@ -3,24 +3,20 @@ import fs from "fs";
 import ear from "../src/index.js";
 
 test("getVerticesClusters no clusters", () => {
-	const graph = JSON.parse(fs.readFileSync(
-		"./tests/files/fold/fan-cp.fold",
-		"utf-8",
-	));
+	const graph = JSON.parse(fs.readFileSync("./tests/files/fold/fan-cp.fold", "utf-8"));
 	const clusters = ear.graph.getVerticesClusters(graph);
-	clusters.forEach(cluster => expect(cluster.length).toBe(1));
+	clusters.forEach((cluster) => expect(cluster.length).toBe(1));
 });
 
 test("getVerticesClusters bird base. clusters", () => {
-	const graph = JSON.parse(fs.readFileSync(
-		"./tests/files/fold/bird-disjoint-edges.fold",
-		"utf-8",
-	));
+	const graph = JSON.parse(
+		fs.readFileSync("./tests/files/fold/bird-disjoint-edges.fold", "utf-8"),
+	);
 	const clusters = ear.graph.getVerticesClusters(graph);
 	// console.log(clusters.map(c => c.length));
 	// clusters vary in length, anywhere between 3 to 10
-	clusters.forEach(cluster => expect(cluster.length).not.toBe(1));
-	clusters.forEach(cluster => expect(cluster.length > 2).toBe(true));
+	clusters.forEach((cluster) => expect(cluster.length).not.toBe(1));
+	clusters.forEach((cluster) => expect(cluster.length > 2).toBe(true));
 });
 
 test("getVerticesClusters bird base", () => {
@@ -41,16 +37,64 @@ test("getVerticesClusters bird base", () => {
 
 test("vertices clusters graphs with holes", () => {
 	// both of these have 14 vertices
-	expect(ear.graph.getVerticesClusters({
-		vertices_coords: [
-			[0, 0, 0], [1, 0, 0],, [0, 0, 0], [0, 1, 0], [0, 0, 0], [0, 1, 0], [0, 0, 0],
-			[0, 1, 0], [1, 1, 0],, [1, 0, 0], [1, 1, 0], [1, 0, 0], [1, 1, 0], [1, 0, 0]
-		],
-	})).toMatchObject([[0, 3, 5, 7], [4, 6, 8], [1, 11, 13, 15], [9, 12, 14]]);
+	expect(
+		ear.graph.getVerticesClusters({
+			vertices_coords: [
+				[0, 0, 0],
+				[1, 0, 0],
+				,
+				[0, 0, 0],
+				[0, 1, 0],
+				[0, 0, 0],
+				[0, 1, 0],
+				[0, 0, 0],
+				[0, 1, 0],
+				[1, 1, 0],
+				,
+				[1, 0, 0],
+				[1, 1, 0],
+				[1, 0, 0],
+				[1, 1, 0],
+				[1, 0, 0],
+			],
+		}),
+	).toMatchObject([
+		[0, 3, 5, 7],
+		[4, 6, 8],
+		[1, 11, 13, 15],
+		[9, 12, 14],
+	]);
 
-	expect(ear.graph.getVerticesClusters({
-		vertices_coords: [, [1, 0, 0], [1, 0, 1],,,,,,, [1, 1, 0], [1, 1, 1], [1, 0, 0], [1, 1, 0],
-			[1, 0, 0], [1, 1, 0], [1, 0, 0], [1, 0, 1], [1, 1, 1], [1, 0, 1], [1, 1, 1], [1, 0, 1]
-		]
-	})).toMatchObject([[1, 11, 13, 15], [2, 16, 18, 20], [9, 12, 14], [10, 17, 19]]);
+	expect(
+		ear.graph.getVerticesClusters({
+			vertices_coords: [
+				,
+				[1, 0, 0],
+				[1, 0, 1],
+				,
+				,
+				,
+				,
+				,
+				,
+				[1, 1, 0],
+				[1, 1, 1],
+				[1, 0, 0],
+				[1, 1, 0],
+				[1, 0, 0],
+				[1, 1, 0],
+				[1, 0, 0],
+				[1, 0, 1],
+				[1, 1, 1],
+				[1, 0, 1],
+				[1, 1, 1],
+				[1, 0, 1],
+			],
+		}),
+	).toMatchObject([
+		[1, 11, 13, 15],
+		[2, 16, 18, 20],
+		[9, 12, 14],
+		[10, 17, 19],
+	]);
 });

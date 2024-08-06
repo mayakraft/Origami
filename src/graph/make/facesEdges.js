@@ -1,9 +1,7 @@
 /**
  * Rabbit Ear (c) Kraft
  */
-import {
-	makeVerticesToEdge,
-} from "./lookup.js";
+import { makeVerticesToEdge } from "./lookup.js";
 
 /**
  * @description Make `faces_edges` from `faces_vertices`.
@@ -14,7 +12,6 @@ import {
 export const makeFacesEdgesFromVertices = ({ edges_vertices, faces_vertices }) => {
 	const map = makeVerticesToEdge({ edges_vertices });
 	return faces_vertices
-		.map(face => face
-			.map((v, i, arr) => [v, arr[(i + 1) % arr.length]].join(" ")))
-		.map(face => face.map(pair => map[pair]));
+		.map((face) => face.map((v, i, arr) => [v, arr[(i + 1) % arr.length]].join(" ")))
+		.map((face) => face.map((pair) => map[pair]));
 };

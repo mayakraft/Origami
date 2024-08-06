@@ -6,19 +6,51 @@ const testEqualVectors = function (...args) {
 };
 
 test("nearest point", () => {
-	testEqualVectors([5, 5], ear.math.nearestPoint2(
-		[[0, 0], [1, 1], [2, 2], [3, 3], [4, 4], [5, 5], [6, 6], [7, 7], [8, 8], [9, 9]],
-		[10, 0],
-	));
-	testEqualVectors([6, 6, 0], ear.math.nearestPoint(
-		[[0, 0, 0], [1, 1, 0], [2, 2, 0], [3, 3, 0], [4, 4, 1],
-			[5, 5, 10], [6, 6, 0], [7, 7, 0], [8, 8, 0], [9, 9, 0]],
-		[10, 0, 0],
-	));
+	testEqualVectors(
+		[5, 5],
+		ear.math.nearestPoint2(
+			[
+				[0, 0],
+				[1, 1],
+				[2, 2],
+				[3, 3],
+				[4, 4],
+				[5, 5],
+				[6, 6],
+				[7, 7],
+				[8, 8],
+				[9, 9],
+			],
+			[10, 0],
+		),
+	);
+	testEqualVectors(
+		[6, 6, 0],
+		ear.math.nearestPoint(
+			[
+				[0, 0, 0],
+				[1, 1, 0],
+				[2, 2, 0],
+				[3, 3, 0],
+				[4, 4, 1],
+				[5, 5, 10],
+				[6, 6, 0],
+				[7, 7, 0],
+				[8, 8, 0],
+				[9, 9, 0],
+			],
+			[10, 0, 0],
+		),
+	);
 });
 
 test("nearestPointOnPolygon", () => {
-	const polygon = [[1, 0], [0, 1], [-1, 0], [0, -1]];
+	const polygon = [
+		[1, 0],
+		[0, 1],
+		[-1, 0],
+		[0, -1],
+	];
 	const result = ear.math.nearestPointOnPolygon(polygon, [10, 10]);
 	// result { point: [ 0.5, 0.5 ], edge: 0, distance: 13.435028842544403 }
 	expect(result.point[0]).toBe(0.5);
@@ -34,7 +66,12 @@ test("nearestPointOnPolygon", () => {
 });
 
 test("nearestPointOnPolygon nearest to vertex", () => {
-	const polygon = [[1, 0], [0, 1], [-1, 0], [0, -1]];
+	const polygon = [
+		[1, 0],
+		[0, 1],
+		[-1, 0],
+		[0, -1],
+	];
 
 	const result1 = ear.math.nearestPointOnPolygon(polygon, [10, 0]);
 	const result2 = ear.math.nearestPointOnPolygon(polygon, [0, 10]);

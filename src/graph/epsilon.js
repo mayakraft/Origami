@@ -1,12 +1,8 @@
 /**
  * Rabbit Ear (c) Kraft
  */
-import {
-	boundingBox,
-} from "./boundary.js";
-import {
-	distance,
-} from "../math/vector.js";
+import { boundingBox } from "./boundary.js";
+import { distance } from "../math/vector.js";
 
 /**
  * @description We ignore any segment lengths which are smaller than 1e-4,
@@ -16,11 +12,10 @@ import {
  */
 export const shortestEdgeLength = ({ vertices_coords, edges_vertices }) => {
 	const lengths = edges_vertices
-		.map(ev => ev.map(v => vertices_coords[v]))
+		.map((ev) => ev.map((v) => vertices_coords[v]))
 		.map(([a, b]) => distance(a, b))
-		.filter(len => len > 1e-4);
-	const minLen = lengths
-		.reduce((a, b) => Math.min(a, b), Infinity);
+		.filter((len) => len > 1e-4);
+	const minLen = lengths.reduce((a, b) => Math.min(a, b), Infinity);
 	return minLen === Infinity ? undefined : minLen;
 };
 
@@ -44,9 +39,9 @@ export const getEpsilon = ({ vertices_coords, edges_vertices }) => {
 // we need to deprecate this method in favor of the other.
 export const makeEpsilon = ({ vertices_coords, edges_vertices }) => {
 	const shortest = shortestEdgeLength({ vertices_coords, edges_vertices });
-	if (shortest) { return Math.max(shortest * 1e-4, 1e-10); }
+	if (shortest) {
+		return Math.max(shortest * 1e-4, 1e-10);
+	}
 	const bounds = boundingBox({ vertices_coords });
-	return bounds && bounds.span
-		? Math.max(1e-6 * Math.max(...bounds.span), 1e-10)
-		: 1e-6;
+	return bounds && bounds.span ? Math.max(1e-6 * Math.max(...bounds.span), 1e-10) : 1e-6;
 };

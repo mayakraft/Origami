@@ -24,12 +24,8 @@ import {
 	makeMatrix3RotateZ,
 	multiplyMatrix3Vector3,
 } from "../math/matrix3.js";
-import {
-	boundingBox,
-} from "../math/polygon.js";
-import {
-	getDimensionQuick,
-} from "../fold/spec.js";
+import { boundingBox } from "../math/polygon.js";
+import { getDimensionQuick } from "../fold/spec.js";
 
 /**
  * @description Alter the vertices by moving the corner of the graph
@@ -39,14 +35,16 @@ import {
  * @returns {FOLD} the same input graph, modified
  */
 export const unitize = (graph) => {
-	if (!graph.vertices_coords) { return graph; }
+	if (!graph.vertices_coords) {
+		return graph;
+	}
 	const box = boundingBox(graph.vertices_coords);
 	const longest = Math.max(...box.span);
-	const scaleAmount = longest === 0 ? 1 : (1 / longest);
+	const scaleAmount = longest === 0 ? 1 : 1 / longest;
 	const origin = box.min;
 	const vertices_coords = graph.vertices_coords
-		.map(coord => subtract(coord, origin))
-		.map(coord => Scale(coord, scaleAmount));
+		.map((coord) => subtract(coord, origin))
+		.map((coord) => Scale(coord, scaleAmount));
 	return Object.assign(graph, { vertices_coords });
 };
 
@@ -57,9 +55,10 @@ export const unitize = (graph) => {
  * @returns {FOLD} the same input graph, modified
  */
 export const translate2 = (graph, translation) => {
-	if (!graph.vertices_coords) { return graph; }
-	const vertices_coords = graph.vertices_coords
-		.map(coord => add2(coord, translation));
+	if (!graph.vertices_coords) {
+		return graph;
+	}
+	const vertices_coords = graph.vertices_coords.map((coord) => add2(coord, translation));
 	return Object.assign(graph, { vertices_coords });
 };
 
@@ -70,11 +69,13 @@ export const translate2 = (graph, translation) => {
  * @returns {FOLD} the same input graph, modified
  */
 export const translate3 = (graph, translation) => {
-	if (!graph.vertices_coords) { return graph; }
+	if (!graph.vertices_coords) {
+		return graph;
+	}
 	const tr3 = resize3(translation);
 	const vertices_coords = graph.vertices_coords
 		.map(resize3)
-		.map(coord => add3(coord, tr3));
+		.map((coord) => add3(coord, tr3));
 	return Object.assign(graph, { vertices_coords });
 };
 
@@ -85,9 +86,10 @@ export const translate3 = (graph, translation) => {
  * @returns {FOLD} the same input graph, modified
  */
 export const translate = (graph, translation) => {
-	if (!graph.vertices_coords) { return graph; }
-	const vertices_coords = graph.vertices_coords
-		.map(coord => add(coord, translation));
+	if (!graph.vertices_coords) {
+		return graph;
+	}
+	const vertices_coords = graph.vertices_coords.map((coord) => add(coord, translation));
 	return Object.assign(graph, { vertices_coords });
 };
 
@@ -100,9 +102,12 @@ export const translate = (graph, translation) => {
  * @returns {FOLD} the same input graph, modified.
  */
 export const scaleUniform2 = (graph, scaleAmount = 1, origin = [0, 0]) => {
-	if (!graph.vertices_coords) { return graph; }
-	const vertices_coords = graph.vertices_coords
-		.map(coord => add2(Scale2(subtract2(coord, origin), scaleAmount), origin));
+	if (!graph.vertices_coords) {
+		return graph;
+	}
+	const vertices_coords = graph.vertices_coords.map((coord) =>
+		add2(Scale2(subtract2(coord, origin), scaleAmount), origin),
+	);
 	return Object.assign(graph, { vertices_coords });
 };
 
@@ -115,11 +120,13 @@ export const scaleUniform2 = (graph, scaleAmount = 1, origin = [0, 0]) => {
  * @returns {FOLD} the same input graph, modified.
  */
 export const scaleUniform3 = (graph, scaleAmount = 1, origin = [0, 0, 0]) => {
-	if (!graph.vertices_coords) { return graph; }
+	if (!graph.vertices_coords) {
+		return graph;
+	}
 	const origin3 = resize3(origin);
 	const vertices_coords = graph.vertices_coords
 		.map(resize3)
-		.map(coord => add3(Scale3(subtract3(coord, origin3), scaleAmount), origin3));
+		.map((coord) => add3(Scale3(subtract3(coord, origin3), scaleAmount), origin3));
 	return Object.assign(graph, { vertices_coords });
 };
 
@@ -132,10 +139,13 @@ export const scaleUniform3 = (graph, scaleAmount = 1, origin = [0, 0, 0]) => {
  * @returns {FOLD} the same input graph, modified.
  */
 export const scaleUniform = (graph, scaleAmount = 1, origin = [0, 0, 0]) => {
-	if (!graph.vertices_coords) { return graph; }
+	if (!graph.vertices_coords) {
+		return graph;
+	}
 	const origin3 = resize3(origin);
-	const vertices_coords = graph.vertices_coords
-		.map(coord => add(Scale(subtract(coord, origin3), scaleAmount), origin3));
+	const vertices_coords = graph.vertices_coords.map((coord) =>
+		add(Scale(subtract(coord, origin3), scaleAmount), origin3),
+	);
 	return Object.assign(graph, { vertices_coords });
 };
 
@@ -149,8 +159,9 @@ export const scaleUniform = (graph, scaleAmount = 1, origin = [0, 0, 0]) => {
  * @returns {FOLD} the same input graph, modified.
  */
 export const scale2 = (graph, scaleAmounts = [1, 1], origin = [0, 0]) => {
-	const vertices_coords = graph.vertices_coords
-		.map(coord => add2(scaleNonUniform2(subtract2(coord, origin), scaleAmounts), origin));
+	const vertices_coords = graph.vertices_coords.map((coord) =>
+		add2(scaleNonUniform2(subtract2(coord, origin), scaleAmounts), origin),
+	);
 	return Object.assign(graph, { vertices_coords });
 };
 
@@ -169,7 +180,7 @@ export const scale3 = (graph, scaleAmounts = [1, 1, 1], origin = [0, 0, 0]) => {
 	const origin3 = resize3(origin);
 	const vertices_coords = graph.vertices_coords
 		.map(resize3)
-		.map(coord => add3(scaleNonUniform3(subtract3(coord, origin3), sc3), origin3));
+		.map((coord) => add3(scaleNonUniform3(subtract3(coord, origin3), sc3), origin3));
 	return Object.assign(graph, { vertices_coords });
 };
 
@@ -184,8 +195,9 @@ export const scale3 = (graph, scaleAmounts = [1, 1, 1], origin = [0, 0, 0]) => {
  */
 export const scale = (graph, scaleAmounts = [1, 1, 1], origin = [0, 0, 0]) => {
 	const origin3 = resize3(origin);
-	const vertices_coords = graph.vertices_coords
-		.map(coord => add(scaleNonUniform(subtract(coord, origin3), scaleAmounts), origin3));
+	const vertices_coords = graph.vertices_coords.map((coord) =>
+		add(scaleNonUniform(subtract(coord, origin3), scaleAmounts), origin3),
+	);
 	return Object.assign(graph, { vertices_coords });
 };
 
@@ -194,9 +206,8 @@ export const scale = (graph, scaleAmounts = [1, 1, 1], origin = [0, 0, 0]) => {
  * @param {number[]} matrix
  * @returns {[number, number]|[number, number, number][]} vertices coords transformed and in 3D
  */
-export const transform = ({ vertices_coords }, matrix) => vertices_coords
-	.map(resize3)
-	.map(v => multiplyMatrix3Vector3(matrix, v));
+export const transform = ({ vertices_coords }, matrix) =>
+	vertices_coords.map(resize3).map((v) => multiplyMatrix3Vector3(matrix, v));
 
 /**
  * @description Apply a rotation to a graph in 3D. This will modify
@@ -254,6 +265,6 @@ export const rotateZ = (graph, angle, origin = [0, 0, 0]) => {
 	const resizeFn = getDimensionQuick(graph) === 2 ? resize2 : resize3;
 	const matrix = makeMatrix3RotateZ(angle, resize3(origin));
 	// return vertices_coords to the same dimension as the input graph
-	const vertices_coords = transform(graph, matrix).map(coord => resizeFn(coord));
+	const vertices_coords = transform(graph, matrix).map((coord) => resizeFn(coord));
 	return Object.assign(graph, { vertices_coords });
 };

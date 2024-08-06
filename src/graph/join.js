@@ -1,21 +1,10 @@
 /**
  * Rabbit Ear (c) Kraft
  */
-import {
-	count,
-} from "./count.js";
-import {
-	clone,
-} from "../general/clone.js";
-import {
-	remapKey,
-	invertFlatToArrayMap,
-} from "./maps.js";
-import {
-	VEF,
-	filterKeysWithPrefix,
-	getDimensionQuick,
-} from "../fold/spec.js";
+import { count } from "./count.js";
+import { clone } from "../general/clone.js";
+import { remapKey, invertFlatToArrayMap } from "./maps.js";
+import { VEF, filterKeysWithPrefix, getDimensionQuick } from "../fold/spec.js";
 
 /**
  * @description Join two graphs into one. The result will be written into
@@ -40,45 +29,61 @@ export const join = (target, source) => {
 	const sourceDimension = getDimensionQuick(source);
 	const targetDimension = getDimensionQuick(target);
 	const sourceKeyArrays = {};
-	VEF.forEach(key => {
+	VEF.forEach((key) => {
 		const arrayName = filterKeysWithPrefix(source, key).shift();
-		sourceKeyArrays[key] = (arrayName !== undefined ? source[arrayName] : []);
+		sourceKeyArrays[key] = arrayName !== undefined ? source[arrayName] : [];
 	});
 	const keyCount = {};
-	VEF.forEach(key => { keyCount[key] = count(target, key); });
+	VEF.forEach((key) => {
+		keyCount[key] = count(target, key);
+	});
 	const indexMaps = { vertices: [], edges: [], faces: [] };
-	VEF.forEach(key => sourceKeyArrays[key]
-		.forEach((_, i) => { indexMaps[key][i] = keyCount[key]++; }));
+	VEF.forEach((key) =>
+		sourceKeyArrays[key].forEach((_, i) => {
+			indexMaps[key][i] = keyCount[key]++;
+		}),
+	);
 	const sourceClone = clone(source);
-	VEF.forEach(key => remapKey(sourceClone, key, indexMaps[key]));
+	VEF.forEach((key) => remapKey(sourceClone, key, indexMaps[key]));
 	Object.keys(sourceClone)
-		.filter(key => sourceClone[key].constructor === Array)
-		.filter(key => !(key in target))
+		.filter((key) => sourceClone[key].constructor === Array)
+		.filter((key) => !(key in target))
 		// eslint-disable-next-line no-param-reassign
-		.forEach(key => { target[key] = []; });
+		.forEach((key) => {
+			target[key] = [];
+		});
 	Object.keys(sourceClone)
-		.filter(key => sourceClone[key].constructor === Array)
-		.forEach(key => sourceClone[key]
-			// eslint-disable-next-line no-param-reassign
-			.forEach((v, i) => { target[key][i] = v; }));
+		.filter((key) => sourceClone[key].constructor === Array)
+		.forEach((key) =>
+			sourceClone[key]
+				// eslint-disable-next-line no-param-reassign
+				.forEach((v, i) => {
+					target[key][i] = v;
+				}),
+		);
 	const summary = {};
 	const targetKeyArrays = {};
-	VEF.forEach(key => {
+	VEF.forEach((key) => {
 		const arrayName = filterKeysWithPrefix(target, key).shift();
-		targetKeyArrays[key] = (arrayName !== undefined ? target[arrayName] : []);
+		targetKeyArrays[key] = arrayName !== undefined ? target[arrayName] : [];
 	});
-	VEF.forEach(key => {
+	VEF.forEach((key) => {
 		const map = targetKeyArrays[key].map(() => 0);
-		indexMaps[key].forEach(v => { map[v] = 1; });
+		indexMaps[key].forEach((v) => {
+			map[v] = 1;
+		});
 		summary[key] = invertFlatToArrayMap(map);
 	});
-	const target2DVertices = sourceDimension !== targetDimension
-		? (target.vertices_coords || [])
-			.map((coords, i) => (coords.length === 2 ? i : undefined))
-			.filter(a => a !== undefined)
-		: [];
+	const target2DVertices =
+		sourceDimension !== targetDimension
+			? (target.vertices_coords || [])
+					.map((coords, i) => (coords.length === 2 ? i : undefined))
+					.filter((a) => a !== undefined)
+			: [];
 	// eslint-disable-next-line no-param-reassign
-	target2DVertices.forEach(v => { target.vertices_coords[v][2] = 0; });
+	target2DVertices.forEach((v) => {
+		target.vertices_coords[v][2] = 0;
+	});
 	return summary;
 };
 

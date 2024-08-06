@@ -20,7 +20,10 @@ import ear from "../src/index.js";
 test("getFacesPlane, random planes", () => {
 	// randomly place a bunch of triangles in a 3D -1...+1 bounding box
 	// disjoint triangles in 3D
-	const foldFile = fs.readFileSync("./tests/files/fold/random-triangles-3d.fold", "utf-8");
+	const foldFile = fs.readFileSync(
+		"./tests/files/fold/random-triangles-3d.fold",
+		"utf-8",
+	);
 	const graph = JSON.parse(foldFile);
 
 	const {
@@ -35,28 +38,23 @@ test("getFacesPlane, random planes", () => {
 	const faces_center = ear.graph.makeFacesCenterQuick(graph);
 	const faces_polygon = ear.graph.makeFacesPolygonQuick(graph);
 
-	const faces_centerXY = faces_center
-		.map((point, f) => ear.math.multiplyMatrix4Vector3(
-			planes_transform[faces_plane[f]],
-			point,
-		));
-	const faces_polygonXY = faces_polygon
-		.map((points, f) => points
-			.map(point => ear.math.multiplyMatrix4Vector3(
-				planes_transform[faces_plane[f]],
-				point,
-			)));
+	const faces_centerXY = faces_center.map((point, f) =>
+		ear.math.multiplyMatrix4Vector3(planes_transform[faces_plane[f]], point),
+	);
+	const faces_polygonXY = faces_polygon.map((points, f) =>
+		points.map((point) =>
+			ear.math.multiplyMatrix4Vector3(planes_transform[faces_plane[f]], point),
+		),
+	);
 
 	expect(faces_plane).toHaveLength(10);
 	expect(faces_center).toHaveLength(10);
 	expect(faces_polygon).toHaveLength(10);
 
-	faces_centerXY
-		.map(([,, z]) => z)
-		.forEach(n => expect(n).toBeCloseTo(0.0));
+	faces_centerXY.map(([, , z]) => z).forEach((n) => expect(n).toBeCloseTo(0.0));
 	faces_polygonXY
-		.flatMap(points => points.map(([,, z]) => z))
-		.forEach(n => expect(n).toBeCloseTo(0.0));
+		.flatMap((points) => points.map(([, , z]) => z))
+		.forEach((n) => expect(n).toBeCloseTo(0.0));
 });
 
 test("getFacesPlane, upside-down planes", () => {
@@ -88,30 +86,22 @@ test("getFacesPlane, upside-down planes", () => {
 		],
 	});
 
-	const {
-		planes,
-		planes_faces,
-		planes_transform,
-		faces_plane,
-		faces_winding,
-	} = ear.graph.getFacesPlane(graph);
+	const { planes, planes_faces, planes_transform, faces_plane, faces_winding } =
+		ear.graph.getFacesPlane(graph);
 
 	const faces_center = ear.graph.makeFacesCenterQuick(graph);
 
 	const faces_polygon = ear.graph.makeFacesPolygonQuick(graph);
 
-	const faces_centerXY = faces_center
-		.map((point, f) => ear.math.multiplyMatrix4Vector3(
-			planes_transform[faces_plane[f]],
-			point,
-		));
+	const faces_centerXY = faces_center.map((point, f) =>
+		ear.math.multiplyMatrix4Vector3(planes_transform[faces_plane[f]], point),
+	);
 
-	const faces_polygonXY = faces_polygon
-		.map((points, f) => points
-			.map(point => ear.math.multiplyMatrix4Vector3(
-				planes_transform[faces_plane[f]],
-				point,
-			)));
+	const faces_polygonXY = faces_polygon.map((points, f) =>
+		points.map((point) =>
+			ear.math.multiplyMatrix4Vector3(planes_transform[faces_plane[f]], point),
+		),
+	);
 
 	expect(planes).toMatchObject([
 		{ normal: [0, 0, 1], origin: [-0, -0, -8] },
@@ -133,38 +123,42 @@ test("getFacesPlane, upside-down planes", () => {
 
 	expect(faces_winding).toMatchObject([true, true, false, false]);
 
-	faces_centerXY
-		.map(([,, z]) => z)
-		.forEach(n => expect(n).toBeCloseTo(0.0));
+	faces_centerXY.map(([, , z]) => z).forEach((n) => expect(n).toBeCloseTo(0.0));
 	faces_polygonXY
-		.flatMap(points => points.map(([,, z]) => z))
-		.forEach(n => expect(n).toBeCloseTo(0.0));
+		.flatMap((points) => points.map(([, , z]) => z))
+		.forEach((n) => expect(n).toBeCloseTo(0.0));
 });
 
 test("getFacesPlane, disjoint", () => {
-	const foldFile = fs.readFileSync("./tests/files/fold/disjoint-triangles-3d.fold", "utf-8");
+	const foldFile = fs.readFileSync(
+		"./tests/files/fold/disjoint-triangles-3d.fold",
+		"utf-8",
+	);
 	const foldObject = JSON.parse(foldFile);
 	const foldedFrame = ear.graph.getFramesByClassName(foldObject, "foldedForm")[0];
-	const {
-		planes,
-		planes_faces,
-		faces_plane,
-		faces_winding,
-	} = ear.graph.getFacesPlane(foldedFrame);
-	fs.writeFileSync(`./tests/tmp/coplanar-planes-disjoint.json`, JSON.stringify({
-		planes,
-		planes_faces,
-		faces_plane,
-		faces_winding,
-	}, null, 2));
+	const { planes, planes_faces, faces_plane, faces_winding } =
+		ear.graph.getFacesPlane(foldedFrame);
+	fs.writeFileSync(
+		`./tests/tmp/coplanar-planes-disjoint.json`,
+		JSON.stringify(
+			{
+				planes,
+				planes_faces,
+				faces_plane,
+				faces_winding,
+			},
+			null,
+			2,
+		),
+	);
 
 	expect(planes.length).toBe(3);
 
 	// plane 0
-	expect(JSON.stringify(planes_faces[0]))
-		.toBe(JSON.stringify([0, 1, 4, 5, 8, 11]));
-	expect(JSON.stringify(planes_faces[0].map(face => faces_winding[face])))
-		.toBe(JSON.stringify([true, true, true, true, true, false]));
+	expect(JSON.stringify(planes_faces[0])).toBe(JSON.stringify([0, 1, 4, 5, 8, 11]));
+	expect(JSON.stringify(planes_faces[0].map((face) => faces_winding[face]))).toBe(
+		JSON.stringify([true, true, true, true, true, false]),
+	);
 	expect(planes[0].origin[0]).toBeCloseTo(0);
 	expect(planes[0].origin[1]).toBeCloseTo(0);
 	expect(planes[0].origin[2]).toBeCloseTo(0);
@@ -173,10 +167,10 @@ test("getFacesPlane, disjoint", () => {
 	expect(planes[0].normal[2]).toBeCloseTo(1);
 
 	// plane 1
-	expect(JSON.stringify(planes_faces[1]))
-		.toBe(JSON.stringify([13]));
-	expect(JSON.stringify(planes_faces[1].map(face => faces_winding[face])))
-		.toBe(JSON.stringify([true]));
+	expect(JSON.stringify(planes_faces[1])).toBe(JSON.stringify([13]));
+	expect(JSON.stringify(planes_faces[1].map((face) => faces_winding[face]))).toBe(
+		JSON.stringify([true]),
+	);
 	expect(planes[1].origin[0]).toBeCloseTo(0);
 	expect(planes[1].origin[1]).toBeCloseTo(0);
 	expect(planes[1].origin[2]).toBeCloseTo(0.5);
@@ -185,10 +179,10 @@ test("getFacesPlane, disjoint", () => {
 	expect(planes[1].normal[2]).toBeCloseTo(1);
 
 	// plane 2
-	expect(JSON.stringify(planes_faces[2]))
-		.toBe(JSON.stringify([2, 3, 6, 7, 9, 10, 12]));
-	expect(JSON.stringify(planes_faces[2].map(face => faces_winding[face])))
-		.toBe(JSON.stringify([true, true, true, true, true, true, false]));
+	expect(JSON.stringify(planes_faces[2])).toBe(JSON.stringify([2, 3, 6, 7, 9, 10, 12]));
+	expect(JSON.stringify(planes_faces[2].map((face) => faces_winding[face]))).toBe(
+		JSON.stringify([true, true, true, true, true, true, false]),
+	);
 	expect(planes[2].origin[0]).toBeCloseTo(0);
 	expect(planes[2].origin[1]).toBeCloseTo(0);
 	expect(planes[2].origin[2]).toBeCloseTo(0);
@@ -199,33 +193,39 @@ test("getFacesPlane, disjoint", () => {
 
 test("getFacesPlane, disjoint and separated", () => {
 	// fold this from the crease pattern, a lot fewer faces are now overlapping
-	const foldFile = fs.readFileSync("./tests/files/fold/disjoint-triangles-3d.fold", "utf-8");
+	const foldFile = fs.readFileSync(
+		"./tests/files/fold/disjoint-triangles-3d.fold",
+		"utf-8",
+	);
 	const foldObject = JSON.parse(foldFile);
 	const creasePattern = ear.graph.getFramesByClassName(foldObject, "creasePattern")[0];
 	const foldedForm = {
 		...creasePattern,
 		vertices_coords: ear.graph.makeVerticesCoordsFolded(creasePattern),
 	};
-	const {
-		planes,
-		planes_faces,
-		faces_plane,
-		faces_winding,
-	} = ear.graph.getFacesPlane(foldedForm);
-	fs.writeFileSync(`./tests/tmp/coplanar-planes-disjoint-separated.json`, JSON.stringify({
-		planes,
-		planes_faces,
-		faces_plane,
-		faces_winding,
-	}, null, 2));
+	const { planes, planes_faces, faces_plane, faces_winding } =
+		ear.graph.getFacesPlane(foldedForm);
+	fs.writeFileSync(
+		`./tests/tmp/coplanar-planes-disjoint-separated.json`,
+		JSON.stringify(
+			{
+				planes,
+				planes_faces,
+				faces_plane,
+				faces_winding,
+			},
+			null,
+			2,
+		),
+	);
 
 	expect(planes.length).toBe(2);
 
 	// plane 0
-	expect(JSON.stringify(planes_faces[0]))
-		.toBe(JSON.stringify([0, 1, 4, 5, 8, 10, 12]));
-	expect(JSON.stringify(planes_faces[0].map(face => faces_winding[face])))
-		.toBe(JSON.stringify([true, true, true, true, true, true, true]));
+	expect(JSON.stringify(planes_faces[0])).toBe(JSON.stringify([0, 1, 4, 5, 8, 10, 12]));
+	expect(JSON.stringify(planes_faces[0].map((face) => faces_winding[face]))).toBe(
+		JSON.stringify([true, true, true, true, true, true, true]),
+	);
 	expect(planes[0].origin[0]).toBeCloseTo(0);
 	expect(planes[0].origin[1]).toBeCloseTo(0);
 	expect(planes[0].origin[2]).toBeCloseTo(0);
@@ -234,10 +234,10 @@ test("getFacesPlane, disjoint and separated", () => {
 	expect(planes[0].normal[2]).toBeCloseTo(1);
 
 	// plane 1
-	expect(JSON.stringify(planes_faces[1]))
-		.toBe(JSON.stringify([2, 3, 6, 7, 9, 11, 13]));
-	expect(JSON.stringify(planes_faces[1].map(face => faces_winding[face])))
-		.toBe(JSON.stringify([true, true, true, true, true, true, true]));
+	expect(JSON.stringify(planes_faces[1])).toBe(JSON.stringify([2, 3, 6, 7, 9, 11, 13]));
+	expect(JSON.stringify(planes_faces[1].map((face) => faces_winding[face]))).toBe(
+		JSON.stringify([true, true, true, true, true, true, true]),
+	);
 	expect(planes[1].origin[0]).toBeCloseTo(0);
 	expect(planes[1].origin[1]).toBeCloseTo(0);
 	expect(planes[1].origin[2]).toBeCloseTo(0);
@@ -251,13 +251,20 @@ test("getFacesPlane, maze", () => {
 	const foldObject = JSON.parse(foldFile);
 	const foldedFrame = ear.graph.getFramesByClassName(foldObject, "foldedForm")[0];
 	const result = ear.graph.getFacesPlane(foldedFrame);
-	fs.writeFileSync(`./tests/tmp/coplanar-planes-maze-u.json`, JSON.stringify(result, null, 2));
+	fs.writeFileSync(
+		`./tests/tmp/coplanar-planes-maze-u.json`,
+		JSON.stringify(result, null, 2),
+	);
 
 	// ensure all faces are accounted for.
 	const totalFaceCount = foldedFrame.faces_vertices.length;
 	const faceFound = [];
-	result.planes_faces.forEach(el => el.forEach(f => { faceFound[f] = true; }));
-	expect(faceFound.filter(a => a !== undefined).length).toBe(totalFaceCount);
+	result.planes_faces.forEach((el) =>
+		el.forEach((f) => {
+			faceFound[f] = true;
+		}),
+	);
+	expect(faceFound.filter((a) => a !== undefined).length).toBe(totalFaceCount);
 
 	// ensure face normals directions match.
 	const facesNormal = ear.graph.makeFacesNormal(foldedFrame);
@@ -269,15 +276,12 @@ test("getFacesPlane, maze", () => {
 });
 
 test("coplanar and overlapping faces, Mooser's train, carriage only", () => {
-	const FOLD = fs.readFileSync(
-		"./tests/files/fold/moosers-train-carriage.fold",
-		"utf-8",
-	);
+	const FOLD = fs.readFileSync("./tests/files/fold/moosers-train-carriage.fold", "utf-8");
 	const graph = JSON.parse(FOLD);
 	const folded = {
 		...graph,
 		vertices_coords: ear.graph.makeVerticesCoordsFolded(graph),
-	}
+	};
 
 	const {
 		planes,
@@ -307,11 +311,15 @@ test("coplanar and overlapping faces, Mooser's train, carriage only", () => {
 		// the bottom of all four wheels
 		[5, 11, 120, 127],
 		// the underside of the carriage
-		[13, 9, 14, 68, 69, 70, 71, 79, 80, 81, 87, 2, 3, 7, 72, 73, 78, 88, 89, 8, 64, 65,
-			66, 67, 92, 109, 110, 111, 116, 117, 138, 126, 58, 59, 60, 61, 83, 108, 133, 82],
+		[
+			13, 9, 14, 68, 69, 70, 71, 79, 80, 81, 87, 2, 3, 7, 72, 73, 78, 88, 89, 8, 64, 65,
+			66, 67, 92, 109, 110, 111, 116, 117, 138, 126, 58, 59, 60, 61, 83, 108, 133, 82,
+		],
 		// the hitch join plane
-		[26, 19, 17, 16, 18, 144, 22, 0, 23, 91, 99, 101, 139, 24,
-			25, 141, 102, 123, 128, 136, 20, 27, 21, 112, 114, 28],
+		[
+			26, 19, 17, 16, 18, 144, 22, 0, 23, 91, 99, 101, 139, 24, 25, 141, 102, 123, 128,
+			136, 20, 27, 21, 112, 114, 28,
+		],
 		// the top of the carriage
 		[55],
 		// the front of the carriage
@@ -338,27 +346,27 @@ test("coplanar and overlapping faces, Mooser's train, carriage only", () => {
 
 	expect(planes).toHaveLength(14);
 
-	[4, 40, 26, 1, 18, 4, 4, 4, 4, 18, 9, 2, 2, 9]
-		.forEach((len, i) => expect(planes_faces[i]).toHaveLength(len));
+	[4, 40, 26, 1, 18, 4, 4, 4, 4, 18, 9, 2, 2, 9].forEach((len, i) =>
+		expect(planes_faces[i]).toHaveLength(len),
+	);
 
-	planes.forEach((_, i) => [0, 1, 2].forEach(d => {
-		expect(planes[i].normal[d]).toBeCloseTo(expectedPlanes[i].normal[d]);
-		expect(planes[i].origin[d]).toBeCloseTo(expectedPlanes[i].origin[d]);
-	}));
+	planes.forEach((_, i) =>
+		[0, 1, 2].forEach((d) => {
+			expect(planes[i].normal[d]).toBeCloseTo(expectedPlanes[i].normal[d]);
+			expect(planes[i].origin[d]).toBeCloseTo(expectedPlanes[i].origin[d]);
+		}),
+	);
 
 	expect(planes_faces).toMatchObject(expectedPlanesFaces);
 });
 
 test("coplanar and overlapping faces, Mooser's train, engine only", () => {
-	const FOLD = fs.readFileSync(
-		"./tests/files/fold/moosers-train-engine.fold",
-		"utf-8",
-	);
+	const FOLD = fs.readFileSync("./tests/files/fold/moosers-train-engine.fold", "utf-8");
 	const graph = JSON.parse(FOLD);
 	const folded = {
 		...graph,
 		vertices_coords: ear.graph.makeVerticesCoordsFolded(graph),
-	}
+	};
 
 	const {
 		planes,
@@ -410,18 +418,22 @@ test("coplanar and overlapping faces, Mooser's train, engine only", () => {
 		// bottom of wheels, 6 wheels
 		[5, 89, 11, 180, 17, 181],
 		// below boiler base plane and undercarriage
-		[83, 84, 85, 86, 120, 146, 147, 148, 106, 119, 145, 196, 202, 20, 87, 88,
-			110, 179, 39, 40, 92, 126, 217, 218, 124, 125, 185, 186, 187, 13, 15, 152,
-			9, 111, 112, 109, 113, 14, 107, 108, 216, 105, 114, 104, 184, 3, 8, 159,
-			160, 93, 94, 115, 116, 2, 7, 130, 131, 19, 151, 140, 37, 38, 215, 95],
+		[
+			83, 84, 85, 86, 120, 146, 147, 148, 106, 119, 145, 196, 202, 20, 87, 88, 110, 179,
+			39, 40, 92, 126, 217, 218, 124, 125, 185, 186, 187, 13, 15, 152, 9, 111, 112, 109,
+			113, 14, 107, 108, 216, 105, 114, 104, 184, 3, 8, 159, 160, 93, 94, 115, 116, 2, 7,
+			130, 131, 19, 151, 140, 37, 38, 215, 95,
+		],
 		// hitch join plane
 		[32, 30, 34, 22, 33, 26, 31, 27, 28, 29, 24, 23, 25],
 		// top of carriage
 		[99],
 		// smoke stack
-		[161, 162, 169, 170, 171, 135, 213, 134, 199, 139, 137, 138, 209,
-			205, 206, 193, 194, 195, 208, 212, 201, 203, 204, 163, 164, 165,
-			166, 136, 188, 189, 190, 200, 210, 174, 175, 214, 177, 176, 167, 168],
+		[
+			161, 162, 169, 170, 171, 135, 213, 134, 199, 139, 137, 138, 209, 205, 206, 193, 194,
+			195, 208, 212, 201, 203, 204, 163, 164, 165, 166, 136, 188, 189, 190, 200, 210, 174,
+			175, 214, 177, 176, 167, 168,
+		],
 		// front wheel row, front side plane
 		[219, 4, 48, 35],
 		// front wheel row, back side plane
@@ -433,7 +445,10 @@ test("coplanar and overlapping faces, Mooser's train, engine only", () => {
 		// back wheel row, front side plane
 		[54, 16, 198, 197],
 		// front of carriage, joint plane with back of boiler
-		[141, 142, 143, 192, 79, 80, 42, 43, 44, 46, 47, 73, 74, 75, 96, 97, 98, 207, 77, 78, 127, 128],
+		[
+			141, 142, 143, 192, 79, 80, 42, 43, 44, 46, 47, 73, 74, 75, 96, 97, 98, 207, 77, 78,
+			127, 128,
+		],
 		// back wheel row, back side plane
 		[172, 173, 18, 56],
 		// back of carriage
@@ -459,13 +474,16 @@ test("coplanar and overlapping faces, Mooser's train, engine only", () => {
 	// I counted 22 planes
 	expect(planes).toHaveLength(22);
 
-	[12, 6, 64, 13, 1, 40, 4, 4, 4, 4, 4, 22, 4, 18, 5, 3, 3, 5, 1, 1, 1, 1]
-		.forEach((len, i) => expect(planes_faces[i]).toHaveLength(len));
+	[12, 6, 64, 13, 1, 40, 4, 4, 4, 4, 4, 22, 4, 18, 5, 3, 3, 5, 1, 1, 1, 1].forEach(
+		(len, i) => expect(planes_faces[i]).toHaveLength(len),
+	);
 
-	planes.forEach((_, i) => [0, 1, 2].forEach(d => {
-		expect(planes[i].normal[d]).toBeCloseTo(expectedPlanes[i].normal[d]);
-		expect(planes[i].origin[d]).toBeCloseTo(expectedPlanes[i].origin[d]);
-	}));
+	planes.forEach((_, i) =>
+		[0, 1, 2].forEach((d) => {
+			expect(planes[i].normal[d]).toBeCloseTo(expectedPlanes[i].normal[d]);
+			expect(planes[i].origin[d]).toBeCloseTo(expectedPlanes[i].origin[d]);
+		}),
+	);
 
 	expect(planes_faces).toMatchObject(expectedPlanesFaces);
 });

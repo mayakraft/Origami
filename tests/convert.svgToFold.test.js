@@ -16,23 +16,26 @@ test("convert svgToFold, fish base", () => {
 	expect(result.vertices_coords.length).toBe(11);
 	expect(result.edges_vertices.length).toBe(22);
 	expect(result.faces_vertices.length).toBe(12);
-	const boundaries = result.edges_assignment.filter(a => a === "B" || a === "b");
+	const boundaries = result.edges_assignment.filter((a) => a === "B" || a === "b");
 	expect(boundaries.length).toBe(8);
 });
 
 test("convert svgToFold, crane all assignments", () => {
-	const testfile = fs.readFileSync("./tests/files/svg/crane-cp-all-assignments.svg", "utf-8");
+	const testfile = fs.readFileSync(
+		"./tests/files/svg/crane-cp-all-assignments.svg",
+		"utf-8",
+	);
 	const result = ear.convert.svgToFold(testfile);
 	expect(result.vertices_coords.length).toBe(68);
 	expect(result.edges_vertices.length).toBe(187);
 	expect(result.faces_vertices.length).toBe(120);
-	const b = result.edges_assignment.filter(a => a === "B" || a === "b");
-	const m = result.edges_assignment.filter(a => a === "M" || a === "m");
-	const v = result.edges_assignment.filter(a => a === "V" || a === "v");
-	const f = result.edges_assignment.filter(a => a === "F" || a === "f");
-	const u = result.edges_assignment.filter(a => a === "U" || a === "u");
-	const j = result.edges_assignment.filter(a => a === "J" || a === "j");
-	const c = result.edges_assignment.filter(a => a === "C" || a === "c");
+	const b = result.edges_assignment.filter((a) => a === "B" || a === "b");
+	const m = result.edges_assignment.filter((a) => a === "M" || a === "m");
+	const v = result.edges_assignment.filter((a) => a === "V" || a === "v");
+	const f = result.edges_assignment.filter((a) => a === "F" || a === "f");
+	const u = result.edges_assignment.filter((a) => a === "U" || a === "u");
+	const j = result.edges_assignment.filter((a) => a === "J" || a === "j");
+	const c = result.edges_assignment.filter((a) => a === "C" || a === "c");
 	expect(b.length).toBe(14);
 	expect(m.length).toBe(61);
 	expect(v.length).toBe(42);
@@ -103,25 +106,25 @@ test("convert svgToFold, crane all assignments", () => {
 	expect(res10.edges_vertices.length).toBe(10);
 	expect(res10.faces_vertices.length).toBe(4);
 
-	expect(res01.edges_assignment.filter(a => a === "B" || a === "b").length).toBe(6);
-	expect(res01.edges_assignment.filter(a => a === "V" || a === "v").length).toBe(2);
-	expect(res01.edges_assignment.filter(a => a === "F" || a === "f").length).toBe(2);
+	expect(res01.edges_assignment.filter((a) => a === "B" || a === "b").length).toBe(6);
+	expect(res01.edges_assignment.filter((a) => a === "V" || a === "v").length).toBe(2);
+	expect(res01.edges_assignment.filter((a) => a === "F" || a === "f").length).toBe(2);
 
-	expect(res02.edges_assignment.filter(a => a === "B" || a === "b").length).toBe(6);
-	expect(res02.edges_assignment.filter(a => a === "V" || a === "v").length).toBe(2);
-	expect(res02.edges_assignment.filter(a => a === "F" || a === "f").length).toBe(2);
+	expect(res02.edges_assignment.filter((a) => a === "B" || a === "b").length).toBe(6);
+	expect(res02.edges_assignment.filter((a) => a === "V" || a === "v").length).toBe(2);
+	expect(res02.edges_assignment.filter((a) => a === "F" || a === "f").length).toBe(2);
 
-	expect(res03.edges_assignment.filter(a => a === "B" || a === "b").length).toBe(6);
-	expect(res03.edges_assignment.filter(a => a === "V" || a === "v").length).toBe(2);
-	expect(res03.edges_assignment.filter(a => a === "F" || a === "f").length).toBe(2);
+	expect(res03.edges_assignment.filter((a) => a === "B" || a === "b").length).toBe(6);
+	expect(res03.edges_assignment.filter((a) => a === "V" || a === "v").length).toBe(2);
+	expect(res03.edges_assignment.filter((a) => a === "F" || a === "f").length).toBe(2);
 
-	expect(res04.edges_assignment.filter(a => a === "B" || a === "b").length).toBe(6);
-	expect(res04.edges_assignment.filter(a => a === "V" || a === "v").length).toBe(2);
-	expect(res04.edges_assignment.filter(a => a === "F" || a === "f").length).toBe(2);
+	expect(res04.edges_assignment.filter((a) => a === "B" || a === "b").length).toBe(6);
+	expect(res04.edges_assignment.filter((a) => a === "V" || a === "v").length).toBe(2);
+	expect(res04.edges_assignment.filter((a) => a === "F" || a === "f").length).toBe(2);
 
-	expect(res05.edges_assignment.filter(a => a === "B" || a === "b").length).toBe(6);
-	expect(res05.edges_assignment.filter(a => a === "V" || a === "v").length).toBe(2);
-	expect(res05.edges_assignment.filter(a => a === "F" || a === "f").length).toBe(2);
+	expect(res05.edges_assignment.filter((a) => a === "B" || a === "b").length).toBe(6);
+	expect(res05.edges_assignment.filter((a) => a === "V" || a === "v").length).toBe(2);
+	expect(res05.edges_assignment.filter((a) => a === "F" || a === "f").length).toBe(2);
 
 	// expect(res06.edges_assignment.filter(a => a === "B" || a === "b").length).toBe(6);
 	// expect(res06.edges_assignment.filter(a => a === "V" || a === "v").length).toBe(2);
@@ -139,9 +142,9 @@ test("convert svgToFold, crane all assignments", () => {
 	// expect(res09.edges_assignment.filter(a => a === "V" || a === "v").length).toBe(2);
 	// expect(res09.edges_assignment.filter(a => a === "F" || a === "f").length).toBe(2);
 
-	expect(res10.edges_assignment.filter(a => a === "B" || a === "b").length).toBe(6);
-	expect(res10.edges_assignment.filter(a => a === "V" || a === "v").length).toBe(2);
-	expect(res10.edges_assignment.filter(a => a === "F" || a === "f").length).toBe(2);
+	expect(res10.edges_assignment.filter((a) => a === "B" || a === "b").length).toBe(6);
+	expect(res10.edges_assignment.filter((a) => a === "V" || a === "v").length).toBe(2);
+	expect(res10.edges_assignment.filter((a) => a === "F" || a === "f").length).toBe(2);
 });
 
 // these fail (which is fine), but I can't seem to setup a
@@ -161,7 +164,6 @@ test("convert svgToFold, crane all assignments", () => {
 // 	ear.convert.svgToFold("");
 // 	expect(true).toBe(true);
 // });
-
 
 // <svg xmlns="http://www.w3.org/2000/svg" viewBox="-10 -10 20 20" stroke-width="0.2" fill="none">
 // <line x1="0" y1="9" x2="0" y2="7.5" stroke="black" />

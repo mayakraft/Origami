@@ -1,6 +1,6 @@
 /* SVG (c) Kraft */
-import makeViewBox from '../arguments/makeViewBox.js';
-import { str_string, str_viewBox } from '../environment/strings.js';
+import makeViewBox from "../arguments/makeViewBox.js";
+import { str_string, str_viewBox } from "../environment/strings.js";
 
 /**
  * Rabbit Ear (c) Kraft
@@ -8,9 +8,8 @@ import { str_string, str_viewBox } from '../environment/strings.js';
 
 const setViewBox = (element, ...args) => {
 	// are they giving us pre-formatted string, or a list of numbers
-	const viewBox = args.length === 1 && typeof args[0] === str_string
-		? args[0]
-		: makeViewBox(...args);
+	const viewBox =
+		args.length === 1 && typeof args[0] === str_string ? args[0] : makeViewBox(...args);
 	if (viewBox) {
 		element.setAttribute(str_viewBox, viewBox);
 	}
@@ -19,9 +18,7 @@ const setViewBox = (element, ...args) => {
 
 const getViewBox = function (element) {
 	const vb = element.getAttribute(str_viewBox);
-	return (vb == null
-		? undefined
-		: vb.split(" ").map(n => parseFloat(n)));
+	return vb == null ? undefined : vb.split(" ").map((n) => parseFloat(n));
 };
 
 const convertToViewBox = function (svg, x, y) {
@@ -34,13 +31,17 @@ const convertToViewBox = function (svg, x, y) {
 };
 
 const foldToViewBox = ({ vertices_coords }) => {
-	if (!vertices_coords) { return undefined; }
+	if (!vertices_coords) {
+		return undefined;
+	}
 	const min = [Infinity, Infinity];
 	const max = [-Infinity, -Infinity];
-	vertices_coords.forEach(coord => [0, 1].forEach(i => {
-		min[i] = Math.min(coord[i], min[i]);
-		max[i] = Math.max(coord[i], max[i]);
-	}));
+	vertices_coords.forEach((coord) =>
+		[0, 1].forEach((i) => {
+			min[i] = Math.min(coord[i], min[i]);
+			max[i] = Math.max(coord[i], max[i]);
+		}),
+	);
 	return [min[0], min[1], max[0] - min[0], max[1] - min[1]].join(" ");
 };
 
