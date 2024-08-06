@@ -1,0 +1,18 @@
+# compiled package
+**/rabbit-ear.js
+
+**/*.json
+
+# import file formats in tests/
+**/*.cp
+**/*.fold
+**/*.obj
+**/*.opx
+**/*.svg
+
+# shaders
+**/*.vert
+**/*.frag
+
+# documentation
+**/*.md
