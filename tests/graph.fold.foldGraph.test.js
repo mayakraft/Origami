@@ -14,7 +14,7 @@ const FOLD_ANGLE = 90;
 // 	// along one of the collinear edges along one of the flaps,
 // 	// through the other flap
 // 	const line = { vector: [0, 1], origin: [2, 0] };
-// 	const result = ear.graph.foldLine(
+// 	const result = ear.graph.simpleFoldLine(
 // 		graph,
 // 		line,
 // 		"V",

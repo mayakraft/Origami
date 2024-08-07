@@ -10,7 +10,7 @@ import { connectedComponents } from "./connectedComponents.js";
 import { makeFacesEdgesFromVertices } from "./make/facesEdges.js";
 import { makeFacesFacesFromEdges } from "./make/facesFaces.js";
 import { makeFacesCenter2DQuick } from "./make/faces.js";
-import { foldLine } from "./fold/simpleFold.js";
+import { simpleFoldLine } from "./fold/simpleFold.js";
 
 /**
  * @description Get a list of separatable flaps in a folded origami model
@@ -35,7 +35,7 @@ export const getFlaps = (
 		vertices,
 		edges: { collinear },
 		faces: { map },
-	} = foldLine(graph, line, { assignment: "F", vertices_coordsFolded }, epsilon);
+	} = simpleFoldLine(graph, line, { assignment: "F", vertices_coordsFolded }, epsilon);
 	const backmap = invertArrayToFlatMap(map);
 
 	const folded = { ...graph, vertices_coords: vertices.folded };

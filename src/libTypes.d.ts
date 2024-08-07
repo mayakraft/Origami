@@ -105,6 +105,20 @@ type FacePointEvent = {
     overlap: boolean;
     t: number[];
 };
+
+type FoldGraphEvent = {
+    vertices?: { folded: [number, number][]|[number, number, number][] },
+    edges?: {
+        new: number[],
+        map: (number|number[])[],
+        collinear: number[],
+        reassigned: number[],
+    },
+    faces?: {
+        new: number[],
+        map: number[][],
+    },
+};
 type WebGLVertexArray = {
     location: number;
     buffer: WebGLBuffer;

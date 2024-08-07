@@ -17,28 +17,7 @@ import {
 	recalculatePointAlongEdge,
 	reassignCollinearEdges,
 	removeInvalidFaceOrders,
-	makeSimpleFoldFaceOrders,
 } from "./general.js";
-
-/**
- * @typedef FoldGraphEvent
- * @type {{
- *   vertices?: {
- *     folded: [number, number][]|[number, number, number][],
- *   },
- *   edges?: {
- *     new: number[],
- *     map: (number|number[])[],
- *     collinear: number[],
- *     reassigned: number[],
- *   },
- *   faces?: {
- *     new: number[],
- *     map: number[][],
- *   },
- * }}
- * @description an object which summarizes the changes to the graph.
- */
 
 /**
  * @description Crease a fold line/ray/segment through a folded origami model.
@@ -252,10 +231,10 @@ export const foldGraph = (
 	// - Now, in the special case where the new crease assignment is "V" or "M"
 	// and it's a flat fold, not 3D, we can create new faceOrders between
 	// the new neighbors that were formed by the split crease.
-	makeSimpleFoldFaceOrders(graph, foldAngle, [
-		...splitGraphResult.edges.new,
-		...reassigned,
-	]);
+	// makeSimpleFoldFaceOrders(graph, foldAngle, [
+	// 	...splitGraphResult.edges.new,
+	// 	...reassigned,
+	// ]);
 
 	// "reassign" contains a subset of existing collinear edges to the fold line.
 	// Let's say you would like to modify the graph after a fold to convert a

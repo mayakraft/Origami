@@ -103,7 +103,7 @@ const makeRandomFold = (graph, vertices_coordsFolded) => {
 	// random F, M, or V
 	const assignment = Array.from("MVF")[Math.floor(Math.random() * 3)];
 
-	ear.graph.foldLine(graph, randomSolution.line, {
+	ear.graph.simpleFoldLine(graph, randomSolution.line, {
 		assignment,
 		// foldAngle,
 		vertices_coordsFolded,

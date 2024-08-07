@@ -201,7 +201,9 @@
 
 /**
  * Intersection related events
- *
+ */
+
+/**
  * @typedef LineLineEvent
  * @type {{ a: number, b: number, point: [number, number] }}
  * @description used in line-line intersection and graph edge-line intersection
@@ -218,6 +220,30 @@
  * @type {{ point: [number, number], overlap: boolean, t: number[] }}
  * @description used in face-graph intersection, the data that describes
  * any points that lie inside of faces
+ */
+
+/**
+ * FoldGraph, base method for folding method
+ */
+
+/**
+ * @typedef FoldGraphEvent
+ * @type {{
+ *   vertices?: {
+ *     folded: [number, number][]|[number, number, number][],
+ *   },
+ *   edges?: {
+ *     new: number[],
+ *     map: (number|number[])[],
+ *     collinear: number[],
+ *     reassigned: number[],
+ *   },
+ *   faces?: {
+ *     new: number[],
+ *     map: number[][],
+ *   },
+ * }}
+ * @description an object which summarizes the changes to the graph.
  */
 
 /**
