@@ -25,16 +25,23 @@ export const initializeWebGL = (canvasElement, preferredVersion) => {
 
 	// if there was a user preference
 	switch (preferredVersion) {
-	case 1: return { gl: canvasElement.getContext("webgl"), version: 1 };
-	case 2: return { gl: canvasElement.getContext("webgl2"), version: 2 };
-	default: break;
+		case 1:
+			return { gl: canvasElement.getContext("webgl"), version: 1 };
+		case 2:
+			return { gl: canvasElement.getContext("webgl2"), version: 2 };
+		default:
+			break;
 	}
 
 	// no user preference. attempt version 2, if fails, return version 1.
 	const gl2 = canvasElement.getContext("webgl2");
-	if (gl2) { return { gl: gl2, version: 2 }; }
+	if (gl2) {
+		return { gl: gl2, version: 2 };
+	}
 	const gl1 = canvasElement.getContext("webgl");
-	if (gl1) { return { gl: gl1, version: 1 }; }
+	if (gl1) {
+		return { gl: gl1, version: 1 };
+	}
 	throw new Error(Messages.noWebGL);
 };
 

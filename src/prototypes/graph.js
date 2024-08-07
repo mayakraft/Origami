@@ -17,13 +17,8 @@ import * as validate from "../graph/validate/validate.js";
 // import {
 // 	getLine,
 // } from "../general/get.js";
-import {
-	foldKeys,
-	invertAssignments,
-} from "../fold/spec.js";
-import {
-	subgraph,
-} from "../graph/subgraph.js";
+import { foldKeys, invertAssignments } from "../fold/spec.js";
+import { subgraph } from "../graph/subgraph.js";
 import {
 	boundary,
 	boundaries,
@@ -100,8 +95,8 @@ Graph.prototype.planarize = function () {
  * leaving metadata and other keys untouched.
  */
 Graph.prototype.clear = function () {
-	foldKeys.graph.forEach(key => delete this[key]);
-	foldKeys.orders.forEach(key => delete this[key]);
+	foldKeys.graph.forEach((key) => delete this[key]);
+	foldKeys.orders.forEach((key) => delete this[key]);
 	// the code above just avoided deleting all "file_" keys,
 	// however, file_frames needs to be removed as it contains geometry.
 	delete this.file_frames;

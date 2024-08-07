@@ -1,23 +1,11 @@
 /**
  * Rabbit Ear (c) Kraft
  */
-import {
-	excludeR,
-} from "./compare.js";
-import {
-	subtract2,
-	distance,
-	flip2,
-} from "./vector.js";
-import {
-	clockwiseBisect2,
-} from "./radial.js";
-import {
-	nearestPointOnLine,
-} from "./nearest.js";
-import {
-	intersectLineLine,
-} from "./intersect.js";
+import { excludeR } from "./compare.js";
+import { subtract2, distance, flip2 } from "./vector.js";
+import { clockwiseBisect2 } from "./radial.js";
+import { nearestPointOnLine } from "./nearest.js";
+import { intersectLineLine } from "./intersect.js";
 
 /**
  * @description this recursive algorithm works outwards-to-inwards, each repeat
@@ -43,31 +31,33 @@ const recurseSkeleton = (points, lines, bisectors) => {
 		// .map((p, i) => math.ray(bisectors[i], p))
 		// .map((ray, i, arr) => ray.intersect(arr[(i + 1) % arr.length]));
 		.map((origin, i) => ({ vector: bisectors[i], origin }))
-		.map((ray, i, arr) => intersectLineLine(
-			ray,
-			arr[(i + 1) % arr.length],
-			excludeR,
-			excludeR,
-		).point);
+		.map(
+			(ray, i, arr) =>
+				intersectLineLine(ray, arr[(i + 1) % arr.length], excludeR, excludeR).point,
+		);
 	// project each intersection point down perpendicular to the edge of the polygon
 	// const projections = lines.map((line, i) => line.nearestPoint(intersects[i]));
 	/** @type {[number, number][]} */
-	const projections = lines.map((line, i) => (
-		nearestPointOnLine(line, intersects[i])
-	)).map(([a, b]) => [a, b]);
+	const projections = lines
+		.map((line, i) => nearestPointOnLine(line, intersects[i]))
+		.map(([a, b]) => [a, b]);
 	// when we reach only 3 points remaining, we are at the end. we can return early
 	// and skip unnecessary calculations, all 3 projection lengths will be the same.
 	if (points.length === 3) {
-		return points.map(p => ({ type: "skeleton", points: [p, intersects[0]] }))
+		return points
+			.map((p) => ({ type: "skeleton", points: [p, intersects[0]] }))
 			.concat([{ type: "perpendicular", points: [projections[0], intersects[0]] }]);
 	}
 	// measure the lengths of the projected lines, these will be used to identify
 	// the smallest length, or the point we want to operate on this round.
-	const projectionLengths = intersects
-		.map((intersect, i) => distance(intersect, projections[i]));
+	const projectionLengths = intersects.map((intersect, i) =>
+		distance(intersect, projections[i]),
+	);
 	let shortest = 0;
 	projectionLengths.forEach((len, i) => {
-		if (len < projectionLengths[shortest]) { shortest = i; }
+		if (len < projectionLengths[shortest]) {
+			shortest = i;
+		}
 	});
 	// we have the shortest length, we now have the solution for this round
 	// (all that remains is to prepare the arguments for the next recursive call)
@@ -132,15 +122,16 @@ export const straightSkeleton = (points) => {
 	const lines = points
 		.map((p, i, arr) => [p, arr[(i + 1) % arr.length]])
 		// .map(side => math.line.fromPoints(...side));
-		.map(side => ({ vector: subtract2(side[1], side[0]), origin: side[0] }));
+		.map((side) => ({ vector: subtract2(side[1], side[0]), origin: side[0] }));
 	// get the interior angle bisectors for every corner of the polygon
 	// index map match to "points"
 	const bisectors = points
 		// each element into 3 (previous, current, next)
-		.map((_, i, ar) => [(i - 1 + ar.length) % ar.length, i, (i + 1) % ar.length]
-			.map(j => ar[j]))
+		.map((_, i, ar) =>
+			[(i - 1 + ar.length) % ar.length, i, (i + 1) % ar.length].map((j) => ar[j]),
+		)
 		// make 2 vectors, from current point to previous/next neighbors
-		.map(p => [subtract2(p[0], p[1]), subtract2(p[2], p[1])])
+		.map((p) => [subtract2(p[0], p[1]), subtract2(p[2], p[1])])
 		// it is a little counter-intuitive but the interior angle between three
 		// consecutive points in a counter-clockwise wound polygon is measured
 		// in the clockwise direction

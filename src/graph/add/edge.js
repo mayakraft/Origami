@@ -14,23 +14,25 @@
  * @param {number} [foldAngle=0] this will become edges_foldAngle
  * @returns {number} the index of the new edge
  */
-export const addEdge = (
-	graph,
-	vertices,
-	faces = [],
-	assignment = "U",
-	foldAngle = 0,
-) => {
-	if (!graph.edges_vertices) { graph.edges_vertices = []; }
+export const addEdge = (graph, vertices, faces = [], assignment = "U", foldAngle = 0) => {
+	if (!graph.edges_vertices) {
+		graph.edges_vertices = [];
+	}
 
 	// the index of our new edge
 	const edge = graph.edges_vertices.length;
 
 	// construct data for our new edge (vertices, assignent, foldAngle...)
 	graph.edges_vertices[edge] = vertices;
-	if (graph.edges_faces) { graph.edges_faces[edge] = faces; }
-	if (graph.edges_assignment) { graph.edges_assignment[edge] = assignment; }
-	if (graph.edges_foldAngle) { graph.edges_foldAngle[edge] = foldAngle; }
+	if (graph.edges_faces) {
+		graph.edges_faces[edge] = faces;
+	}
+	if (graph.edges_assignment) {
+		graph.edges_assignment[edge] = assignment;
+	}
+	if (graph.edges_foldAngle) {
+		graph.edges_foldAngle[edge] = foldAngle;
+	}
 
 	return edge;
 };
@@ -46,12 +48,7 @@ export const addEdge = (
  * @param {number} [foldAngle=0] this will become edges_foldAngle
  * @returns {number} the index of the new edge
  */
-export const addIsolatedEdge = (
-	graph,
-	vertices,
-	assignment = "U",
-	foldAngle = 0,
-) => {
+export const addIsolatedEdge = (graph, vertices, assignment = "U", foldAngle = 0) => {
 	const edge = addEdge(graph, vertices, [], assignment, foldAngle);
 
 	// No face data is to be touched.
@@ -62,8 +59,10 @@ export const addIsolatedEdge = (
 	if (graph.vertices_vertices) {
 		// ensure the arrays for these vertices exist
 		vertices
-			.filter(vertex => !graph.vertices_vertices[vertex])
-			.forEach(vertex => { graph.vertices_vertices[vertex] = []; });
+			.filter((vertex) => !graph.vertices_vertices[vertex])
+			.forEach((vertex) => {
+				graph.vertices_vertices[vertex] = [];
+			});
 		const otherVertices = [vertices[1], vertices[0]];
 		vertices.forEach((vertex, i) => {
 			graph.vertices_vertices[vertex].push(otherVertices[i]);
@@ -72,15 +71,21 @@ export const addIsolatedEdge = (
 	if (graph.vertices_edges) {
 		// ensure the arrays for these vertices exist
 		vertices
-			.filter(vertex => !graph.vertices_edges[vertex])
-			.forEach(vertex => { graph.vertices_edges[vertex] = []; });
-		vertices.forEach((vertex) => { graph.vertices_edges[vertex].push(edge); });
+			.filter((vertex) => !graph.vertices_edges[vertex])
+			.forEach((vertex) => {
+				graph.vertices_edges[vertex] = [];
+			});
+		vertices.forEach((vertex) => {
+			graph.vertices_edges[vertex].push(edge);
+		});
 	}
 	if (graph.vertices_faces) {
 		// ensure the arrays for these vertices exist. that is all. empty arrays.
 		vertices
-			.filter(vertex => !graph.vertices_faces[vertex])
-			.forEach(vertex => { graph.vertices_faces[vertex] = []; });
+			.filter((vertex) => !graph.vertices_faces[vertex])
+			.forEach((vertex) => {
+				graph.vertices_faces[vertex] = [];
+			});
 	}
 	return edge;
 };

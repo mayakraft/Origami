@@ -1,8 +1,8 @@
 /* SVG (c) Kraft */
-import { pathCommandNames, parsePathCommands } from '../../general/path.js';
-import TransformMethods from './shared/transforms.js';
-import methods from './shared/urls.js';
-import * as dom from './shared/dom.js';
+import { pathCommandNames, parsePathCommands } from "../../general/path.js";
+import TransformMethods from "./shared/transforms.js";
+import methods from "./shared/urls.js";
+import * as dom from "./shared/dom.js";
 
 /**
  * Rabbit Ear (c) Kraft
@@ -13,10 +13,10 @@ import * as dom from './shared/dom.js';
  */
 const getD = (el) => {
 	const attr = el.getAttribute("d");
-	return (attr == null) ? "" : attr;
+	return attr == null ? "" : attr;
 };
 
-const clear = element => {
+const clear = (element) => {
 	element.removeAttribute("d");
 	return element;
 };
@@ -28,7 +28,7 @@ const appendPathCommand = (el, command, ...args) => {
 };
 
 // break out the path commands into an array of descriptive objects
-const getCommands = element => parsePathCommands(getD(element));
+const getCommands = (element) => parsePathCommands(getD(element));
 
 // const setters = {
 //   string: setPathString,
@@ -65,7 +65,7 @@ const path_methods = {
 	clear,
 	getCommands: getCommands,
 	get: getCommands,
-	getD: el => el.getAttribute("d"),
+	getD: (el) => el.getAttribute("d"),
 	// set: clearAndSet,
 	// add: noClearSet,
 	...TransformMethods,
@@ -74,7 +74,8 @@ const path_methods = {
 };
 
 Object.keys(pathCommandNames).forEach((key) => {
-	path_methods[pathCommandNames[key]] = (el, ...args) => appendPathCommand(el, key, ...args);
+	path_methods[pathCommandNames[key]] = (el, ...args) =>
+		appendPathCommand(el, key, ...args);
 });
 
 const pathDef = {

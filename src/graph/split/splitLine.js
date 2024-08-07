@@ -1,18 +1,10 @@
 /**
  * Rabbit Ear (c) Kraft
  */
-import {
-	EPSILON,
-} from "../../math/constant.js";
-import {
-	includeL,
-} from "../../math/compare.js";
-import {
-	remapKey,
-} from "../maps.js";
-import {
-	intersectLineAndPoints,
-} from "../intersect.js";
+import { EPSILON } from "../../math/constant.js";
+import { includeL } from "../../math/compare.js";
+import { remapKey } from "../maps.js";
+import { intersectLineAndPoints } from "../intersect.js";
 
 /**
  * @description
@@ -45,12 +37,14 @@ export const splitLineToSegments = (
 	// for us to create a new straight edge between the pair of points.
 	// delete all faces which contain anything other than 2 points.
 	faces
-		.map(face => ["vertices", "edges", "points"]
-			.map(key => face[key].length)
-			.reduce((a, b) => a + b, 0))
+		.map((face) =>
+			["vertices", "edges", "points"]
+				.map((key) => face[key].length)
+				.reduce((a, b) => a + b, 0),
+		)
 		.map((count, f) => (count !== 2 ? f : undefined))
-		.filter(a => a !== undefined)
-		.forEach(f => delete faces[f]);
+		.filter((a) => a !== undefined)
+		.forEach((f) => delete faces[f]);
 
 	// our segments will be a little mini graph, with components:
 	// - vertices: with any combination of { a, b, t, point, vertex, edge, face}
@@ -65,9 +59,7 @@ export const splitLineToSegments = (
 	const segments = {
 		vertices: [],
 		// because of the previous delete operation on this faces array, we can do this
-		edges_face: faces
-			.map((_, face) => face)
-			.filter(a => a !== undefined)
+		edges_face: faces.map((_, face) => face).filter((a) => a !== undefined),
 	};
 
 	// keep track of any vertices we have already created and added to the graph,
@@ -75,33 +67,42 @@ export const splitLineToSegments = (
 	const vertexVertex = {};
 	const edgeVertex = {};
 
-	segments.edges_vertices = faces.map((el, face) => {
-		const vertsVerts = el.vertices.map(({ a, vertex }) => {
-			const index = segments.vertices.length;
-			if (vertexVertex[vertex] !== undefined) { return vertexVertex[vertex]; }
-			segments.vertices.push({ a, vertex, point: [...vertices_coords[vertex]] });
-			vertexVertex[vertex] = index;
-			return index;
-		});
-		const edgesVerts = el.edges.map(({ a, b, point, edge }) => {
-			const index = segments.vertices.length;
-			if (edgeVertex[edge] !== undefined) { return edgeVertex[edge]; }
-			segments.vertices.push({ a, b, point, edge });
-			edgeVertex[edge] = index;
-			return index;
-		});
-		const pointsVerts = el.points.map(({ point, t }) => {
-			const index = segments.vertices.length;
-			segments.vertices.push({ point, t, face });
-			return index;
-		});
-		// create an edge_vertices by joining all results from the new vertex
-		// indices from the vertices/edges/points. it will result in only 2.
-		return vertsVerts.concat(edgesVerts).concat(pointsVerts);
-	}).filter(a => a !== undefined);
+	segments.edges_vertices = faces
+		.map((el, face) => {
+			const vertsVerts = el.vertices.map(({ a, vertex }) => {
+				const index = segments.vertices.length;
+				if (vertexVertex[vertex] !== undefined) {
+					return vertexVertex[vertex];
+				}
+				segments.vertices.push({ a, vertex, point: [...vertices_coords[vertex]] });
+				vertexVertex[vertex] = index;
+				return index;
+			});
+			const edgesVerts = el.edges.map(({ a, b, point, edge }) => {
+				const index = segments.vertices.length;
+				if (edgeVertex[edge] !== undefined) {
+					return edgeVertex[edge];
+				}
+				segments.vertices.push({ a, b, point, edge });
+				edgeVertex[edge] = index;
+				return index;
+			});
+			const pointsVerts = el.points.map(({ point, t }) => {
+				const index = segments.vertices.length;
+				segments.vertices.push({ point, t, face });
+				return index;
+			});
+			// create an edge_vertices by joining all results from the new vertex
+			// indices from the vertices/edges/points. it will result in only 2.
+			return vertsVerts.concat(edgesVerts).concat(pointsVerts);
+		})
+		.filter((a) => a !== undefined);
 
 	return {
-		vertices, edges, faces, segments,
+		vertices,
+		edges,
+		faces,
+		segments,
 	};
 };
 
@@ -175,12 +176,10 @@ export const splitLineIntoEdges = (
 	// excludes those vertices which are pointing to existing vertex indices
 	// from the input graph; only including vertices which will become new points.
 	let count = 0;
-	const vertexMap = segmentsAsFOLD.vertices_info
-		.map(el => (el.vertex === undefined
-			? vertices_coords.length + (count++)
-			: el.vertex));
-	const edgeMap = segmentsAsFOLD.edges_vertices
-		.map((_, i) => edges_vertices.length + i);
+	const vertexMap = segmentsAsFOLD.vertices_info.map((el) =>
+		el.vertex === undefined ? vertices_coords.length + count++ : el.vertex,
+	);
+	const edgeMap = segmentsAsFOLD.edges_vertices.map((_, i) => edges_vertices.length + i);
 	remapKey(segmentsAsFOLD, "vertices", vertexMap);
 	remapKey(segmentsAsFOLD, "edges", edgeMap);
 
@@ -192,13 +191,14 @@ export const splitLineIntoEdges = (
 	// input graph, we just need to check the input graph and delete these.
 	segmentsAsFOLD.vertices
 		.map((_, v) => v)
-		.filter(v => vertices_coords[v] !== undefined)
-		.forEach(v => delete segmentsAsFOLD.vertices[v]);
+		.filter((v) => vertices_coords[v] !== undefined)
+		.forEach((v) => delete segmentsAsFOLD.vertices[v]);
 
 	// using the overlapped vertices, make a list of edges collinear to the line
-	const verticesCollinear = vertices.map(v => v !== undefined);
-	const edges_collinear = edges_vertices
-		.map(verts => verticesCollinear[verts[0]] && verticesCollinear[verts[1]]);
+	const verticesCollinear = vertices.map((v) => v !== undefined);
+	const edges_collinear = edges_vertices.map(
+		(verts) => verticesCollinear[verts[0]] && verticesCollinear[verts[1]],
+	);
 
 	return {
 		...segmentsAsFOLD,

@@ -7,13 +7,8 @@ import {
 	makePerspectiveMatrix4,
 	invertMatrix4,
 } from "../../math/matrix4.js";
-import {
-	midpoint,
-	resize,
-} from "../../math/vector.js";
-import {
-	boundingBox,
-} from "../../graph/boundary.js";
+import { midpoint, resize } from "../../math/vector.js";
+import { boundingBox } from "../../graph/boundary.js";
 
 /**
  * @description Initialize a viewport for a WebGL context
@@ -23,10 +18,11 @@ import {
  * @returns {undefined}
  */
 export const rebuildViewport = (gl, canvas) => {
-	if (!gl) { return; }
+	if (!gl) {
+		return;
+	}
 	const devicePixelRatio = window.devicePixelRatio || 1;
-	const size = [canvas.clientWidth, canvas.clientHeight]
-		.map(n => n * devicePixelRatio);
+	const size = [canvas.clientWidth, canvas.clientHeight].map((n) => n * devicePixelRatio);
 	if (canvas.width !== size[0] || canvas.height !== size[1]) {
 		// eslint-disable-next-line no-param-reassign
 		canvas.width = size[0];
@@ -44,17 +40,18 @@ export const rebuildViewport = (gl, canvas) => {
  * @param {number} fov the field of view (perspective only)
  * @returns {number[]} a 4x4 projection matrix
  */
-export const makeProjectionMatrix = ([width, height], perspective = "perspective", fov = 45) => {
+export const makeProjectionMatrix = (
+	[width, height],
+	perspective = "perspective",
+	fov = 45,
+) => {
 	const Z_NEAR = 0.1;
 	const Z_FAR = 20;
 	const ORTHO_FAR = -100;
 	const ORTHO_NEAR = 100;
 	const vmin = Math.min(width, height);
-	const padding = [
-		((width - vmin) / vmin) / 2,
-		((height - vmin) / vmin) / 2,
-	];
-	const side = padding.map(p => p + 0.5);
+	const padding = [(width - vmin) / vmin / 2, (height - vmin) / vmin / 2];
+	const side = padding.map((p) => p + 0.5);
 	return perspective === "orthographic"
 		? makeOrthographicMatrix4(side[1], side[0], -side[1], -side[0], ORTHO_FAR, ORTHO_NEAR)
 		: makePerspectiveMatrix4(fov * (Math.PI / 180), width / height, Z_NEAR, Z_FAR);
@@ -68,12 +65,33 @@ export const makeProjectionMatrix = ([width, height], perspective = "perspective
  * @returns {number[]} a 4x4 model matrix
  */
 export const makeModelMatrix = (graph) => {
-	if (!graph) { return [...identity4x4]; }
+	if (!graph) {
+		return [...identity4x4];
+	}
 	const bounds = boundingBox(graph);
-	if (!bounds) { return [...identity4x4]; }
+	if (!bounds) {
+		return [...identity4x4];
+	}
 	const scale = Math.max(...bounds.span); // * Math.SQRT2;
-	if (scale === 0) { return [...identity4x4]; }
+	if (scale === 0) {
+		return [...identity4x4];
+	}
 	const center = resize(3, midpoint(bounds.min, bounds.max));
-	const scalePositionMatrix = [scale, 0, 0, 0, 0, scale, 0, 0, 0, 0, scale, 0, ...center, 1];
+	const scalePositionMatrix = [
+		scale,
+		0,
+		0,
+		0,
+		0,
+		scale,
+		0,
+		0,
+		0,
+		0,
+		scale,
+		0,
+		...center,
+		1,
+	];
 	return invertMatrix4(scalePositionMatrix) || [...identity4x4];
 };

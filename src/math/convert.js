@@ -65,10 +65,8 @@ export const pointsToLine3 = (a, b) => ({
  * one point
  * @returns {VecLine} an object with "vector" and "origin".
  */
-export const pointsToLine = (a, b) => (a.length === 3 && b.length === 3
-	? pointsToLine3(a, b)
-	: pointsToLine2(a, b)
-);
+export const pointsToLine = (a, b) =>
+	a.length === 3 && b.length === 3 ? pointsToLine3(a, b) : pointsToLine2(a, b);
 
 /**
  * @description Convert a line from one parameterization into another.

@@ -36,10 +36,7 @@ test("planarize, flapping bird with line through", () => {
 	const FOLD = fs.readFileSync("./tests/files/fold/randlett-flapping-bird.fold", "utf-8");
 	const cp = JSON.parse(FOLD);
 	cp.vertices_coords.push([0.1, 1], [1, 0.1]);
-	cp.edges_vertices.push([
-		cp.vertices_coords.length - 2,
-		cp.vertices_coords.length - 1,
-	]);
+	cp.edges_vertices.push([cp.vertices_coords.length - 2, cp.vertices_coords.length - 1]);
 	cp.edges_assignment.push("F");
 	const { result, changes } = ear.graph.planarizeVerbose(cp);
 
@@ -47,14 +44,8 @@ test("planarize, flapping bird with line through", () => {
 	expect(result.edges_vertices).toHaveLength(63);
 	expect(result.faces_vertices).toHaveLength(32);
 
-	fs.writeFileSync(
-		"./tests/tmp/planarize-flapping-bird.fold",
-		JSON.stringify(result),
-	);
-	fs.writeFileSync(
-		"./tests/tmp/planarize-flapping-bird.json",
-		JSON.stringify(changes),
-	);
+	fs.writeFileSync("./tests/tmp/planarize-flapping-bird.fold", JSON.stringify(result));
+	fs.writeFileSync("./tests/tmp/planarize-flapping-bird.json", JSON.stringify(changes));
 });
 
 test("planarize, non-planar bird base", () => {
@@ -134,14 +125,8 @@ test("planarizeVerbose, kraft bird base", () => {
 	expect(result.edges_vertices).toHaveLength(572);
 	expect(result.faces_vertices).toHaveLength(328);
 
-	fs.writeFileSync(
-		"./tests/tmp/planarize-kraft-bird-base.fold",
-		JSON.stringify(result),
-	);
-	fs.writeFileSync(
-		"./tests/tmp/planarize-kraft-bird-base.json",
-		JSON.stringify(changes),
-	);
+	fs.writeFileSync("./tests/tmp/planarize-kraft-bird-base.fold", JSON.stringify(result));
+	fs.writeFileSync("./tests/tmp/planarize-kraft-bird-base.json", JSON.stringify(changes));
 });
 
 test("planarizeVerbose, crane already planar", () => {
@@ -153,14 +138,8 @@ test("planarizeVerbose, crane already planar", () => {
 	expect(result.edges_vertices).toHaveLength(114);
 	expect(result.faces_vertices).toHaveLength(59);
 
-	fs.writeFileSync(
-		"./tests/tmp/planarize-crane.fold",
-		JSON.stringify(result),
-	);
-	fs.writeFileSync(
-		"./tests/tmp/planarize-crane.json",
-		JSON.stringify(changes),
-	);
+	fs.writeFileSync("./tests/tmp/planarize-crane.fold", JSON.stringify(result));
+	fs.writeFileSync("./tests/tmp/planarize-crane.json", JSON.stringify(changes));
 });
 
 test("planarizeVerbose, foldedForm, windmill", () => {
@@ -170,16 +149,41 @@ test("planarizeVerbose, foldedForm, windmill", () => {
 	const { result, changes } = ear.graph.planarizeVerbose(folded);
 
 	expect(changes.vertices.map).toMatchObject([
-		[4], [7], [5], [6], [7], [0], [1], [8], [2], [3], [7], [7],
+		[4],
+		[7],
+		[5],
+		[6],
+		[7],
+		[0],
+		[1],
+		[8],
+		[2],
+		[3],
+		[7],
+		[7],
 	]);
 
 	// 8 edges with just one mapping. checks out.
 	expect(changes.edges.map).toMatchObject([
-		[9, 10], [15, 16], [13, 14], [9, 10],
-		[6], [23],
-		[2, 3], [4, 5],
-		[17], [18], [0], [8], [7],
-		[19, 20], [21, 22], [15, 16], [11, 12], [11, 12], [13, 14],
+		[9, 10],
+		[15, 16],
+		[13, 14],
+		[9, 10],
+		[6],
+		[23],
+		[2, 3],
+		[4, 5],
+		[17],
+		[18],
+		[0],
+		[8],
+		[7],
+		[19, 20],
+		[21, 22],
+		[15, 16],
+		[11, 12],
+		[11, 12],
+		[13, 14],
 		[1],
 	]);
 
@@ -208,7 +212,7 @@ test("planarizeVerbose, foldedForm, windmill", () => {
 		[0, 1, 3, 4, 7, 8, 9, 10],
 		[3, 4, 5, 8],
 		[4, 5],
-	])
+	]);
 
 	fs.writeFileSync("./tests/tmp/planarize-windmill.fold", JSON.stringify(result));
 	fs.writeFileSync("./tests/tmp/planarize-windmill.json", JSON.stringify(changes));

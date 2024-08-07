@@ -2,12 +2,13 @@ import { expect, test } from "vitest";
 import ear from "../src/index.js";
 
 test("isIdentity", () => {
-	expect(ear.math.isIdentity4x4([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]))
-		.toBe(false);
-	expect(ear.math.isIdentity4x4([1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 4, 5, 6, 1]))
-		.toBe(false);
-	expect(ear.math.isIdentity4x4([1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]))
-		.toBe(true);
+	expect(ear.math.isIdentity4x4([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11])).toBe(false);
+	expect(ear.math.isIdentity4x4([1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 4, 5, 6, 1])).toBe(
+		false,
+	);
+	expect(ear.math.isIdentity4x4([1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1])).toBe(
+		true,
+	);
 });
 
 test("multiply", () => {
@@ -16,31 +17,55 @@ test("multiply", () => {
 		ear.math.makeMatrix4RotateZ(Math.PI / 4),
 	);
 	const sq = Math.SQRT1_2;
-	[sq, 0.5, 0.5, 0, -sq, 0.5, 0.5, 0, 0, -sq, sq, 0, 0, 0, 0, 1]
-		.forEach((a, i) => expect(a).toBeCloseTo(m[i]));
+	[sq, 0.5, 0.5, 0, -sq, 0.5, 0.5, 0, 0, -sq, sq, 0, 0, 0, 0, 1].forEach((a, i) =>
+		expect(a).toBeCloseTo(m[i]),
+	);
 });
 
 test("determinant", () => {
 	// randomly made matrices, made using these affine transforms,
 	// even their inverted forms, should all have a determinant of 1
 	expect(ear.math.determinant4([...ear.math.identity4x4])).toBeCloseTo(1);
-	expect(ear.math.determinant4(ear.math.makeMatrix4RotateX(Math.random() * Math.PI * 2)))
-		.toBeCloseTo(1);
-	expect(ear.math.determinant4(ear.math.makeMatrix4RotateZ(Math.random() * Math.PI * 2)))
-		.toBeCloseTo(1);
-	expect(ear.math.determinant4(ear.math.makeMatrix4Translate(1, 2, 3)))
-		.toBeCloseTo(1);
-	expect(ear.math.determinant4(ear.math.invertMatrix4(
-		ear.math.makeMatrix4Rotate(Math.random() * Math.PI * 2, [1, 5, 8]),
-	))).toBeCloseTo(1);
+	expect(
+		ear.math.determinant4(ear.math.makeMatrix4RotateX(Math.random() * Math.PI * 2)),
+	).toBeCloseTo(1);
+	expect(
+		ear.math.determinant4(ear.math.makeMatrix4RotateZ(Math.random() * Math.PI * 2)),
+	).toBeCloseTo(1);
+	expect(ear.math.determinant4(ear.math.makeMatrix4Translate(1, 2, 3))).toBeCloseTo(1);
+	expect(
+		ear.math.determinant4(
+			ear.math.invertMatrix4(
+				ear.math.makeMatrix4Rotate(Math.random() * Math.PI * 2, [1, 5, 8]),
+			),
+		),
+	).toBeCloseTo(1);
 });
 
 test("inverse", () => {
 	const m = ear.math.invertMatrix4([0, -1, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]);
-	[0, 1, 0, 0, -1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]
-		.forEach((a, i) => expect(a).toBeCloseTo(m[i]));
+	[0, 1, 0, 0, -1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1].forEach((a, i) =>
+		expect(a).toBeCloseTo(m[i]),
+	);
 
-	const bad = ear.math.invertMatrix4([1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, Infinity, 0, 1]);
+	const bad = ear.math.invertMatrix4([
+		1,
+		0,
+		0,
+		0,
+		0,
+		1,
+		0,
+		0,
+		0,
+		0,
+		1,
+		0,
+		0,
+		Infinity,
+		0,
+		1,
+	]);
 	expect(bad).toBe(undefined);
 });
 
@@ -54,22 +79,25 @@ test("translate", () => {
 test("rotateX", () => {
 	const sq = Math.SQRT1_2;
 	const m = ear.math.makeMatrix4RotateX(Math.PI / 4);
-	[1, 0, 0, 0, 0, sq, sq, 0, 0, -sq, sq, 0, 0, 0, 0, 1]
-		.forEach((a, i) => expect(a).toBeCloseTo(m[i]));
+	[1, 0, 0, 0, 0, sq, sq, 0, 0, -sq, sq, 0, 0, 0, 0, 1].forEach((a, i) =>
+		expect(a).toBeCloseTo(m[i]),
+	);
 });
 
 test("rotateY", () => {
 	const sq = Math.SQRT1_2;
 	const m = ear.math.makeMatrix4RotateY(Math.PI / 4);
-	[sq, 0, -sq, 0, 0, 1, 0, 0, sq, 0, sq, 0, 0, 0, 0, 1]
-		.forEach((a, i) => expect(a).toBeCloseTo(m[i]));
+	[sq, 0, -sq, 0, 0, 1, 0, 0, sq, 0, sq, 0, 0, 0, 0, 1].forEach((a, i) =>
+		expect(a).toBeCloseTo(m[i]),
+	);
 });
 
 test("rotateZ", () => {
 	const sq = Math.SQRT1_2;
 	const m = ear.math.makeMatrix4RotateZ(Math.PI / 4);
-	[sq, sq, 0, 0, -sq, sq, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]
-		.forEach((a, i) => expect(a).toBeCloseTo(m[i]));
+	[sq, sq, 0, 0, -sq, sq, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1].forEach((a, i) =>
+		expect(a).toBeCloseTo(m[i]),
+	);
 });
 
 test("rotate", () => {
@@ -84,23 +112,28 @@ test("rotate", () => {
 
 test("scale", () => {
 	const m = ear.math.makeMatrix4Scale([0.5, 0.5, 0.5]);
-	[0.5, 0, 0, 0, 0, 0.5, 0, 0, 0, 0, 0.5, 0, 0, 0, 0, 1]
-		.forEach((a, i) => expect(a).toBeCloseTo(m[i]));
+	[0.5, 0, 0, 0, 0, 0.5, 0, 0, 0, 0, 0.5, 0, 0, 0, 0, 1].forEach((a, i) =>
+		expect(a).toBeCloseTo(m[i]),
+	);
 });
 
 test("makeMatrix4Scale", () => {
 	const m0 = ear.math.makeMatrix4Scale();
-	[1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]
-		.forEach((n, i) => expect(n).toBeCloseTo(m0[i]));
+	[1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1].forEach((n, i) =>
+		expect(n).toBeCloseTo(m0[i]),
+	);
 	const m1 = ear.math.makeMatrix4Scale([0.5, 0.5, 0.5]);
-	[0.5, 0, 0, 0, 0, 0.5, 0, 0, 0, 0, 0.5, 0, 0, 0, 0, 1]
-		.forEach((n, i) => expect(n).toBeCloseTo(m1[i]));
+	[0.5, 0, 0, 0, 0, 0.5, 0, 0, 0, 0, 0.5, 0, 0, 0, 0, 1].forEach((n, i) =>
+		expect(n).toBeCloseTo(m1[i]),
+	);
 	const m2 = ear.math.makeMatrix4UniformScale();
-	[1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]
-		.forEach((n, i) => expect(n).toBeCloseTo(m2[i]));
+	[1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1].forEach((n, i) =>
+		expect(n).toBeCloseTo(m2[i]),
+	);
 	const m3 = ear.math.makeMatrix4UniformScale(0.5);
-	[0.5, 0, 0, 0, 0, 0.5, 0, 0, 0, 0, 0.5, 0, 0, 0, 0, 1]
-		.forEach((n, i) => expect(n).toBeCloseTo(m3[i]));
+	[0.5, 0, 0, 0, 0, 0.5, 0, 0, 0, 0, 0.5, 0, 0, 0, 0, 1].forEach((n, i) =>
+		expect(n).toBeCloseTo(m3[i]),
+	);
 });
 
 test("combine operations", () => {
@@ -108,14 +141,16 @@ test("combine operations", () => {
 		ear.math.makeMatrix4RotateX(Math.PI / 2),
 		ear.math.makeMatrix4Translate(40, 20, 10),
 	);
-	[1, 0, 0, 0, 0, 0, 1, 0, 0, -1, 0, 0, 40, -10, 20, 1]
-		.forEach((n, i) => expect(n).toBeCloseTo(result[i]));
+	[1, 0, 0, 0, 0, 0, 1, 0, 0, -1, 0, 0, 40, -10, 20, 1].forEach((n, i) =>
+		expect(n).toBeCloseTo(result[i]),
+	);
 });
 
 test("reflectZ", () => {
 	const m = ear.math.makeMatrix4ReflectZ([1, 1, 1], [0, 0, 0]);
-	[0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]
-		.forEach((n, i) => expect(n).toBeCloseTo(m[i]));
+	[0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1].forEach((n, i) =>
+		expect(n).toBeCloseTo(m[i]),
+	);
 });
 
 test("transform", () => {
@@ -123,12 +158,15 @@ test("transform", () => {
 		ear.math.makeMatrix4RotateZ(Math.PI / 2),
 		ear.math.makeMatrix4Translate(4, 5, 6),
 	);
-	const segment = [[-1, 0, 0], [1, 0, 0]];
-	const result = segment
-		.map(p => ear.math.multiplyMatrix4Vector3(matrix, p));
-	[[-5, 3, 6], [-5, 5, 6]]
-		.forEach((p, i) => p
-			.forEach((n, j) => expect(n).toBe(result[i][j])));
+	const segment = [
+		[-1, 0, 0],
+		[1, 0, 0],
+	];
+	const result = segment.map((p) => ear.math.multiplyMatrix4Vector3(matrix, p));
+	[
+		[-5, 3, 6],
+		[-5, 5, 6],
+	].forEach((p, i) => p.forEach((n, j) => expect(n).toBe(result[i][j])));
 });
 
 test("transformVector", () => {
@@ -160,8 +198,9 @@ test("transformLine", () => {
  */
 test("perspective matrix", () => {
 	const res1 = ear.math.makePerspectiveMatrix4(Math.PI / 2, 1, 1, 10);
-	[1, 0, 0, 0, 0, 1, 0, 0, 0, 0, -(11 / 9), -1, 0, 0, -(20 / 9), 0]
-		.forEach((n, i) => expect(res1[i]).toBeCloseTo(n));
+	[1, 0, 0, 0, 0, 1, 0, 0, 0, 0, -(11 / 9), -1, 0, 0, -(20 / 9), 0].forEach((n, i) =>
+		expect(res1[i]).toBeCloseTo(n),
+	);
 
 	// fov 180deg results in 0 in x and y diagonal
 	const res2 = ear.math.makePerspectiveMatrix4(Math.PI, 1, 1, 10);
@@ -171,24 +210,29 @@ test("perspective matrix", () => {
 
 test("orthographic matrix", () => {
 	const res1 = ear.math.makeOrthographicMatrix4(1, 1, -1, -1, 1, 10);
-	[1, 0, 0, 0, 0, 1, 0, 0, 0, 0, -(2 / 9), 0, 0, 0, -(11 / 9), 1]
-		.forEach((n, i) => expect(res1[i]).toBeCloseTo(n));
+	[1, 0, 0, 0, 0, 1, 0, 0, 0, 0, -(2 / 9), 0, 0, 0, -(11 / 9), 1].forEach((n, i) =>
+		expect(res1[i]).toBeCloseTo(n),
+	);
 });
 
 test("lookat matrix", () => {
 	const res1 = ear.math.makeLookAtMatrix4([0, 0, 1], [0, 0, 0], [0, 1, 0]);
-	[1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, -1, 1]
-		.forEach((n, i) => expect(res1[i]).toBeCloseTo(n));
+	[1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, -1, 1].forEach((n, i) =>
+		expect(res1[i]).toBeCloseTo(n),
+	);
 
 	const res2 = ear.math.makeLookAtMatrix4([1, 0, 0], [0, 0, 0], [0, 1, 0]);
-	[0, 0, 1, 0, 0, 1, 0, 0, -1, 0, 0, 0, -1, 0, 0, 1]
-		.forEach((n, i) => expect(res2[i]).toBeCloseTo(n));
+	[0, 0, 1, 0, 0, 1, 0, 0, -1, 0, 0, 0, -1, 0, 0, 1].forEach((n, i) =>
+		expect(res2[i]).toBeCloseTo(n),
+	);
 
 	const res3 = ear.math.makeLookAtMatrix4([0, 0, -1], [0, 0, 0], [0, 1, 0]);
-	[-1, 0, 0, 0, 0, 1, 0, 0, 0, 0, -1, 0, 0, 0, 1, 1]
-		.forEach((n, i) => expect(res3[i]).toBeCloseTo(n));
+	[-1, 0, 0, 0, 0, 1, 0, 0, 0, 0, -1, 0, 0, 0, 1, 1].forEach((n, i) =>
+		expect(res3[i]).toBeCloseTo(n),
+	);
 
 	const res4 = ear.math.makeLookAtMatrix4([0, 0, 1], [0, 0, 0], [0, -1, 0]);
-	[-1, 0, 0, 0, 0, -1, 0, 0, 0, 0, 1, 0, 0, 0, -1, 1]
-		.forEach((n, i) => expect(res4[i]).toBeCloseTo(n));
+	[-1, 0, 0, 0, 0, -1, 0, 0, 0, 0, 1, 0, 0, 0, -1, 1].forEach((n, i) =>
+		expect(res4[i]).toBeCloseTo(n),
+	);
 });

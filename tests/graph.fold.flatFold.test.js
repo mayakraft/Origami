@@ -12,10 +12,7 @@ test("flatFold, square, valley fold", () => {
 	expect(ear.graph.countVertices(graph)).toBe(9);
 	expect(ear.graph.countEdges(graph)).toBe(12);
 	expect(ear.graph.countFaces(graph)).toBe(4);
-	fs.writeFileSync(
-		"./tests/tmp/flatFold-square.fold",
-		JSON.stringify(graph),
-	);
+	fs.writeFileSync("./tests/tmp/flatFold-square.fold", JSON.stringify(graph));
 });
 
 test("flatFold, crane", () => {
@@ -33,12 +30,6 @@ test("flatFold, crane", () => {
 	expect(ear.graph.countEdges(folded)).toBe(175);
 	expect(ear.graph.countFaces(folded)).toBe(88);
 
-	fs.writeFileSync(
-		"./tests/tmp/flatFold-crane-cp.fold",
-		JSON.stringify(graph),
-	);
-	fs.writeFileSync(
-		"./tests/tmp/flatFold-crane-folded.fold",
-		JSON.stringify(folded),
-	);
+	fs.writeFileSync("./tests/tmp/flatFold-crane-cp.fold", JSON.stringify(graph));
+	fs.writeFileSync("./tests/tmp/flatFold-crane-folded.fold", JSON.stringify(folded));
 });

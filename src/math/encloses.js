@@ -14,8 +14,7 @@ import { EPSILON } from "./constant.js";
  */
 export const pointInBoundingBox = (point, box, epsilon = EPSILON) => {
 	for (let d = 0; d < point.length; d += 1) {
-		if (point[d] < box.min[d] - epsilon
-			|| point[d] > box.max[d] + epsilon) {
+		if (point[d] < box.min[d] - epsilon || point[d] > box.max[d] + epsilon) {
 			return false;
 		}
 	}
@@ -36,8 +35,7 @@ export const enclosingBoundingBoxes = (outer, inner, epsilon = EPSILON) => {
 	const dimensions = Math.min(outer.min.length, inner.min.length);
 	for (let d = 0; d < dimensions; d += 1) {
 		// if one minimum is above the other's maximum, or visa versa
-		if (inner.min[d] < outer.min[d] - epsilon
-			|| inner.max[d] > outer.max[d] + epsilon) {
+		if (inner.min[d] < outer.min[d] - epsilon || inner.max[d] > outer.max[d] + epsilon) {
 			return false;
 		}
 	}

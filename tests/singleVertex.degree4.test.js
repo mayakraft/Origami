@@ -9,12 +9,7 @@ test("foldDegree4", () => {
 		["M", "M", "V", "M"],
 		foldAngle,
 	);
-	const expected = [
-		0.9272952180016123,
-		foldAngle,
-		-0.9272952180016123,
-		foldAngle,
-	];
+	const expected = [0.9272952180016123, foldAngle, -0.9272952180016123, foldAngle];
 	result.forEach((res, i) => expect(res).toBeCloseTo(expected[i]));
 });
 
@@ -26,12 +21,14 @@ test("foldDegree4, does not worry about self intersection", () => {
 		["M", "M", "V", "M"],
 		["M", "M", "M", "V"],
 	];
-	const result = assignments.map(assign => ear.singleVertex.foldDegree4(
-		[seventh * 1, seventh * 2, seventh * 2, seventh * 2],
-		assign,
-		Math.PI / 2,
-	));
-	result.forEach(res => {
+	const result = assignments.map((assign) =>
+		ear.singleVertex.foldDegree4(
+			[seventh * 1, seventh * 2, seventh * 2, seventh * 2],
+			assign,
+			Math.PI / 2,
+		),
+	);
+	result.forEach((res) => {
 		expect(res).not.toBe(undefined);
 		expect(res.length).toBe(4);
 	});

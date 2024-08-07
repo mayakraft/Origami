@@ -13,8 +13,7 @@ test("edgeAssignmentToFoldAngle", () => {
 	// every letter besides "m", "v"
 	"abcdefghijklnopqrstuwxyzABCDEFGHIJKLNOPQRSTUWXYZ.!@#$%^&*(){}[]-=_+"
 		.split("")
-		.forEach(ch => expect(ear.graph.edgeAssignmentToFoldAngle(ch))
-			.toBe(0));
+		.forEach((ch) => expect(ear.graph.edgeAssignmentToFoldAngle(ch)).toBe(0));
 	expect(ear.graph.edgeAssignmentToFoldAngle("v")).toBe(180);
 	expect(ear.graph.edgeAssignmentToFoldAngle("V")).toBe(180);
 	expect(ear.graph.edgeAssignmentToFoldAngle("m")).toBe(-180);
@@ -63,8 +62,7 @@ test("transposeGraphArrays", () => {
 	expect(result[0].edges_vertices.length).toBe(2);
 	expect(result[0].edges_assignment.length).toBe(1); // string, "M" or "V" or something
 	// no key
-	expect(ear.graph.transposeGraphArrays(crane, "nokey").length)
-		.toBe(0);
+	expect(ear.graph.transposeGraphArrays(crane, "nokey").length).toBe(0);
 });
 
 test("transposeGraphArrayAtIndex", () => {
@@ -74,14 +72,13 @@ test("transposeGraphArrayAtIndex", () => {
 	expect(result.edges_vertices.length).toBe(2);
 	expect(result.edges_assignment.length).toBe(1); // string, "M" or "V" or something
 	// no key
-	expect(ear.graph.transposeGraphArrayAtIndex(crane, "nokey", 0))
-		.toBe(undefined);
+	expect(ear.graph.transposeGraphArrayAtIndex(crane, "nokey", 0)).toBe(undefined);
 });
 
 test("edge angle assinments", () => {
 	const assignments = ["B", "b", "M", "m", "V", "v", "F", "f", "U", "u"];
 	const angles = [0, 0, -180, -180, 180, 180, 0, 0, 0, 0];
-	const calculated = assignments.map(a => ear.graph.edgeAssignmentToFoldAngle(a));
+	const calculated = assignments.map((a) => ear.graph.edgeAssignmentToFoldAngle(a));
 	expect(ear.math.epsilonEqualVectors(calculated, angles)).toBe(true);
 });
 
@@ -112,9 +109,7 @@ test("prefix key search test", () => {
 	];
 	const calculated = ear.graph.filterKeysWithPrefix(graph, "vertices");
 
-	expect(expected).toEqual(
-		expect.arrayContaining(calculated),
-	);
+	expect(expected).toEqual(expect.arrayContaining(calculated));
 });
 
 test("suffix key search test", () => {
@@ -144,9 +139,7 @@ test("suffix key search test", () => {
 
 	const calculated = ear.graph.filterKeysWithSuffix(graph, "vertices");
 
-	expect(expected).toEqual(
-		expect.arrayContaining(calculated),
-	);
+	expect(expected).toEqual(expect.arrayContaining(calculated));
 });
 
 test("prefix key with extensions search test", () => {
@@ -195,9 +188,7 @@ test("prefix key with extensions search test", () => {
 
 	const calculated = ear.graph.filterKeysWithPrefix(graph, "vertices");
 
-	expect(expected).toEqual(
-		expect.arrayContaining(calculated),
-	);
+	expect(expected).toEqual(expect.arrayContaining(calculated));
 });
 
 test("transpose geometry arrays", () => {
@@ -209,16 +200,44 @@ test("transpose geometry arrays", () => {
 		frame_title: "",
 		frame_attributes: ["2D"],
 		frame_classes: ["creasePattern"],
-		vertices_coords: [[0, 0], [0.5, 0], [1, 0], [1, 1], [0.5, 1], [0, 1]],
-		vertices_vertices: [[1, 5], [2, 4, 0], [3, 1], [4, 2], [5, 1, 3], [0, 4]],
+		vertices_coords: [
+			[0, 0],
+			[0.5, 0],
+			[1, 0],
+			[1, 1],
+			[0.5, 1],
+			[0, 1],
+		],
+		vertices_vertices: [
+			[1, 5],
+			[2, 4, 0],
+			[3, 1],
+			[4, 2],
+			[5, 1, 3],
+			[0, 4],
+		],
 		vertices_faces: [[0], [0, 1], [1], [1], [1, 0], [0]],
-		edges_vertices: [[0, 1], [1, 2], [2, 3], [3, 4], [4, 5], [5, 0], [1, 4]],
+		edges_vertices: [
+			[0, 1],
+			[1, 2],
+			[2, 3],
+			[3, 4],
+			[4, 5],
+			[5, 0],
+			[1, 4],
+		],
 		edges_faces: [[0], [1], [1], [1], [0], [0], [0, 1]],
 		edges_assignment: ["B", "B", "B", "B", "B", "B", "V"],
 		edges_foldAngle: [0, 0, 0, 0, 0, 0, 180],
 		edges_length: [0.5, 0.5, 1, 0.5, 0.5, 1, 1],
-		faces_vertices: [[1, 4, 5, 0], [4, 1, 2, 3]],
-		faces_edges: [[6, 4, 5, 0], [6, 1, 2, 3]],
+		faces_vertices: [
+			[1, 4, 5, 0],
+			[4, 1, 2, 3],
+		],
+		faces_edges: [
+			[6, 4, 5, 0],
+			[6, 1, 2, 3],
+		],
 	};
 	const transposedVertices = ear.graph.transposeGraphArrays(graph, "vertices");
 
@@ -249,25 +268,26 @@ test("get keys with ending", () => {
 });
 
 test("invertAssignments assignments", () => {
-	expect(ear.graph.invertAssignments({ edges_assignment: Array.from("MBVUFJC") })
-		.edges_assignment
-		.join("")).toBe("VBMUFJC");
-	expect(ear.graph
-		.invertAssignments({ edges_foldAngle: [0, -180, 180] })
-		.edges_foldAngle[0])
-		.toBe(-0);
-	expect(ear.graph
-		.invertAssignments({ edges_foldAngle: [0, -180, 180] })
-		.edges_foldAngle[1])
-		.toBe(180);
-	expect(ear.graph
-		.invertAssignments({ edges_foldAngle: [0, -180, 180] })
-		.edges_foldAngle[2])
-		.toBe(-180);
+	expect(
+		ear.graph
+			.invertAssignments({ edges_assignment: Array.from("MBVUFJC") })
+			.edges_assignment.join(""),
+	).toBe("VBMUFJC");
+	expect(
+		ear.graph.invertAssignments({ edges_foldAngle: [0, -180, 180] }).edges_foldAngle[0],
+	).toBe(-0);
+	expect(
+		ear.graph.invertAssignments({ edges_foldAngle: [0, -180, 180] }).edges_foldAngle[1],
+	).toBe(180);
+	expect(
+		ear.graph.invertAssignments({ edges_foldAngle: [0, -180, 180] }).edges_foldAngle[2],
+	).toBe(-180);
 });
 
 test("getFileMetadata", () => {
-	const graph = JSON.parse(fs.readFileSync("./tests/files/fold/crane-cp-bmvfcj.fold", "utf-8"));
+	const graph = JSON.parse(
+		fs.readFileSync("./tests/files/fold/crane-cp-bmvfcj.fold", "utf-8"),
+	);
 	const metadata = ear.graph.getFileMetadata(graph);
 	expect(Object.keys(metadata).length).toBe(5);
 	expect(metadata.file_author).toBe("Kraft");

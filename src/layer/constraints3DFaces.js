@@ -1,34 +1,15 @@
 /**
  * Rabbit Ear (c) Kraft
  */
-import {
-	EPSILON,
-} from "../math/constant.js";
-import {
-	average2,
-	resize3,
-} from "../math/vector.js";
-import {
-	multiplyMatrix4Vector3,
-} from "../math/matrix4.js";
-import {
-	mergeArraysWithHoles,
-} from "../general/array.js";
-import {
-	makeFacesPolygon,
-} from "../graph/make/faces.js";
-import {
-	connectedComponentsPairs,
-} from "../graph/connectedComponents.js";
-import {
-	getCoplanarAdjacentOverlappingFaces,
-} from "../graph/faces/planes.js";
-import {
-	subgraphWithFaces,
-} from "../graph/subgraph.js";
-import {
-	getFacesFacesOverlap,
-} from "../graph/overlap.js";
+import { EPSILON } from "../math/constant.js";
+import { average2, resize3 } from "../math/vector.js";
+import { multiplyMatrix4Vector3 } from "../math/matrix4.js";
+import { mergeArraysWithHoles } from "../general/array.js";
+import { makeFacesPolygon } from "../graph/make/faces.js";
+import { connectedComponentsPairs } from "../graph/connectedComponents.js";
+import { getCoplanarAdjacentOverlappingFaces } from "../graph/faces/planes.js";
+import { subgraphWithFaces } from "../graph/subgraph.js";
+import { getFacesFacesOverlap } from "../graph/overlap.js";
 
 /**
  * @description The first subroutine to initialize solver constraints for a
@@ -52,10 +33,19 @@ import {
  *   facePairs: string[],
  * }}
  */
-export const constraints3DFaceClusters = ({
-	vertices_coords, edges_vertices, edges_faces, edges_assignment, edges_foldAngle,
-	faces_vertices, faces_edges, faces_faces,
-}, epsilon = EPSILON) => {
+export const constraints3DFaceClusters = (
+	{
+		vertices_coords,
+		edges_vertices,
+		edges_faces,
+		edges_assignment,
+		edges_foldAngle,
+		faces_vertices,
+		faces_edges,
+		faces_faces,
+	},
+	epsilon = EPSILON,
+) => {
 	// cluster faces into coplanar-adjacent-overlapping sets. this creates:
 	// - "planes": every unique plane that at least one face inhabits
 	// - "clusters": a coplanar set of faces, multiple of these clusters can be
@@ -70,28 +60,38 @@ export const constraints3DFaceClusters = ({
 		faces_cluster,
 		clusters_plane,
 		clusters_faces,
-	} = getCoplanarAdjacentOverlappingFaces({
-		vertices_coords, faces_vertices, faces_faces,
-	}, epsilon);
+	} = getCoplanarAdjacentOverlappingFaces(
+		{
+			vertices_coords,
+			faces_vertices,
+			faces_faces,
+		},
+		epsilon,
+	);
 
 	// for each cluster, get the transform which, when applied, brings
 	// all points into the XY plane.
-	const clusters_transform = clusters_plane.map(p => planes_transform[p]);
+	const clusters_transform = clusters_plane.map((p) => planes_transform[p]);
 
 	// for every cluster, make a shallow copy of the input graph, containing
 	// only the faces included in that cluster, and by extension, all edges and
 	// vertices which are used by this subset of faces.
 	/** @type {FOLDExtended[]} */
-	const clusters_graph = clusters_faces.map(faces => subgraphWithFaces({
-		vertices_coords,
-		edges_vertices,
-		edges_faces,
-		edges_assignment,
-		edges_foldAngle,
-		faces_vertices,
-		faces_edges,
-		faces_faces,
-	}, faces));
+	const clusters_graph = clusters_faces.map((faces) =>
+		subgraphWithFaces(
+			{
+				vertices_coords,
+				edges_vertices,
+				edges_faces,
+				edges_assignment,
+				edges_foldAngle,
+				faces_vertices,
+				faces_edges,
+				faces_faces,
+			},
+			faces,
+		),
+	);
 
 	// ensure all vertices_coords are 3D (make a copy array here) for use in
 	// multiplyMatrix4Vector3, which requires points to be in 3D.
@@ -101,10 +101,7 @@ export const constraints3DFaceClusters = ({
 	// to bring them all into the XY plane. convert back into a 2D point.
 	clusters_graph.forEach(({ vertices_coords: coords }, c) => {
 		clusters_graph[c].vertices_coords = coords
-			.map((_, v) => multiplyMatrix4Vector3(
-				clusters_transform[c],
-				vertices_coords3D[v],
-			))
+			.map((_, v) => multiplyMatrix4Vector3(clusters_transform[c], vertices_coords3D[v]))
 			.map(([x, y]) => [x, y]);
 	});
 
@@ -116,13 +113,14 @@ export const constraints3DFaceClusters = ({
 	// is re-oriented into 2D via each set's transformation.
 	// collinear vertices (if exist) are removed from every polygon.
 	/** @type {[number, number][][]} */
-	const faces_polygon = mergeArraysWithHoles(...clusters_graph
-		.map(copy => makeFacesPolygon(copy, epsilon)));
+	const faces_polygon = mergeArraysWithHoles(
+		...clusters_graph.map((copy) => makeFacesPolygon(copy, epsilon)),
+	);
 
 	// simple faces center by averaging all the face's vertices.
 	// we don't have to be precise here, these are used to tell which
 	// side of a face's edge the face is (assuming all faces are convex).
-	const faces_center = faces_polygon.map(coords => average2(...coords));
+	const faces_center = faces_polygon.map((coords) => average2(...coords));
 
 	// populate individual graph copies with faces_center data.
 	clusters_graph.forEach(({ faces_vertices: fv }, c) => {
@@ -132,8 +130,8 @@ export const constraints3DFaceClusters = ({
 	// ensure that all faces are counter-clockwise, flip winding if necessary.
 	faces_winding
 		.map((upright, i) => (upright ? undefined : i))
-		.filter(a => a !== undefined)
-		.forEach(f => faces_polygon[f].reverse());
+		.filter((a) => a !== undefined)
+		.forEach((f) => faces_polygon[f].reverse());
 
 	// for every face, a list of face indices which overlap this face.
 	// compute face-face-overlap for every cluster's graph one at a time,
@@ -143,13 +141,15 @@ export const constraints3DFaceClusters = ({
 	// overlap information separately, we can merge all of the results into
 	// a flat array since none of the resulting arrays will overlap.
 	/** @type {number[][]} */
-	const facesFacesOverlap = mergeArraysWithHoles(...clusters_graph
-		.map(graph => getFacesFacesOverlap(graph, epsilon)));
+	const facesFacesOverlap = mergeArraysWithHoles(
+		...clusters_graph.map((graph) => getFacesFacesOverlap(graph, epsilon)),
+	);
 
 	// these are all the variables we need to solve- all overlapping faces in
 	// pairwise combinations, as a space-separated string, smallest index first
-	const facePairs = connectedComponentsPairs(facesFacesOverlap)
-		.map(pair => pair.join(" "));
+	const facePairs = connectedComponentsPairs(facesFacesOverlap).map((pair) =>
+		pair.join(" "),
+	);
 
 	return {
 		planes_transform,

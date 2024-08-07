@@ -1,13 +1,8 @@
 /**
  * Rabbit Ear (c) Kraft
  */
-import {
-	identity4x4,
-	multiplyMatrices4,
-} from "../../math/matrix4.js";
-import {
-	parseColorToWebGLColor,
-} from "../general/colors.js";
+import { identity4x4, multiplyMatrices4 } from "../../math/matrix4.js";
+import { parseColorToWebGLColor } from "../general/colors.js";
 
 /**
  * @description Uniforms must exist so there are protections to ensure

@@ -1,25 +1,24 @@
 /**
  * Rabbit Ear (c) Kraft
  */
-import {
-	assignmentFlatFoldAngle,
-} from "../../fold/spec.js";
+import { assignmentFlatFoldAngle } from "../../fold/spec.js";
 
 /**
  * @param {FOLD} graph a FOLD object
  * @returns {string[]}
  */
 const assignmentsAndFoldAngleMatch = ({ edges_assignment, edges_foldAngle }) => {
-	const angleSign = edges_foldAngle
-		.map(Math.sign);
+	const angleSign = edges_foldAngle.map(Math.sign);
 	const assignmentSign = edges_assignment
-		.map(assign => assignmentFlatFoldAngle[assign])
+		.map((assign) => assignmentFlatFoldAngle[assign])
 		.map(Math.sign);
 	return assignmentSign
-		.map((s, i) => (s === angleSign[i]
-			? undefined
-			: `assignment does not match fold angle at ${i}: ${edges_assignment[i]}, ${edges_foldAngle[i]}`))
-		.filter(a => a !== undefined);
+		.map((s, i) =>
+			s === angleSign[i]
+				? undefined
+				: `assignment does not match fold angle at ${i}: ${edges_assignment[i]}, ${edges_foldAngle[i]}`,
+		)
+		.filter((a) => a !== undefined);
 };
 
 /**

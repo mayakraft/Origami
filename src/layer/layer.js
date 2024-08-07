@@ -1,13 +1,8 @@
 /**
  * Rabbit Ear (c) Kraft
  */
-import {
-	solveFaceOrders,
-	solveFaceOrders3D,
-} from "./solve.js";
-import {
-	LayerPrototype,
-} from "./prototype.js";
+import { solveFaceOrders, solveFaceOrders3D } from "./solve.js";
+import { LayerPrototype } from "./prototype.js";
 
 /**
  * @description Find all possible layer orderings of the faces
@@ -18,10 +13,8 @@ import {
  * @param {number} [epsilon=1e-6] an optional epsilon
  * @returns {typeof LayerPrototype} a layer solution object
  */
-export const layer = (graph, epsilon) => Object.assign(
-	Object.create(LayerPrototype),
-	solveFaceOrders(graph, epsilon),
-);
+export const layer = (graph, epsilon) =>
+	Object.assign(Object.create(LayerPrototype), solveFaceOrders(graph, epsilon));
 
 /**
  * @description Find all possible layer orderings of the faces
@@ -32,7 +25,5 @@ export const layer = (graph, epsilon) => Object.assign(
  * @param {number} [epsilon=1e-6] an optional epsilon
  * @returns {typeof LayerPrototype} a layer solution object
  */
-export const layer3D = (graph, epsilon) => Object.assign(
-	Object.create(LayerPrototype),
-	solveFaceOrders3D(graph, epsilon),
-);
+export const layer3D = (graph, epsilon) =>
+	Object.assign(Object.create(LayerPrototype), solveFaceOrders3D(graph, epsilon));

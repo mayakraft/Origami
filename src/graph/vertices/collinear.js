@@ -1,15 +1,9 @@
 /**
  * Rabbit Ear (c) Kraft
  */
-import {
-	EPSILON,
-} from "../../math/constant.js";
-import {
-	collinearBetween,
-} from "../../math/line.js";
-import {
-	makeVerticesEdgesUnsorted,
-} from "../make/verticesEdges.js";
+import { EPSILON } from "../../math/constant.js";
+import { collinearBetween } from "../../math/line.js";
+import { makeVerticesEdgesUnsorted } from "../make/verticesEdges.js";
 
 /**
  * @description Given one vertex, and a list of edges which contain this vertex,
@@ -19,11 +13,12 @@ import {
  * @param {number[]} edges a list of edge indices
  * @returns {number[]} for every edge, one vertex that is the opposite vertex
  */
-export const getOtherVerticesInEdges = ({ edges_vertices }, vertex, edges) => (
-	edges.map(edge => (edges_vertices[edge][0] === vertex
-		? edges_vertices[edge][1]
-		: edges_vertices[edge][0]))
-);
+export const getOtherVerticesInEdges = ({ edges_vertices }, vertex, edges) =>
+	edges.map((edge) =>
+		edges_vertices[edge][0] === vertex
+			? edges_vertices[edge][1]
+			: edges_vertices[edge][0],
+	);
 
 /**
  * @description determine if a vertex exists between two and only two edges,
@@ -36,22 +31,27 @@ export const getOtherVerticesInEdges = ({ edges_vertices }, vertex, edges) => (
  * @param {number} [epsilon=1e-6] an optional epsilon
  * @returns {boolean} true if the vertex is collinear and can be removed.
  */
-export const isVertexCollinear = ({
-	vertices_coords, vertices_edges, edges_vertices,
-}, vertex, epsilon = EPSILON) => {
-	if (!vertices_coords || !edges_vertices) { return false; }
+export const isVertexCollinear = (
+	{ vertices_coords, vertices_edges, edges_vertices },
+	vertex,
+	epsilon = EPSILON,
+) => {
+	if (!vertices_coords || !edges_vertices) {
+		return false;
+	}
 	if (!vertices_edges) {
 		vertices_edges = makeVerticesEdgesUnsorted({ edges_vertices });
 	}
 	const edges = vertices_edges[vertex];
-	if (edges === undefined || edges.length !== 2) { return false; }
+	if (edges === undefined || edges.length !== 2) {
+		return false;
+	}
 	// don't just check if they are parallel, use the direction of the vertex
 	// to make sure the center vertex is inbetween, instead of the odd
 	// case where the two edges are on top of one another with
 	// a leaf-like vertex.
 	const vertices = getOtherVerticesInEdges({ edges_vertices }, vertex, edges);
-	const [a, b, c] = [vertices[0], vertex, vertices[1]]
-		.map(v => vertices_coords[v]);
+	const [a, b, c] = [vertices[0], vertex, vertices[1]].map((v) => vertices_coords[v]);
 	return collinearBetween(a, b, c, false, epsilon);
 };
 

@@ -26,7 +26,9 @@ const makeIndexMap = (graph, key, replaceIndices, replaces) => {
 			i += 1;
 			walk += 1;
 		}
-		if (i < arrayLength) { indexMap[i] = j; }
+		if (i < arrayLength) {
+			indexMap[i] = j;
+		}
 	}
 	return indexMap;
 };
@@ -68,7 +70,7 @@ export const replace = (graph, key, replaceIndices) => {
 			// eslint-disable-next-line no-param-reassign
 			replaceIndices[value] = index;
 		});
-	const removes = Object.keys(replaceIndices).map(n => parseInt(n, 10));
+	const removes = Object.keys(replaceIndices).map((n) => parseInt(n, 10));
 	const replaces = uniqueSortedNumbers(removes);
 	const indexMap = makeIndexMap(graph, key, replaceIndices, replaces);
 	remapKey(graph, key, indexMap);

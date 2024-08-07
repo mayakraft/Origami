@@ -41,16 +41,16 @@ export const solveFlatAdjacentEdges = (
 		const localOrder = assignmentOrder[assignment];
 
 		// skip boundary edges, non-manifold edges, and irrelevant assignments
-		if (faces.length !== 2 || localOrder === undefined) { return; }
+		if (faces.length !== 2 || localOrder === undefined) {
+			return;
+		}
 
 		// face[0] is the origin face.
 		// the direction of "m" or "v" will be inverted if face[0] is flipped.
 		const upright = faces_winding[faces[0]];
 
 		// now we know from a global perspective the order between the face pair.
-		const globalOrder = upright
-			? localOrder
-			: flipCondition[localOrder];
+		const globalOrder = upright ? localOrder : flipCondition[localOrder];
 
 		// all face-pairs are stored "a b" where a < b. Our globalOrder is the
 		// relationship from faces[0] to faces[1], so if faces[0] > [1] we need

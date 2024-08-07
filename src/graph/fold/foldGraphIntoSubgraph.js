@@ -1,39 +1,18 @@
 /**
  * Rabbit Ear (c) Kraft
  */
-import {
-	EPSILON,
-} from "../../math/constant.js";
-import {
-	includeL,
-} from "../../math/compare.js";
-import {
-	pointsToLine2,
-} from "../../math/convert.js";
-import {
-	add2,
-	scale2,
-} from "../../math/vector.js";
-import {
-	assignmentFlatFoldAngle,
-	invertAssignment,
-} from "../../fold/spec.js";
-import {
-	makeEdgesFacesUnsorted,
-} from "../make/edgesFaces.js";
-import {
-	splitLineIntoEdges,
-} from "../split/splitLine.js";
-import {
-	makeFacesWinding,
-} from "../faces/winding.js";
-import {
-	transferPointInFaceBetweenGraphs,
-} from "../transfer.js";
+import { EPSILON } from "../../math/constant.js";
+import { includeL } from "../../math/compare.js";
+import { pointsToLine2 } from "../../math/convert.js";
+import { add2, scale2 } from "../../math/vector.js";
+import { assignmentFlatFoldAngle, invertAssignment } from "../../fold/spec.js";
+import { makeEdgesFacesUnsorted } from "../make/edgesFaces.js";
+import { splitLineIntoEdges } from "../split/splitLine.js";
+import { makeFacesWinding } from "../faces/winding.js";
+import { transferPointInFaceBetweenGraphs } from "../transfer.js";
 
 const transferPointOnEdgeBetweenGraphs = (to, edge, parameter) => {
-	const edgeSegment = to.edges_vertices[edge]
-		.map(v => to.vertices_coords[v]);
+	const edgeSegment = to.edges_vertices[edge].map((v) => to.vertices_coords[v]);
 	const edgeLine = pointsToLine2(edgeSegment[0], edgeSegment[1]);
 	return add2(edgeLine.origin, scale2(edgeLine.vector, parameter));
 };
@@ -113,12 +92,7 @@ export const foldGraphIntoSubgraph = (
 	const oppositeFoldAngle = foldAngle === 0 ? 0 : -foldAngle;
 	const faces_winding = makeFacesWinding(folded);
 
-	const {
-		vertices,
-		edges_vertices,
-		edges_collinear,
-		edges_face,
-	} = splitLineIntoEdges(
+	const { vertices, edges_vertices, edges_collinear, edges_face } = splitLineIntoEdges(
 		folded,
 		line,
 		lineDomain,
@@ -129,14 +103,17 @@ export const foldGraphIntoSubgraph = (
 	// splitSegmentWithGraph created new points in the foldedForm coordinate
 	// space. we need to transfer these to their respective position in the
 	// crease pattern space. 2 different methods depending on how the point was made
-	const vertices_coords = vertices
-		.map(pointInfo => transferPoint(folded, cp, pointInfo));
+	const vertices_coords = vertices.map((pointInfo) =>
+		transferPoint(folded, cp, pointInfo),
+	);
 
 	// get the first face in these instances
-	const edges_assignment = edges_face
-		.map((face) => (faces_winding[face] ? assignment : oppositeAssignment));
-	const edges_foldAngle = edges_face
-		.map((face) => (faces_winding[face] ? foldAngle : oppositeFoldAngle));
+	const edges_assignment = edges_face.map((face) =>
+		faces_winding[face] ? assignment : oppositeAssignment,
+	);
+	const edges_foldAngle = edges_face.map((face) =>
+		faces_winding[face] ? foldAngle : oppositeFoldAngle,
+	);
 
 	// this is the crease pattern's edges_faces (not edges_face from above)
 	const edges_faces = cp.edges_faces ? cp.edges_faces : makeEdgesFacesUnsorted(cp);
@@ -150,12 +127,12 @@ export const foldGraphIntoSubgraph = (
 
 	edges_collinear
 		.map((collinear, e) => (collinear ? e : undefined))
-		.filter(a => a !== undefined)
-		.forEach(edge => {
-			if (!reassignable[edges_assignment[edge]]) { return; }
-			const face = edges_faces[edge]
-				.filter(a => a !== undefined)
-				.shift();
+		.filter((a) => a !== undefined)
+		.forEach((edge) => {
+			if (!reassignable[edges_assignment[edge]]) {
+				return;
+			}
+			const face = edges_faces[edge].filter((a) => a !== undefined).shift();
 			const winding = faces_winding[face];
 			edges_assignment[edge] = winding ? assignment : oppositeAssignment;
 			edges_foldAngle[edge] = winding ? foldAngle : oppositeFoldAngle;

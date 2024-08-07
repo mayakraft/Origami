@@ -1,16 +1,9 @@
 /**
  * Rabbit Ear (c) Kraft
  */
-import {
-	EPSILON,
-} from "./constant.js";
-import {
-	clampLine,
-	clampSegment,
-} from "./line.js";
-import {
-	arrayMinimumIndex,
-} from "../general/array.js";
+import { EPSILON } from "./constant.js";
+import { clampLine, clampSegment } from "./line.js";
+import { arrayMinimumIndex } from "../general/array.js";
 import {
 	magSquared,
 	distance,
@@ -34,7 +27,7 @@ import {
  */
 export const nearestPoint2 = (points, point) => {
 	// todo speed up with partitioning
-	const index = arrayMinimumIndex(points, el => distance2(el, point));
+	const index = arrayMinimumIndex(points, (el) => distance2(el, point));
 	return index === undefined ? undefined : points[index];
 };
 
@@ -47,7 +40,7 @@ export const nearestPoint2 = (points, point) => {
 export const nearestPoint = (points, point) => {
 	// todo speed up with partitioning
 	// const index = arrayMinimumIndex(points, point, distance);
-	const index = arrayMinimumIndex(points, el => distance(el, point));
+	const index = arrayMinimumIndex(points, (el) => distance(el, point));
 	return index === undefined ? undefined : points[index];
 };
 
@@ -87,13 +80,14 @@ export const nearestPointOnLine = (
  * @returns {object} a point
  * edge index matches vertices such that edge(N) = [vert(N), vert(N + 1)]
  */
-export const nearestPointOnPolygon = (polygon, point) => polygon
-	.map((p, i, arr) => subtract2(arr[(i + 1) % arr.length], p))
-	.map((vector, i) => ({ vector, origin: polygon[i] }))
-	.map(line => nearestPointOnLine(line, point, clampSegment))
-	.map((p, edge) => ({ point: p, edge, distance: distance2(p, point) }))
-	.sort((a, b) => a.distance - b.distance)
-	.shift();
+export const nearestPointOnPolygon = (polygon, point) =>
+	polygon
+		.map((p, i, arr) => subtract2(arr[(i + 1) % arr.length], p))
+		.map((vector, i) => ({ vector, origin: polygon[i] }))
+		.map((line) => nearestPointOnLine(line, point, clampSegment))
+		.map((p, edge) => ({ point: p, edge, distance: distance2(p, point) }))
+		.sort((a, b) => a.distance - b.distance)
+		.shift();
 
 /**
  * @description find the nearest point on the boundary of a circle to another point
@@ -102,9 +96,8 @@ export const nearestPointOnPolygon = (polygon, point) => polygon
  * @param {[number, number]} point the point to test nearness to
  * @returns {[number, number]} a point
  */
-export const nearestPointOnCircle = ({ radius, origin }, point) => (
-	add2(origin, scale2(normalize2(subtract2(point, origin)), radius))
-);
+export const nearestPointOnCircle = ({ radius, origin }, point) =>
+	add2(origin, scale2(normalize2(subtract2(point, origin)), radius));
 
 // todo
 // const nearestPointOnEllipse = () => false;

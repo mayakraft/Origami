@@ -1,10 +1,10 @@
 /* SVG (c) Kraft */
-import { str_points, str_string } from '../../environment/strings.js';
-import { svgSemiFlattenArrays } from '../../arguments/semiFlattenArrays.js';
-import makeCoordinates from '../../arguments/makeCoordinates.js';
-import TransformMethods from './shared/transforms.js';
-import methods from './shared/urls.js';
-import * as dom from './shared/dom.js';
+import { str_points, str_string } from "../../environment/strings.js";
+import { svgSemiFlattenArrays } from "../../arguments/semiFlattenArrays.js";
+import makeCoordinates from "../../arguments/makeCoordinates.js";
+import TransformMethods from "./shared/transforms.js";
+import methods from "./shared/urls.js";
+import * as dom from "./shared/dom.js";
 
 /**
  * Rabbit Ear (c) Kraft
@@ -12,12 +12,11 @@ import * as dom from './shared/dom.js';
 
 const getPoints = (el) => {
 	const attr = el.getAttribute(str_points);
-	return (attr == null) ? "" : attr;
+	return attr == null ? "" : attr;
 };
 
 const polyString = function () {
-	return Array
-		.from(Array(Math.floor(arguments.length / 2)))
+	return Array.from(Array(Math.floor(arguments.length / 2)))
 		.map((_, i) => `${arguments[i * 2 + 0]},${arguments[i * 2 + 1]}`)
 		.join(" ");
 };
@@ -32,9 +31,10 @@ const setPoints = (element, ...args) => {
 };
 
 const addPoint = (element, ...args) => {
-	element.setAttribute(str_points, [getPoints(element), stringifyArgs(...args)[0]]
-		.filter(a => a !== "")
-		.join(" "));
+	element.setAttribute(
+		str_points,
+		[getPoints(element), stringifyArgs(...args)[0]].filter((a) => a !== "").join(" "),
+	);
 	return element;
 };
 

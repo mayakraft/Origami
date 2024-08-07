@@ -1,26 +1,11 @@
 /**
  * Rabbit Ear (c) Kraft
  */
-import {
-	EPSILON,
-} from "./constant.js";
-import {
-	include,
-	includeL,
-} from "./compare.js";
-import {
-	magnitude2,
-	cross2,
-	add2,
-	subtract2,
-	scale2,
-} from "./vector.js";
-import {
-	intersectPolygonLine,
-} from "./intersect.js";
-import {
-	overlapConvexPolygonPoint,
-} from "./overlap.js";
+import { EPSILON } from "./constant.js";
+import { include, includeL } from "./compare.js";
+import { magnitude2, cross2, add2, subtract2, scale2 } from "./vector.js";
+import { intersectPolygonLine } from "./intersect.js";
+import { overlapConvexPolygonPoint } from "./overlap.js";
 
 /**
  * @description Given a list of sorted numbers and a domain function which
@@ -34,18 +19,26 @@ import {
  * @returns {[number, number]} a pair of numbers
  */
 const getMinMax = (numbers, func, scaled_epsilon) => {
-	if (numbers.length < 2) { return undefined; }
+	if (numbers.length < 2) {
+		return undefined;
+	}
 	let a = 0;
 	let b = numbers.length - 1;
 	while (a < b) {
-		if (func(numbers[a + 1] - numbers[a], scaled_epsilon)) { break; }
+		if (func(numbers[a + 1] - numbers[a], scaled_epsilon)) {
+			break;
+		}
 		a += 1;
 	}
 	while (b > a) {
-		if (func(numbers[b] - numbers[b - 1], scaled_epsilon)) { break; }
+		if (func(numbers[b] - numbers[b - 1], scaled_epsilon)) {
+			break;
+		}
 		b -= 1;
 	}
-	if (a >= b) { return undefined; }
+	if (a >= b) {
+		return undefined;
+	}
 	return [numbers[a], numbers[b]];
 };
 
@@ -69,21 +62,28 @@ export const clipLineConvexPolygon = (
 ) => {
 	// clip the polygon with an infinite line, the actual line domain
 	// function will be used later to clip these paramterization results.
-	const numbers = intersectPolygonLine(poly, { vector, origin }, includeL, epsilon)
-		.map(({ a }) => a);
-	if (numbers.length < 2) { return undefined; }
+	const numbers = intersectPolygonLine(poly, { vector, origin }, includeL, epsilon).map(
+		({ a }) => a,
+	);
+	if (numbers.length < 2) {
+		return undefined;
+	}
 	const scaled_epsilon = (epsilon * 2) / magnitude2(vector);
 	// ends is now an array, length 2, of the min and max parameter on the line
 	// this also verifies the two intersections are not the same point
 	const ends = getMinMax(numbers, fnPoly, scaled_epsilon);
-	if (ends === undefined) { return undefined; }
+	if (ends === undefined) {
+		return undefined;
+	}
 	// ends_clip is the intersection between 2 domains, the result
 	// and the valid inclusive/exclusive function
 	// todo: this line hardcodes the parameterization that segments and rays are cropping
 	// their lowest point at 0 and highest (if segment) at 1
 	/** @param {number} t */
 	const clip_fn = (t) => {
-		if (fnLine(t)) { return t; }
+		if (fnLine(t)) {
+			return t;
+		}
 		return t < 0.5 ? 0 : 1;
 	};
 	const ends_clip = ends.map(clip_fn);
@@ -96,7 +96,7 @@ export const clipLineConvexPolygon = (
 	// const mid = paramToPoint(vector, origin, (ends_clip[0] + ends_clip[1]) / 2);
 	const mid = add2(origin, scale2(vector, (ends_clip[0] + ends_clip[1]) / 2));
 	return overlapConvexPolygonPoint(poly, mid, fnPoly, epsilon).overlap
-		? ends_clip.map(t => add2(origin, scale2(vector, t)))
+		? ends_clip.map((t) => add2(origin, scale2(vector, t)))
 		: undefined;
 };
 
@@ -116,9 +116,8 @@ export const clipLineConvexPolygon = (
  * @returns {number[][]} a polygon as an array of points.
  */
 export const clipPolygonPolygon = (polygon1, polygon2, epsilon = EPSILON) => {
-	const inside = (p, cp1, cp2) => (
-		(cp2[0] - cp1[0]) * (p[1] - cp1[1])) > ((cp2[1] - cp1[1]) * (p[0] - cp1[0]) + epsilon
-	);
+	const inside = (p, cp1, cp2) =>
+		(cp2[0] - cp1[0]) * (p[1] - cp1[1]) > (cp2[1] - cp1[1]) * (p[0] - cp1[0]) + epsilon;
 	const intersection = (cp1, cp2, e, s) => {
 		const dc = subtract2(cp1, cp2);
 		const dp = subtract2(s, e);

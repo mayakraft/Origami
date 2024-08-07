@@ -2,37 +2,19 @@
  * Rabbit Ear (c) Kraft
  */
 import Messages from "../environment/messages.js";
-import {
-	EPSILON,
-} from "../math/constant.js";
-import {
-	edgeFoldAngleIsFlat,
-} from "../fold/spec.js";
-import {
-	constraints3DFaceClusters,
-} from "./constraints3DFaces.js";
+import { EPSILON } from "../math/constant.js";
+import { edgeFoldAngleIsFlat } from "../fold/spec.js";
+import { constraints3DFaceClusters } from "./constraints3DFaces.js";
 import {
 	constraints3DEdges,
 	getOverlapFacesWith3DEdge,
 	solveOverlapFacesWith3DEdge,
 } from "./constraints3DEdges.js";
-import {
-	makeTacosAndTortillas,
-} from "./tacosTortillas.js";
-import {
-	makeTransitivity,
-	getTransitivityTriosFromTacos,
-} from "./transitivity.js";
-import {
-	makeConstraintsLookup,
-} from "./constraintsFlat.js";
-import {
-	solveFlatAdjacentEdges,
-} from "./initialSolutionsFlat.js";
-import {
-	faceOrdersToSolverOrders,
-	mergeWithoutOverwrite,
-} from "./general.js";
+import { makeTacosAndTortillas } from "./tacosTortillas.js";
+import { makeTransitivity, getTransitivityTriosFromTacos } from "./transitivity.js";
+import { makeConstraintsLookup } from "./constraintsFlat.js";
+import { solveFlatAdjacentEdges } from "./initialSolutionsFlat.js";
+import { faceOrdersToSolverOrders, mergeWithoutOverwrite } from "./general.js";
 
 /**
  * @description Convert a 3D folded graph into the input parameters for the
@@ -65,10 +47,20 @@ import {
  * - orders: solutions to facePairs that were discovered during
  *   the construction of these constraints.
  */
-export const makeSolverConstraints3D = ({
-	vertices_coords, edges_vertices, edges_faces, edges_assignment, edges_foldAngle,
-	faces_vertices, faces_edges, faces_faces, faceOrders,
-}, epsilon = EPSILON) => {
+export const makeSolverConstraints3D = (
+	{
+		vertices_coords,
+		edges_vertices,
+		edges_faces,
+		edges_assignment,
+		edges_foldAngle,
+		faces_vertices,
+		faces_edges,
+		faces_faces,
+		faceOrders,
+	},
+	epsilon = EPSILON,
+) => {
 	const {
 		// planes_transform,
 		faces_plane,
@@ -81,29 +73,36 @@ export const makeSolverConstraints3D = ({
 		// clusters_transform,
 		facesFacesOverlap,
 		facePairs,
-	} = constraints3DFaceClusters({
-		vertices_coords,
-		edges_vertices,
-		edges_faces,
-		edges_assignment,
-		edges_foldAngle,
-		faces_vertices,
-		faces_edges,
-		faces_faces,
-	}, epsilon);
-
-	let edgeResults;
-	try {
-		edgeResults = constraints3DEdges({
+	} = constraints3DFaceClusters(
+		{
 			vertices_coords,
 			edges_vertices,
 			edges_faces,
+			edges_assignment,
 			edges_foldAngle,
-		}, {
-			faces_plane,
-			faces_winding,
-			facesFacesOverlap,
-		}, epsilon);
+			faces_vertices,
+			faces_edges,
+			faces_faces,
+		},
+		epsilon,
+	);
+
+	let edgeResults;
+	try {
+		edgeResults = constraints3DEdges(
+			{
+				vertices_coords,
+				edges_vertices,
+				edges_faces,
+				edges_foldAngle,
+			},
+			{
+				faces_plane,
+				faces_winding,
+				facesFacesOverlap,
+			},
+			epsilon,
+		);
 	} catch (error) {
 		throw new Error(Messages.noLayerSolution, { cause: error });
 	}
@@ -119,35 +118,40 @@ export const makeSolverConstraints3D = ({
 	const nonFlatEdges = edges_foldAngle
 		.map(edgeFoldAngleIsFlat)
 		.map((flat, i) => (!flat ? i : undefined))
-		.filter(a => a !== undefined);
+		.filter((a) => a !== undefined);
 
 	// remove any non-flat edges from the shallow copies.
-	["edges_vertices", "edges_faces", "edges_assignment", "edges_foldAngle"]
-		.forEach(key => clusters_graph
-			.forEach((_, c) => nonFlatEdges
-				.forEach(e => delete clusters_graph[c][key][e])));
+	["edges_vertices", "edges_faces", "edges_assignment", "edges_foldAngle"].forEach(
+		(key) =>
+			clusters_graph.forEach((_, c) =>
+				nonFlatEdges.forEach((e) => delete clusters_graph[c][key][e]),
+			),
+	);
 
 	// now that we have all faces separated into coplanar-overlapping sets,
 	// run the 2D taco/tortilla algorithms on each set individually
-	const clusters_TacosAndTortillas = clusters_graph
-		.map(el => makeTacosAndTortillas(el, epsilon));
+	const clusters_TacosAndTortillas = clusters_graph.map((el) =>
+		makeTacosAndTortillas(el, epsilon),
+	);
 
 	// now that we have computed these separately, we can flatten them into the
 	// same array. The fact that these face pairs are from different 2D planes
 	// does not matter, the solver simply solves them all at once.
-	const taco_taco = clusters_TacosAndTortillas
-		.flatMap(el => el.taco_taco);
-	const taco_tortilla = clusters_TacosAndTortillas
-		.flatMap(el => el.taco_tortilla);
-	const tortilla_tortilla = clusters_TacosAndTortillas
-		.flatMap(el => el.tortilla_tortilla);
+	const taco_taco = clusters_TacosAndTortillas.flatMap((el) => el.taco_taco);
+	const taco_tortilla = clusters_TacosAndTortillas.flatMap((el) => el.taco_tortilla);
+	const tortilla_tortilla = clusters_TacosAndTortillas.flatMap(
+		(el) => el.tortilla_tortilla,
+	);
 
 	// transitivity can be built once, globally. transitivity is built from
 	// facesFacesOverlap, which inheritely includes the clusters-information by
 	// the fact that no two faces in different sets overlap one another.
 	const tacosTrios = getTransitivityTriosFromTacos({ taco_taco, taco_tortilla });
-	const transitivity = makeTransitivity({ faces_polygon }, facesFacesOverlap, epsilon)
-		.filter(trio => tacosTrios[trio.join(" ")] === undefined);
+	const transitivity = makeTransitivity(
+		{ faces_polygon },
+		facesFacesOverlap,
+		epsilon,
+	).filter((trio) => tacosTrios[trio.join(" ")] === undefined);
 
 	// 3D-tortillas are a constraint that follow the exact same rules as the
 	// 2D tortilla-tortillas. we can simply add them to the this array.
@@ -167,8 +171,8 @@ export const makeSolverConstraints3D = ({
 	// at this point, this means adjacent faces with an M or V edge between them.
 	// this is a 2D-only algorithm, we need to run it on each cluster individually
 	const adjacentOrders = clusters_graph
-		.map(el => solveFlatAdjacentEdges(el, faces_winding))
-		.reduce((a, b) => Object.assign(a, b), ({}));
+		.map((el) => solveFlatAdjacentEdges(el, faces_winding))
+		.reduce((a, b) => Object.assign(a, b), {});
 
 	// solutions where an edge with a 3D fold angle is crossing somewhere
 	// in the interior of another face, where one of the edge's face's is
@@ -190,7 +194,6 @@ export const makeSolverConstraints3D = ({
 	} catch (error) {
 		throw new Error(Messages.noLayerSolution, { cause: error });
 	}
-
 
 	// if the FOLD object contains a subset of pre-solved faceOrders,
 	// convert them into solver form and use them as the initial condition.

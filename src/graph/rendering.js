@@ -1,47 +1,18 @@
 /**
  * Rabbit Ear (c) Kraft
  */
-import {
-	scale3,
-	add3,
-	resize3,
-} from "../math/vector.js";
-import {
-	invertMatrix4,
-	multiplyMatrix4Vector3,
-} from "../math/matrix4.js";
-import {
-	clone,
-} from "../general/clone.js";
-import {
-	faceOrdersSubset,
-	nudgeFacesWithFaceOrders,
-} from "./orders.js";
-import {
-	countEdges,
-	countImpliedEdges,
-} from "./count.js";
-import {
-	invertArrayToFlatMap,
-} from "./maps.js";
-import {
-	triangulate,
-} from "./triangulate.js";
-import {
-	explodeFaces,
-} from "./explode.js";
-import {
-	fixCycles,
-} from "./cycles.js";
-import {
-	getFacesPlane,
-} from "./faces/planes.js";
-import {
-	subgraphWithFaces,
-} from "./subgraph.js";
-import {
-	join,
-} from "./join.js";
+import { scale3, add3, resize3 } from "../math/vector.js";
+import { invertMatrix4, multiplyMatrix4Vector3 } from "../math/matrix4.js";
+import { clone } from "../general/clone.js";
+import { faceOrdersSubset, nudgeFacesWithFaceOrders } from "./orders.js";
+import { countEdges, countImpliedEdges } from "./count.js";
+import { invertArrayToFlatMap } from "./maps.js";
+import { triangulate } from "./triangulate.js";
+import { explodeFaces } from "./explode.js";
+import { fixCycles } from "./cycles.js";
+import { getFacesPlane } from "./faces/planes.js";
+import { subgraphWithFaces } from "./subgraph.js";
+import { join } from "./join.js";
 
 const LAYER_NUDGE = 5e-6;
 
@@ -58,7 +29,10 @@ const LAYER_NUDGE = 5e-6;
  * to nudge the faces in the cross axis to prevent Z-fighting.
  * @returns {FOLD} a copy of the input FOLD graph, with exploded faces
  */
-export const prepareForRenderingWithCycles = (inputGraph, { earcut, layerNudge } = {}) => {
+export const prepareForRenderingWithCycles = (
+	inputGraph,
+	{ earcut, layerNudge } = {},
+) => {
 	const graph = clone(inputGraph);
 	const {
 		// planes,
@@ -72,8 +46,9 @@ export const prepareForRenderingWithCycles = (inputGraph, { earcut, layerNudge }
 	}
 	const planes_inverseTransform = planes_transform.map(invertMatrix4);
 
-	const planes_faceOrders = planes_faces
-		.map(faces => faceOrdersSubset(graph.faceOrders, faces));
+	const planes_faceOrders = planes_faces.map((faces) =>
+		faceOrdersSubset(graph.faceOrders, faces),
+	);
 
 	// ensure the vertices are in 3D before creating a bunch of subgraphs
 	const graph3 = {
@@ -81,38 +56,37 @@ export const prepareForRenderingWithCycles = (inputGraph, { earcut, layerNudge }
 		vertices_coords: graph.vertices_coords.map(resize3),
 	};
 
-	const planes_graphs = planes_faces
-		.map(faces => subgraphWithFaces(graph3, faces));
+	const planes_graphs = planes_faces.map((faces) => subgraphWithFaces(graph3, faces));
 
-	const planes_graphXY = planes_graphs
-		.map((g, p) => ({
-			...g,
-			vertices_coords: g.vertices_coords
-				.map(coord => multiplyMatrix4Vector3(planes_transform[p], coord)),
-		}));
+	const planes_graphXY = planes_graphs.map((g, p) => ({
+		...g,
+		vertices_coords: g.vertices_coords.map((coord) =>
+			multiplyMatrix4Vector3(planes_transform[p], coord),
+		),
+	}));
 
 	// this resizes the length of the coordinates back to 2.
-	const planes_graphXYFixed = planes_graphXY
-		.map((g, p) => fixCycles({
+	const planes_graphXYFixed = planes_graphXY.map((g, p) =>
+		fixCycles({
 			...g,
 			faceOrders: planes_faceOrders[p],
-		}));
+		}),
+	);
 
-	const planes_graphFixed = planes_graphXYFixed
-		.map((graphXY, p) => ({
-			...graphXY,
-			vertices_coords: graphXY.vertices_coords
-				.map(resize3)
-				.map(coord => multiplyMatrix4Vector3(planes_inverseTransform[p], coord)),
-		}));
+	const planes_graphFixed = planes_graphXYFixed.map((graphXY, p) => ({
+		...graphXY,
+		vertices_coords: graphXY.vertices_coords
+			.map(resize3)
+			.map((coord) => multiplyMatrix4Vector3(planes_inverseTransform[p], coord)),
+	}));
 
-	const planes_facesNudge = planes_graphFixed
-		.map(graphXY => nudgeFacesWithFaceOrders(graphXY));
+	const planes_facesNudge = planes_graphFixed.map((graphXY) =>
+		nudgeFacesWithFaceOrders(graphXY),
+	);
 
 	// triangulate will modify faces and edges.
 	// this will store the changes to the graph from the triangulation
-	const planes_triangulatedVerbose = planes_graphFixed
-		.map(g => triangulate(g, earcut));
+	const planes_triangulatedVerbose = planes_graphFixed.map((g) => triangulate(g, earcut));
 
 	const planes_graphExploded = planes_triangulatedVerbose
 		.map(({ result }) => result)
@@ -120,17 +94,20 @@ export const prepareForRenderingWithCycles = (inputGraph, { earcut, layerNudge }
 
 	planes_triangulatedVerbose.forEach(({ changes }, p) => {
 		const backmap = invertArrayToFlatMap(changes.faces.map);
-		const verticesOffset = planes_graphExploded[p].vertices_coords
-			.map(() => undefined);
+		const verticesOffset = planes_graphExploded[p].vertices_coords.map(() => undefined);
 		backmap.forEach((oldFace, face) => {
 			const nudge = planes_facesNudge[p][oldFace];
-			if (!nudge) { return; }
-			planes_graphExploded[p].faces_vertices[face].forEach(v => {
+			if (!nudge) {
+				return;
+			}
+			planes_graphExploded[p].faces_vertices[face].forEach((v) => {
 				verticesOffset[v] = scale3(nudge.vector, nudge.layer * layerNudge);
 			});
 		});
 		verticesOffset.forEach((offset, v) => {
-			if (!offset) { return; }
+			if (!offset) {
+				return;
+			}
 			planes_graphExploded[p].vertices_coords[v] = add3(
 				resize3(planes_graphExploded[p].vertices_coords[v]),
 				offset,
@@ -141,7 +118,9 @@ export const prepareForRenderingWithCycles = (inputGraph, { earcut, layerNudge }
 	// join all graphs into one
 	if (planes_graphExploded.length > 1) {
 		planes_graphExploded.forEach((exploded, i) => {
-			if (i === 0) { return; }
+			if (i === 0) {
+				return;
+			}
 			join(planes_graphExploded[0], exploded);
 		});
 	}
@@ -160,7 +139,10 @@ export const prepareForRenderingWithCycles = (inputGraph, { earcut, layerNudge }
  * the faces in the cross axis to prevent Z-fighting
  * @returns {FOLD} a copy of the input FOLD graph, with exploded faces
  */
-export const prepareForRendering = (inputGraph, { earcut, layerNudge = LAYER_NUDGE } = {}) => {
+export const prepareForRendering = (
+	inputGraph,
+	{ earcut, layerNudge = LAYER_NUDGE } = {},
+) => {
 	// todo: remove the structured clone as long as everything is working.
 	// update: shallow copy is not working. the input parameter is still modified.
 	const graph = clone(inputGraph);
@@ -193,10 +175,7 @@ export const prepareForRendering = (inputGraph, { earcut, layerNudge = LAYER_NUD
 
 	// triangulate will modify faces and edges.
 	// use face information to match data.
-	const {
-		changes,
-		result: triangulated,
-	} = triangulate(graph, earcut);
+	const { changes, result: triangulated } = triangulate(graph, earcut);
 
 	// explode will modify edges and vertices.
 	// we don't need the return information for anything just yet.
@@ -207,13 +186,12 @@ export const prepareForRendering = (inputGraph, { earcut, layerNudge = LAYER_NUD
 		const backmap = invertArrayToFlatMap(changes.faces.map);
 		backmap.forEach((oldFace, face) => {
 			const nudge = faces_nudge[oldFace];
-			if (!nudge) { return; }
-			exploded.faces_vertices[face].forEach(v => {
+			if (!nudge) {
+				return;
+			}
+			exploded.faces_vertices[face].forEach((v) => {
 				const vec = scale3(nudge.vector, nudge.layer * layerNudge);
-				exploded.vertices_coords[v] = add3(
-					resize3(exploded.vertices_coords[v]),
-					vec,
-				);
+				exploded.vertices_coords[v] = add3(resize3(exploded.vertices_coords[v]), vec);
 			});
 		});
 	}

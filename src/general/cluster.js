@@ -1,17 +1,9 @@
 /**
  * Rabbit Ear (c) Kraft
  */
-import {
-	EPSILON,
-} from "../math/constant.js";
-import {
-	normalize,
-	parallelNormalized,
-} from "../math/vector.js";
-import {
-	doRangesOverlap,
-	rangeUnion,
-} from "../math/range.js";
+import { EPSILON } from "../math/constant.js";
+import { normalize, parallelNormalized } from "../math/vector.js";
+import { doRangesOverlap, rangeUnion } from "../math/range.js";
 
 /**
  * @description Given a list of pre-sorted elements, create clusters
@@ -27,7 +19,9 @@ import {
  * where each inner list is a cluster of similar element indices.
  */
 export const clusterSortedGeneric = (elements, comparison) => {
-	if (!elements.length) { return []; }
+	if (!elements.length) {
+		return [];
+	}
 
 	// get a list of indices, we will iterate over this list.
 	// this allows this method to work with arrays with holes
@@ -72,7 +66,9 @@ export const clusterSortedGeneric = (elements, comparison) => {
  * where each inner list is a cluster of similar element indices.
  */
 export const clusterUnsortedIndices = (indices, comparison) => {
-	if (!indices.length) { return []; }
+	if (!indices.length) {
+		return [];
+	}
 
 	const indicesCopy = indices.slice();
 
@@ -86,7 +82,7 @@ export const clusterUnsortedIndices = (indices, comparison) => {
 		// if false, create a new group and add it to the groups container.
 		const matchFound = groups
 			.map((group, g) => (comparison(group[0], index) ? g : undefined))
-			.filter(a => a !== undefined)
+			.filter((a) => a !== undefined)
 			.shift();
 
 		if (matchFound !== undefined) {
@@ -114,13 +110,13 @@ export const clusterScalars = (numbers, epsilon = EPSILON) => {
 	const indices = numbers
 		.map((v, i) => ({ v, i }))
 		.sort((a, b) => a.v - b.v)
-		.map(el => el.i)
+		.map((el) => el.i)
 		.filter(() => true);
 
 	// prepare data for the method clusterSortedGeneric,
 	// the values will be the sorted numbers,
 	// the comparison function will be a simple: is "a" epsilon similar to "b"?
-	const sortedNumbers = indices.map(i => numbers[i]);
+	const sortedNumbers = indices.map((i) => numbers[i]);
 	/** @param {number} a @param {number} b */
 	const compFn = (a, b) => Math.abs(a - b) < epsilon;
 
@@ -128,8 +124,9 @@ export const clusterScalars = (numbers, epsilon = EPSILON) => {
 	// to the sorted list "sortedNumbers", which of course does not match our
 	// input array "numbers", so, remap these indices so that our
 	// final result of indices relates to the input array "numbers".
-	return clusterSortedGeneric(sortedNumbers, compFn)
-		.map(arr => arr.map(i => indices[i]));
+	return clusterSortedGeneric(sortedNumbers, compFn).map((arr) =>
+		arr.map((i) => indices[i]),
+	);
 };
 
 /**
@@ -148,7 +145,7 @@ export const clusterRanges = (ranges, epsilon = EPSILON) => {
 	const indices = ranges
 		.map(([a, b], i) => ({ v: Math.min(a, b), i }))
 		.sort((a, b) => a.v - b.v)
-		.map(el => el.i)
+		.map((el) => el.i)
 		.filter(() => true);
 
 	// prepare data for the method clusterSortedGeneric,
@@ -157,7 +154,7 @@ export const clusterRanges = (ranges, epsilon = EPSILON) => {
 	// maintain the current range outside of the function,
 	// if there is an overlap, update the range to be a union with the new range,
 	// if there is no overlap, reset it to be the new range.
-	const sortedRanges = indices.map(i => ranges[i]);
+	const sortedRanges = indices.map((i) => ranges[i]);
 
 	let currentRange = [...sortedRanges[0]];
 
@@ -176,8 +173,9 @@ export const clusterRanges = (ranges, epsilon = EPSILON) => {
 	// to the sorted list "sortedRanges", which of course does not match our
 	// input array "ranges", so, remap these indices so that our
 	// final result of indices relates to the input array "ranges".
-	return clusterSortedGeneric(sortedRanges, comparison)
-		.map(arr => arr.map(i => indices[i]));
+	return clusterSortedGeneric(sortedRanges, comparison).map((arr) =>
+		arr.map((i) => indices[i]),
+	);
 };
 
 /**

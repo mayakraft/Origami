@@ -26,15 +26,17 @@ const BOUNDARY_CP = {
  */
 export const drawBoundaries = (graph, options = {}) => {
 	const g = SVG.g();
-	if (!graph) { return g; }
+	if (!graph) {
+		return g;
+	}
 
 	// get the boundary of the graph as a list of points
 	const polygons = boundaries(graph)
-		.map(({ vertices }) => vertices.map(v => graph.vertices_coords[v]))
-		.filter(polygon => polygon.length);
+		.map(({ vertices }) => vertices.map((v) => graph.vertices_coords[v]))
+		.filter((polygon) => polygon.length);
 
 	// give the boundary polygons a class and add them to the group
-	polygons.forEach(polygon => {
+	polygons.forEach((polygon) => {
 		const svgPolygon = SVG.polygon(polygon);
 		addClass(svgPolygon, "boundary");
 		g.appendChild(svgPolygon);

@@ -1,27 +1,12 @@
 /**
  * Rabbit Ear (c) Kraft
  */
-import {
-	uniqueElements,
-	splitCircularArray,
-} from "../../general/array.js";
-import {
-	makeEdgesFacesUnsorted,
-} from "../make/edgesFaces.js";
-import {
-	makeVerticesToEdge,
-	makeVerticesToFace,
-} from "../make/lookup.js";
-import {
-	addEdge,
-	addIsolatedEdge,
-} from "../add/edge.js";
-import {
-	remove,
-} from "../remove.js";
-import {
-	makeVerticesFacesForVertex,
-} from "./general.js";
+import { uniqueElements, splitCircularArray } from "../../general/array.js";
+import { makeEdgesFacesUnsorted } from "../make/edgesFaces.js";
+import { makeVerticesToEdge, makeVerticesToFace } from "../make/lookup.js";
+import { addEdge, addIsolatedEdge } from "../add/edge.js";
+import { remove } from "../remove.js";
+import { makeVerticesFacesForVertex } from "./general.js";
 
 /**
  * @description Return true if all of the contents of an array are unique
@@ -29,9 +14,8 @@ import {
  * @param {any[]} array an array of any type
  * @returns {boolean}
  */
-const arrayValuesAreUnique = (array) => (
-	Array.from(new Set(array)).length === array.length
-);
+const arrayValuesAreUnique = (array) =>
+	Array.from(new Set(array)).length === array.length;
 
 /**
  * @description Splice in the leaf vertex and duplicate the vertex
@@ -60,12 +44,15 @@ const splitArrayWithLeaf = (array, spliceIndex, newElement) => {
  * @param {number[]} vertices
  * @returns {boolean}
  */
-const edgeExistsInFace = ({ faces_vertices }, face, vertices) => (
+const edgeExistsInFace = ({ faces_vertices }, face, vertices) =>
 	faces_vertices[face]
 		.map((v, i, arr) => [v, arr[(i + 1) % arr.length]])
-		.map(([v0, v1]) => (v0 === vertices[0] && v1 === vertices[1])
-			|| (v0 === vertices[1] && v1 === vertices[0]))
-		.reduce((a, b) => a || b, false));
+		.map(
+			([v0, v1]) =>
+				(v0 === vertices[0] && v1 === vertices[1]) ||
+				(v0 === vertices[1] && v1 === vertices[0]),
+		)
+		.reduce((a, b) => a || b, false);
 
 /**
  * @description A new cycle (face) of vertices has been created,
@@ -79,7 +66,9 @@ const edgeExistsInFace = ({ faces_vertices }, face, vertices) => (
 const getAdjacencySpliceIndex = (cycle, adjacent, vertex) => {
 	// the index of this vertex inside cycle
 	const indexInCycle = cycle.indexOf(vertex);
-	if (indexInCycle === -1) { return -1; }
+	if (indexInCycle === -1) {
+		return -1;
+	}
 
 	// the previous and next vertex in the cycle from this vertex
 	const prevVertex = cycle[(indexInCycle + cycle.length - 1) % cycle.length];
@@ -92,12 +81,14 @@ const getAdjacencySpliceIndex = (cycle, adjacent, vertex) => {
 	// so, in the adjacency, we want to splice inbetween "next", ___, "prev",
 	// and for Javascript splice() this means we use the "prev" index.
 	const prevIndex = adjacent.indexOf(prevVertex);
-	if (prevIndex === -1) { return -1; }
+	if (prevIndex === -1) {
+		return -1;
+	}
 
 	// quickly verify that "nextVertex" is the vertex previous to "prev"
 	// in the adjacency array, verifying that the adjacency was built correctly
 	const nextTest = adjacent[(prevIndex + adjacent.length - 1) % adjacent.length];
-	return (nextTest !== nextVertex ? -1 : prevIndex);
+	return nextTest !== nextVertex ? -1 : prevIndex;
 };
 
 /**
@@ -117,16 +108,19 @@ const getAdjacencySpliceIndex = (cycle, adjacent, vertex) => {
  * @param {number} face the index of the face containing these two vertices
  * @param {number[]} vertices the two vertices newly connected by an edge
  * @returns {undefined}
-*/
+ */
 const updateVerticesVertices = (
 	{ vertices_vertices, faces_vertices },
 	face, // todo: is this okay, for leaf, this contents is actually the updated contents
 	vertices,
 ) => {
-	if (!vertices_vertices) { return; }
+	if (!vertices_vertices) {
+		return;
+	}
 
-	const verticesSpliceIndex = vertices
-		.map(v => getAdjacencySpliceIndex(faces_vertices[face], vertices_vertices[v], v));
+	const verticesSpliceIndex = vertices.map((v) =>
+		getAdjacencySpliceIndex(faces_vertices[face], vertices_vertices[v], v),
+	);
 
 	verticesSpliceIndex.forEach((index, i) => {
 		const otherVertex = vertices[(i + 1) % vertices.length];
@@ -146,12 +140,10 @@ const updateVerticesVertices = (
  * @param {number} edge an edge index
  * @returns {undefined}
  */
-const updateVerticesEdges = (
-	{ vertices_edges, vertices_vertices },
-	vertices,
-	edge,
-) => {
-	if (!vertices_edges) { return; }
+const updateVerticesEdges = ({ vertices_edges, vertices_vertices }, vertices, edge) => {
+	if (!vertices_edges) {
+		return;
+	}
 
 	// vertices_vertices does not exist, create an unsorted solution.
 	if (!vertices_vertices) {
@@ -162,10 +154,11 @@ const updateVerticesEdges = (
 	// for each of the two vertices, check its vertices_vertices for the
 	// index of the opposite vertex. this is the edge. return its position
 	// in the vertices_vertices to be used to insert into vertices_edges.
-	const spliceIndices = vertices
-		.map((v, i, arr) => vertices_vertices[v].indexOf(arr[(i + 1) % arr.length]));
+	const spliceIndices = vertices.map((v, i, arr) =>
+		vertices_vertices[v].indexOf(arr[(i + 1) % arr.length]),
+	);
 
-	if (spliceIndices.some(i => i === -1)) {
+	if (spliceIndices.some((i) => i === -1)) {
 		throw new Error(`splitFace() vertices_edges ${vertices.join(", ")}`);
 	}
 
@@ -189,28 +182,37 @@ const updateVerticesFaces = (
 	face,
 	faces,
 ) => {
-	if (!vertices_faces || !faces_vertices) { return; }
+	if (!vertices_faces || !faces_vertices) {
+		return;
+	}
 
 	// all faces which are in need of an update includes more than just our
 	// new vertices. other vertices which are associated with the face-to-be-
 	// removed need to know which of the new faces replaces the old face index
-	const allVertices = uniqueElements(faces.flatMap(f => faces_vertices[f]));
+	const allVertices = uniqueElements(faces.flatMap((f) => faces_vertices[f]));
 
 	// get all faces involved, but filter out the old face.
 	// due to vertices_faces, we have to filter out any null values
 	const allFaces = uniqueElements([
 		...faces,
-		...allVertices.flatMap(v => vertices_faces[v])
-	]).filter(f => f !== face)
-		.filter(a => a !== undefined && a !== null);
+		...allVertices.flatMap((v) => vertices_faces[v]),
+	])
+		.filter((f) => f !== face)
+		.filter((a) => a !== undefined && a !== null);
 
 	const verticesToFace = makeVerticesToFace({ faces_vertices }, allFaces);
 
-	allVertices.map(vertex => makeVerticesFacesForVertex(
-		{ vertices_vertices, vertices_edges, edges_vertices },
-		vertex,
-		verticesToFace,
-	)).forEach((v_f, i) => { vertices_faces[allVertices[i]] = v_f || []; });
+	allVertices
+		.map((vertex) =>
+			makeVerticesFacesForVertex(
+				{ vertices_vertices, vertices_edges, edges_vertices },
+				vertex,
+				verticesToFace,
+			),
+		)
+		.forEach((v_f, i) => {
+			vertices_faces[allVertices[i]] = v_f || [];
+		});
 };
 
 /**
@@ -231,7 +233,9 @@ const updateEdgesFaces = (
 	faces,
 	edge,
 ) => {
-	if (!edges_faces) { return; }
+	if (!edges_faces) {
+		return;
+	}
 
 	// it's probably rare for a graph to have edges_faces but no faces_edges.
 	// This is an easy solution, just build the entire array from scratch.
@@ -245,23 +249,25 @@ const updateEdgesFaces = (
 	}
 
 	const facesHash = {};
-	[...faces, face].forEach(f => { facesHash[f] = true; });
+	[...faces, face].forEach((f) => {
+		facesHash[f] = true;
+	});
 
-	const edges = Array.from(new Set(faces.flatMap(f => faces_edges[f])));
+	const edges = Array.from(new Set(faces.flatMap((f) => faces_edges[f])));
 
 	const edgesOtherFaces = [];
-	edges.forEach(e => {
-		edgesOtherFaces[e] = edges_faces[e].filter(f => !facesHash[f]);
+	edges.forEach((e) => {
+		edgesOtherFaces[e] = edges_faces[e].filter((f) => !facesHash[f]);
 	});
 
 	const edgesTheseFaces = [];
-	edges.forEach(e => { edgesTheseFaces[e] = []; });
-	faces.forEach(f => faces_edges[f]
-		.forEach(e => edgesTheseFaces[e].push(f)));
+	edges.forEach((e) => {
+		edgesTheseFaces[e] = [];
+	});
+	faces.forEach((f) => faces_edges[f].forEach((e) => edgesTheseFaces[e].push(f)));
 
-	edges.forEach(e => {
-		edges_faces[e] = Array
-			.from(new Set([...edgesTheseFaces[e], ...edgesOtherFaces[e]]));
+	edges.forEach((e) => {
+		edges_faces[e] = Array.from(new Set([...edgesTheseFaces[e], ...edgesOtherFaces[e]]));
 	});
 
 	edges_faces[edge] = [...faces];
@@ -279,10 +285,10 @@ const updateEdgesFaces = (
  * vertices, which will become a new edge and split the face into two faces.
  */
 const updateFacesVerticesSplit = ({ faces_vertices }, face, vertices) => {
-	const [i0, i1] = vertices
-		.map(vertex => faces_vertices[face].indexOf(vertex));
-	return splitCircularArray(faces_vertices[face], [i0, i1])
-		.map((face_vertices) => faces_vertices.push(face_vertices));
+	const [i0, i1] = vertices.map((vertex) => faces_vertices[face].indexOf(vertex));
+	return splitCircularArray(faces_vertices[face], [i0, i1]).map((face_vertices) =>
+		faces_vertices.push(face_vertices),
+	);
 };
 
 /**
@@ -297,13 +303,10 @@ const updateFacesVerticesSplit = ({ faces_vertices }, face, vertices) => {
  * @param {number} vertexLeaf the vertex which is not currently in the face.
  * @returns {undefined}
  */
-const updateFacesVerticesLeaf = (
-	{ faces_vertices },
-	face,
-	vertexFace,
-	vertexLeaf,
-) => {
-	if (!faces_vertices) { return; }
+const updateFacesVerticesLeaf = ({ faces_vertices }, face, vertexFace, vertexLeaf) => {
+	if (!faces_vertices) {
+		return;
+	}
 	// this method will splice in the leaf vertex and duplicate the vertex
 	// at the splice index to be on either side of the leaf vertex, like:
 	// _ _ _ 5 8 5 _ _, where 5 got spliced into the spot where 8 was.
@@ -332,7 +335,9 @@ const updateFacesEdges = (
 	faces,
 	edge,
 ) => {
-	if (!faces_edges) { return; }
+	if (!faces_edges) {
+		return;
+	}
 
 	// all edges involved in this rewrite, duplicates are okay here.
 	const allEdges = [...faces_edges[face], edge];
@@ -342,17 +347,20 @@ const updateFacesEdges = (
 	const verticesToEdge = makeVerticesToEdge({ edges_vertices }, allEdges);
 
 	// simply rebuild the faces_edges in question using the vertices-edge lookup
-	const newFacesEdges = faces
-		.map(f => faces_vertices[f]
+	const newFacesEdges = faces.map((f) =>
+		faces_vertices[f]
 			.map((fv, i, arr) => [fv, arr[(i + 1) % arr.length]])
-			.map(pair => pair.join(" "))
-			.map(key => verticesToEdge[key]));
+			.map((pair) => pair.join(" "))
+			.map((key) => verticesToEdge[key]),
+	);
 
-	if (newFacesEdges.flat().some(e => e === undefined)) {
+	if (newFacesEdges.flat().some((e) => e === undefined)) {
 		throw new Error(`splitFace() faces_edges ${face}`);
 	}
 
-	faces.forEach((f, i) => { faces_edges[f] = newFacesEdges[i]; });
+	faces.forEach((f, i) => {
+		faces_edges[f] = newFacesEdges[i];
+	});
 };
 
 /**
@@ -370,19 +378,23 @@ const updateFacesFaces = (
 	oldFace,
 	faces,
 ) => {
-	if (!faces_faces) { return; }
+	if (!faces_faces) {
+		return;
+	}
 
 	// these are all of the faces which need their faces_faces updated
 	// due to faces_faces we have to filter out any undefined or null
-	const allFaces = uniqueElements([...faces_faces[oldFace], ...faces])
-		.filter(a => a !== undefined && a !== null);
+	const allFaces = uniqueElements([...faces_faces[oldFace], ...faces]).filter(
+		(a) => a !== undefined && a !== null,
+	);
 
 	// if both edges_faces and faces_edges exists, this is the easiest way:
 	// for every edge, get the face across it, this preserves winding order.
 	if (edges_faces && faces_edges) {
-		allFaces.forEach(face => {
-			faces_faces[face] = faces_edges[face]
-				.map(edge => edges_faces[edge].find(f => f !== face));
+		allFaces.forEach((face) => {
+			faces_faces[face] = faces_edges[face].map((edge) =>
+				edges_faces[edge].find((f) => f !== face),
+			);
 		});
 		return;
 	}
@@ -402,12 +414,12 @@ const updateFacesFaces = (
 
 	if (edges_vertices && faces_vertices) {
 		const verticesToFace = makeVerticesToFace({ faces_vertices }, allFaces);
-		allFaces.forEach(face => {
+		allFaces.forEach((face) => {
 			faces_faces[face] = faces_vertices[face]
 				// build the vertex pair in reverse to get the face opposite
 				.map((v, i, arr) => [arr[(i + 1) % arr.length], v])
-				.map(pair => pair.join(" "))
-				.map(key => verticesToFace[key]);
+				.map((pair) => pair.join(" "))
+				.map((key) => verticesToFace[key]);
 		});
 	}
 };
@@ -421,7 +433,9 @@ const updateFacesFaces = (
  * @param {number[]} newFaces
  */
 const updateFaceOrders = ({ faceOrders }, oldFace, newFaces) => {
-	if (!faceOrders) { return; }
+	if (!faceOrders) {
+		return;
+	}
 	// a single new face
 	const newFace = newFaces[0];
 	// all the other new faces besides the first face
@@ -432,13 +446,13 @@ const updateFaceOrders = ({ faceOrders }, oldFace, newFaces) => {
 		if (f0 === oldFace) {
 			faceOrders[i] = [newFace, f1, order];
 			/** @type {[number, number, number][]} */
-			const newOrders = faces.map(f => [f, f1, order]);
+			const newOrders = faces.map((f) => [f, f1, order]);
 			newFaceOrders.push(...newOrders);
 		}
 		if (f1 === oldFace) {
 			faceOrders[i] = [f0, newFace, order];
 			/** @type {[number, number, number][]} */
-			const newOrders = faces.map(f => [f0, f, order]);
+			const newOrders = faces.map((f) => [f0, f, order]);
 			newFaceOrders.push(...newOrders);
 		}
 	});
@@ -481,8 +495,9 @@ export const splitFaceWithLeafEdge = (
 	// this is a unique situation. from this point on we are associating
 	// this leaf vertex with this face. make vertices_faces include this face.
 	if (graph.vertices_faces) {
-		graph.vertices_faces[vertexLeaf] = Array
-			.from(new Set([...graph.vertices_faces[vertexLeaf], face]));
+		graph.vertices_faces[vertexLeaf] = Array.from(
+			new Set([...graph.vertices_faces[vertexLeaf], face]),
+		);
 	}
 
 	// skip vertices_faces and edges_faces, these were previously set.
@@ -551,25 +566,31 @@ export const splitFaceWithEdge = (
 	assignment = "U",
 	foldAngle = 0,
 ) => {
-	if (!graph.vertices_coords
-		|| !graph.edges_vertices
-		|| !graph.faces_vertices) { return {}; }
-	if (vertices.length !== 2) { return {}; }
+	if (!graph.vertices_coords || !graph.edges_vertices || !graph.faces_vertices) {
+		return {};
+	}
+	if (vertices.length !== 2) {
+		return {};
+	}
 
 	// this method will work fine with non-convex polygons, but if a face
 	// contains a leaf edge, where the sequence of face_vertices visits the same
 	// vertex more than once, this method might fail. don't proceed.
-	if (!arrayValuesAreUnique(graph.faces_vertices[face])) { return {}; }
+	if (!arrayValuesAreUnique(graph.faces_vertices[face])) {
+		return {};
+	}
 
 	// ensure that the two vertices are not next to each other in
 	// the current face's faces_vertices vertices list.
-	if (edgeExistsInFace(graph, face, vertices)) { return {}; }
+	if (edgeExistsInFace(graph, face, vertices)) {
+		return {};
+	}
 
 	// edges_faces will be [x, x] where x is the index of
 	// the old face, twice, and will be replaced later in this function.
 	const edge = addEdge(graph, vertices, [face, face], assignment, foldAngle);
 
-	const faces = [0, 1].map(i => graph.faces_vertices.length + i);
+	const faces = [0, 1].map((i) => graph.faces_vertices.length + i);
 
 	updateFacesVerticesSplit(graph, face, vertices);
 	updateFacesEdges(graph, face, faces, edge);
@@ -585,7 +606,9 @@ export const splitFaceWithEdge = (
 
 	// the graph is now complete, however our return object needs updating.
 	// shift our new face indices since these relate to the graph before remove().
-	faces.forEach((_, i) => { faces[i] = faceMap[faces[i]]; });
+	faces.forEach((_, i) => {
+		faces[i] = faceMap[faces[i]];
+	});
 
 	// we had to run "remove" with the new faces added, but the face map
 	// should represent the graph before any changes - to after changes.
@@ -640,20 +663,16 @@ export const splitFaceWithEdge = (
  *   faces?: { map?: (number|number[])[], new?: number[], remove?: number },
  * }} a summary of changes to the FOLD object
  */
-export const splitFace = (
-	graph,
-	face,
-	vertices,
-	assignment = "U",
-	foldAngle = 0,
-) => {
-	if (!graph.vertices_coords
-		|| !graph.edges_vertices
-		|| !graph.faces_vertices) { return {}; }
-	if (vertices.length !== 2) { return {}; }
+export const splitFace = (graph, face, vertices, assignment = "U", foldAngle = 0) => {
+	if (!graph.vertices_coords || !graph.edges_vertices || !graph.faces_vertices) {
+		return {};
+	}
+	if (vertices.length !== 2) {
+		return {};
+	}
 
 	// run the correct method depending on how many vertices are a part of the face
-	const verticesIndexOf = vertices.map(vertex => ({
+	const verticesIndexOf = vertices.map((vertex) => ({
 		vertex,
 		index: graph.faces_vertices[face].indexOf(vertex),
 	}));
@@ -661,25 +680,25 @@ export const splitFace = (
 	const matchCount = verticesIndexOf.filter(({ index }) => index !== -1).length;
 
 	switch (matchCount) {
-	case 2:
-		// this edge will split the existing face into two faces
-		return splitFaceWithEdge(graph, face, vertices, assignment, foldAngle);
-	case 1:
-		// this edge will connect to only one face vertex, the other point
-		// will lie somewhere inside the face, the face will become non-convex.
-		return splitFaceWithLeafEdge(
-			graph,
-			face,
-			verticesIndexOf.filter(({ index }) => index !== -1).shift().vertex,
-			verticesIndexOf.filter(({ index }) => index === -1).shift().vertex,
-			assignment,
-			foldAngle,
-		);
-	default:
-		// add the edge to the graph without any face associations
-		return {
-			edge: addIsolatedEdge(graph, vertices, assignment, foldAngle),
-			faces: {},
-		}
+		case 2:
+			// this edge will split the existing face into two faces
+			return splitFaceWithEdge(graph, face, vertices, assignment, foldAngle);
+		case 1:
+			// this edge will connect to only one face vertex, the other point
+			// will lie somewhere inside the face, the face will become non-convex.
+			return splitFaceWithLeafEdge(
+				graph,
+				face,
+				verticesIndexOf.filter(({ index }) => index !== -1).shift().vertex,
+				verticesIndexOf.filter(({ index }) => index === -1).shift().vertex,
+				assignment,
+				foldAngle,
+			);
+		default:
+			// add the edge to the graph without any face associations
+			return {
+				edge: addIsolatedEdge(graph, vertices, assignment, foldAngle),
+				faces: {},
+			};
 	}
 };

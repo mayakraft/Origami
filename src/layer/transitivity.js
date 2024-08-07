@@ -1,12 +1,8 @@
 /**
  * Rabbit Ear (c) Kraft
  */
-import {
-	EPSILON,
-} from "../math/constant.js";
-import {
-	clipPolygonPolygon,
-} from "../math/clip.js";
+import { EPSILON } from "../math/constant.js";
+import { clipPolygonPolygon } from "../math/clip.js";
 
 /**
  * @description Given a folded graph, find all trios of faces which overlap
@@ -24,33 +20,49 @@ export const makeTransitivity = (
 ) => {
 	// convert facesFacesOverlap into index-based sparse arrays for fast access.
 	const overlap_matrix = facesFacesOverlap.map(() => ({}));
-	facesFacesOverlap.forEach((faces, i) => faces.forEach(j => {
-		overlap_matrix[i][j] = true;
-		overlap_matrix[j][i] = true;
-	}));
+	facesFacesOverlap.forEach((faces, i) =>
+		faces.forEach((j) => {
+			overlap_matrix[i][j] = true;
+			overlap_matrix[j][i] = true;
+		}),
+	);
 
 	// for every pair of faces that overlap, compute their intersection,
 	// if it exists, save the new polygon in this sparse matrix.
 	const facesFacesIntersection = [];
-	facesFacesOverlap.forEach((faces, i) => faces.forEach(j => {
-		const polygon = clipPolygonPolygon(faces_polygon[i], faces_polygon[j], epsilon);
-		if (polygon) {
-			if (!facesFacesIntersection[i]) { facesFacesIntersection[i] = []; }
-			if (!facesFacesIntersection[j]) { facesFacesIntersection[j] = []; }
-			facesFacesIntersection[i][j] = polygon;
-			facesFacesIntersection[j][i] = polygon;
-		}
-	}));
+	facesFacesOverlap.forEach((faces, i) =>
+		faces.forEach((j) => {
+			const polygon = clipPolygonPolygon(faces_polygon[i], faces_polygon[j], epsilon);
+			if (polygon) {
+				if (!facesFacesIntersection[i]) {
+					facesFacesIntersection[i] = [];
+				}
+				if (!facesFacesIntersection[j]) {
+					facesFacesIntersection[j] = [];
+				}
+				facesFacesIntersection[i][j] = polygon;
+				facesFacesIntersection[j][i] = polygon;
+			}
+		}),
+	);
 
 	/** @type {[number, number, number][]} an array of three face indices */
 	const trios = [];
 	for (let i = 0; i < facesFacesIntersection.length - 1; i += 1) {
-		if (!facesFacesIntersection[i]) { continue; }
+		if (!facesFacesIntersection[i]) {
+			continue;
+		}
 		for (let j = i + 1; j < facesFacesIntersection.length; j += 1) {
-			if (!facesFacesIntersection[i][j]) { continue; }
+			if (!facesFacesIntersection[i][j]) {
+				continue;
+			}
 			for (let k = j + 1; k < facesFacesIntersection.length; k += 1) {
-				if (i === k || j === k) { continue; }
-				if (!overlap_matrix[i][k] || !overlap_matrix[j][k]) { continue; }
+				if (i === k || j === k) {
+					continue;
+				}
+				if (!overlap_matrix[i][k] || !overlap_matrix[j][k]) {
+					continue;
+				}
 				const polygon = clipPolygonPolygon(
 					facesFacesIntersection[i][j],
 					faces_polygon[k],
@@ -85,7 +97,7 @@ export const getTransitivityTriosFromTacos = ({ taco_taco, taco_tortilla }) => {
 	// the three faces (sorted low to high) into a dictionary for quick lookup.
 	// store them as space-separated strings.
 	const tacoTacoTrios = taco_taco
-		.map(arr => arr.slice().sort((a, b) => a - b))
+		.map((arr) => arr.slice().sort((a, b) => a - b))
 		.flatMap(([t0, t1, t2, t3]) => [
 			[t0, t1, t2],
 			[t0, t1, t3],
@@ -93,8 +105,7 @@ export const getTransitivityTriosFromTacos = ({ taco_taco, taco_tortilla }) => {
 			[t1, t2, t3],
 		]);
 
-	const tacoTortillaTrios = taco_tortilla
-		.map(arr => arr.slice().sort((a, b) => a - b));
+	const tacoTortillaTrios = taco_tortilla.map((arr) => arr.slice().sort((a, b) => a - b));
 
 	// will contain taco-taco and taco-tortilla events encoded as all
 	// permutations of 3 faces involved in each event.
@@ -103,8 +114,10 @@ export const getTransitivityTriosFromTacos = ({ taco_taco, taco_tortilla }) => {
 
 	tacoTacoTrios
 		.concat(tacoTortillaTrios)
-		.map(faces => faces.join(" "))
-		.forEach(key => { tacos_trios[key] = true; });
+		.map((faces) => faces.join(" "))
+		.forEach((key) => {
+			tacos_trios[key] = true;
+		});
 
 	return tacos_trios;
 };

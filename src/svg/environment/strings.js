@@ -26,4 +26,24 @@ const str_arrow = "arrow";
 const str_head = "head";
 const str_tail = "tail";
 
-export { str_arrow, str_boolean, str_class, str_fill, str_function, str_head, str_id, str_none, str_number, str_object, str_path, str_points, str_string, str_stroke, str_style, str_svg, str_tail, str_transform, str_viewBox };
+export {
+	str_arrow,
+	str_boolean,
+	str_class,
+	str_fill,
+	str_function,
+	str_head,
+	str_id,
+	str_none,
+	str_number,
+	str_object,
+	str_path,
+	str_points,
+	str_string,
+	str_stroke,
+	str_style,
+	str_svg,
+	str_tail,
+	str_transform,
+	str_viewBox,
+};

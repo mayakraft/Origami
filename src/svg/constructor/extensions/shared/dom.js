@@ -1,5 +1,5 @@
 /* SVG (c) Kraft */
-import { toKebab } from '../../../general/string.js';
+import { toKebab } from "../../../general/string.js";
 
 /**
  * Rabbit Ear (c) Kraft
@@ -20,8 +20,7 @@ const appendTo = (element, parent) => {
 };
 
 const setAttributes = (element, attrs) => {
-	Object.keys(attrs)
-		.forEach(key => element.setAttribute(toKebab(key), attrs[key]));
+	Object.keys(attrs).forEach((key) => element.setAttribute(toKebab(key), attrs[key]));
 	return element;
 };
 

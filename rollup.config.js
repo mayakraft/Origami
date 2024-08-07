@@ -39,9 +39,7 @@ const moduleFolder = {
 		},
 		// sourcemap: true,
 	},
-	plugins: [
-		cleanup(),
-	],
+	plugins: [cleanup()],
 };
 
 // const commonJS = {

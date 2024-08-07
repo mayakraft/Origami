@@ -3,24 +3,67 @@ import ear from "../src/index.js";
 
 const testEqualVectorVectors = function (a, b) {
 	expect(a.length).toBe(b.length);
-	a.forEach((_, i) => expect(ear.math.epsilonEqualVectors(a[i], b[i]))
-		.toBe(true));
+	a.forEach((_, i) => expect(ear.math.epsilonEqualVectors(a[i], b[i])).toBe(true));
 };
 
 test("signedArea", () => {
-	expect(ear.math.signedArea([[1, 0], [0, 1], [-1, 0], [0, -1]])).toBeCloseTo(2);
-	expect(ear.math.signedArea([[1, 0], [0, 1], [-1, 0]])).toBeCloseTo(1);
+	expect(
+		ear.math.signedArea([
+			[1, 0],
+			[0, 1],
+			[-1, 0],
+			[0, -1],
+		]),
+	).toBeCloseTo(2);
+	expect(
+		ear.math.signedArea([
+			[1, 0],
+			[0, 1],
+			[-1, 0],
+		]),
+	).toBeCloseTo(1);
 });
 
 test("centroid", () => {
-	expect(ear.math.centroid([[1, 0], [0, 1], [-1, 0], [0, -1]])[0]).toBeCloseTo(0);
-	expect(ear.math.centroid([[1, 0], [0, 1], [-1, 0], [0, -1]])[1]).toBeCloseTo(0);
-	expect(ear.math.centroid([[1, 0], [0, 1], [-1, 0]])[0]).toBeCloseTo(0);
-	expect(ear.math.centroid([[1, 0], [0, 1], [-1, 0]])[1]).toBeCloseTo(1 / 3);
+	expect(
+		ear.math.centroid([
+			[1, 0],
+			[0, 1],
+			[-1, 0],
+			[0, -1],
+		])[0],
+	).toBeCloseTo(0);
+	expect(
+		ear.math.centroid([
+			[1, 0],
+			[0, 1],
+			[-1, 0],
+			[0, -1],
+		])[1],
+	).toBeCloseTo(0);
+	expect(
+		ear.math.centroid([
+			[1, 0],
+			[0, 1],
+			[-1, 0],
+		])[0],
+	).toBeCloseTo(0);
+	expect(
+		ear.math.centroid([
+			[1, 0],
+			[0, 1],
+			[-1, 0],
+		])[1],
+	).toBeCloseTo(1 / 3);
 });
 
 test("boundingBox", () => {
-	const box = ear.math.boundingBox([[1, 0], [0, 1], [-1, 0], [0, -1]]);
+	const box = ear.math.boundingBox([
+		[1, 0],
+		[0, 1],
+		[-1, 0],
+		[0, -1],
+	]);
 	expect(box.min[0]).toBe(-1);
 	expect(box.min[1]).toBe(-1);
 	expect(box.span[0]).toBe(2);
@@ -99,10 +142,21 @@ test("make_polygon_side_length_s", () => {
 });
 
 test("makePolygonNonCollinear", () => {
-	const polygon = [[0, 0], [1, 0], [2, 0], [2, 2], [0, 2]];
+	const polygon = [
+		[0, 0],
+		[1, 0],
+		[2, 0],
+		[2, 2],
+		[0, 2],
+	];
 	const result = ear.math.makePolygonNonCollinear(polygon);
 	testEqualVectorVectors(
-		[[0, 0], [2, 0], [2, 2], [0, 2]],
+		[
+			[0, 0],
+			[2, 0],
+			[2, 2],
+			[0, 2],
+		],
 		result,
 	);
 });

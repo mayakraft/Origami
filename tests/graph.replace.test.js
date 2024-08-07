@@ -57,10 +57,41 @@ test("", () => {
 	// {3:1, 8:6, 9:4, 10:7, 13:11, 14:7, 15:11, 16:0, 17:4,
 	// 18:12, 19:2, 20:5, 21:11, 22:5, 24:23, 25:5, 26:5, 27:12, 28:11}
 	const arr = [
-		null, null, null, 1, null, null, null, null, 6, 4, 7, null,
-		null, 11, 7, 11, 0, 4, 12, 2, 5, 11, 5, null, 23, 5, 5, 12, 11,
+		null,
+		null,
+		null,
+		1,
+		null,
+		null,
+		null,
+		null,
+		6,
+		4,
+		7,
+		null,
+		null,
+		11,
+		7,
+		11,
+		0,
+		4,
+		12,
+		2,
+		5,
+		11,
+		5,
+		null,
+		23,
+		5,
+		5,
+		12,
+		11,
 	];
-	arr.forEach((el, i) => { if (el === null) { delete arr[i]; } });
+	arr.forEach((el, i) => {
+		if (el === null) {
+			delete arr[i];
+		}
+	});
 
 	ear.graph.replace(graph, "vertices", arr);
 	// console.log(graph);

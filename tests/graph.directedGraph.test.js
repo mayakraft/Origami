@@ -15,27 +15,43 @@ test("topologicalSort, Single node graph", () => {
 });
 
 test("topologicalSort, Linear graph", () => {
-	const directedEdges = [[0, 1], [1, 2], [2, 3]];
+	const directedEdges = [
+		[0, 1],
+		[1, 2],
+		[2, 3],
+	];
 	const result = ear.graph.topologicalSort(directedEdges);
 	expect(result).toMatchObject([0, 1, 2, 3]);
 });
 
 test("topologicalSort, Graph with cycles", () => {
-	const directedEdges = [[0, 1], [1, 2], [2, 0]];
+	const directedEdges = [
+		[0, 1],
+		[1, 2],
+		[2, 0],
+	];
 	const result = ear.graph.topologicalSort(directedEdges);
 	// Since the graph contains a cycle, the result should be undefined
 	expect(result).toMatchObject(undefined);
 });
 
 test("topologicalSort, Graph with disconnected components", () => {
-	const directedEdges = [[0, 1], [1, 2], [3, 4], [4, 5]];
+	const directedEdges = [
+		[0, 1],
+		[1, 2],
+		[3, 4],
+		[4, 5],
+	];
 	const result = ear.graph.topologicalSort(directedEdges);
 	expect(result).toMatchObject([0, 1, 2, 3, 4, 5]);
 });
 
 test("topologicalSort, Graph with multiple possible orders", () => {
 	const directedEdges = [
-		[0, 1], [0, 2], [1, 3], [2, 3]
+		[0, 1],
+		[0, 2],
+		[1, 3],
+		[2, 3],
 	];
 	const result = ear.graph.topologicalSort(directedEdges);
 	expect(result).toMatchObject([0, 1, 2, 3]);
@@ -54,7 +70,10 @@ test("topologicalSort, Large acyclic graph", () => {
 
 test("topologicalSort, Graph with self-referencing nodes", () => {
 	const directedEdges = [
-		[0, 1], [1, 2], [2, 2], [2, 3]
+		[0, 1],
+		[1, 2],
+		[2, 2],
+		[2, 3],
 	];
 	const result = ear.graph.topologicalSort(directedEdges);
 	expect(result).toMatchObject([0, 1, 2, 3]);
@@ -62,7 +81,11 @@ test("topologicalSort, Graph with self-referencing nodes", () => {
 
 test("topologicalSort, Graph with duplicate edges", () => {
 	const directedEdges = [
-		[0, 1], [1, 2], [2, 3], [0, 1], [2, 3]
+		[0, 1],
+		[1, 2],
+		[2, 3],
+		[0, 1],
+		[2, 3],
 	];
 	const result = ear.graph.topologicalSort(directedEdges);
 	expect(result).toMatchObject([0, 1, 2, 3]);
@@ -70,7 +93,12 @@ test("topologicalSort, Graph with duplicate edges", () => {
 
 test("topologicalSort, Graph with multiple disconnected components", () => {
 	const directedEdges = [
-		[0, 1], [1, 2], [2, 0], [3, 4], [4, 5], [5, 3]
+		[0, 1],
+		[1, 2],
+		[2, 0],
+		[3, 4],
+		[4, 5],
+		[5, 3],
 	];
 	const result = ear.graph.topologicalSort(directedEdges);
 	expect(result).toMatchObject(undefined);
@@ -78,7 +106,10 @@ test("topologicalSort, Graph with multiple disconnected components", () => {
 
 test("topologicalSort, Graph with loops", () => {
 	const directedEdges = [
-		[0, 1], [1, 2], [2, 3], [3, 1]
+		[0, 1],
+		[1, 2],
+		[2, 3],
+		[3, 1],
 	];
 	const result = ear.graph.topologicalSort(directedEdges);
 	expect(result).toMatchObject(undefined);
@@ -86,7 +117,10 @@ test("topologicalSort, Graph with loops", () => {
 
 test("topologicalSort, Graph with negative vertex indices", () => {
 	const directedEdges = [
-		[-1, 0], [0, 1], [1, 2], [2, 3]
+		[-1, 0],
+		[0, 1],
+		[1, 2],
+		[2, 3],
 	];
 	const result = ear.graph.topologicalSort(directedEdges);
 	expect(result).toEqual([-1, 0, 1, 2, 3]);
@@ -94,19 +128,33 @@ test("topologicalSort, Graph with negative vertex indices", () => {
 
 test("topologicalSort, Graph with negative and positive vertex indices", () => {
 	const directedEdges = [
-		[-2, -1], [-1, 0], [0, 1], [1, 2], [2, 3]
+		[-2, -1],
+		[-1, 0],
+		[0, 1],
+		[1, 2],
+		[2, 3],
 	];
 	const result = ear.graph.topologicalSort(directedEdges);
 	expect(result).toEqual([-2, -1, 0, 1, 2, 3]);
 });
 
 test("topologicalSort", () => {
-	const ordering = ear.graph.topologicalSort([[5, 2], [2, 1], [5, 1], [1, 0], [1, 3]]);
+	const ordering = ear.graph.topologicalSort([
+		[5, 2],
+		[2, 1],
+		[5, 1],
+		[1, 0],
+		[1, 3],
+	]);
 	expect(ordering).toMatchObject([5, 2, 1, 0, 3]);
 });
 
 test("topologicalSort, with cycle", () => {
-	const ordering = ear.graph.topologicalSort([[5, 2], [2, 1], [1, 5]]);
+	const ordering = ear.graph.topologicalSort([
+		[5, 2],
+		[2, 1],
+		[1, 5],
+	]);
 	expect(ordering).toMatchObject(undefined);
 });
 
@@ -117,9 +165,9 @@ test("topologicalSort, crane", () => {
 	graph.faces_normal = ear.graph.makeFacesNormal(graph);
 	const ordering = ear.graph.linearizeFaceOrders(graph);
 	const expected = [
-		37, 46, 36, 30, 2, 39, 43, 35, 29, 3, 0, 4, 28, 15, 9, 27, 22, 16, 12, 20,
-		11, 19, 10, 13, 8, 14, 26, 55, 54, 51, 58, 57, 52, 53, 56, 18, 21, 17, 23,
-		25, 5, 24, 31, 34, 42, 45, 40, 32, 33, 41, 44, 38, 47, 50, 7, 48, 49, 6, 1,
+		37, 46, 36, 30, 2, 39, 43, 35, 29, 3, 0, 4, 28, 15, 9, 27, 22, 16, 12, 20, 11, 19, 10,
+		13, 8, 14, 26, 55, 54, 51, 58, 57, 52, 53, 56, 18, 21, 17, 23, 25, 5, 24, 31, 34, 42,
+		45, 40, 32, 33, 41, 44, 38, 47, 50, 7, 48, 49, 6, 1,
 	];
 	expect(ordering).toMatchObject(expected);
 });
@@ -200,14 +248,24 @@ test("topologicalSort, subset of crane faces. again", () => {
 });
 
 test("topologicalSortQuick, Graph with cycles", () => {
-	const directedEdges = [[0, 1], [1, 2], [2, 0]];
+	const directedEdges = [
+		[0, 1],
+		[1, 2],
+		[2, 0],
+	];
 	const result = ear.graph.topologicalSortQuick(directedEdges);
 	// Since the graph contains a cycle, the result should be undefined
 	expect(result).toMatchObject([1, 2, 0]);
 });
 
 test("topologicalSortQuick, Graph with cycles", () => {
-	const directedEdges = [[11, 12], [12, 13], [13, 14], [14, 15], [15, 11]];
+	const directedEdges = [
+		[11, 12],
+		[12, 13],
+		[13, 14],
+		[14, 15],
+		[15, 11],
+	];
 	const result = ear.graph.topologicalSortQuick(directedEdges);
 	// Since the graph contains a cycle, the result should be undefined
 	expect(result).toMatchObject([12, 13, 14, 15, 11]);
@@ -215,7 +273,12 @@ test("topologicalSortQuick, Graph with cycles", () => {
 
 test("topologicalSortQuick, Graph with multiple disconnected components", () => {
 	const directedEdges = [
-		[0, 1], [1, 2], [2, 0], [3, 4], [4, 5], [5, 3]
+		[0, 1],
+		[1, 2],
+		[2, 0],
+		[3, 4],
+		[4, 5],
+		[5, 3],
 	];
 	const result = ear.graph.topologicalSortQuick(directedEdges);
 	// two separate cycles, two elements in this result
@@ -224,7 +287,10 @@ test("topologicalSortQuick, Graph with multiple disconnected components", () => 
 
 test("topologicalSortQuick, Graph with loops", () => {
 	const directedEdges = [
-		[0, 1], [1, 2], [2, 3], [3, 1]
+		[0, 1],
+		[1, 2],
+		[2, 3],
+		[3, 1],
 	];
 	const result = ear.graph.topologicalSortQuick(directedEdges);
 	expect(result).toMatchObject([0, 2, 3, 1]);

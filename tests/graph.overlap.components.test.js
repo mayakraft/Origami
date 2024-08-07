@@ -4,197 +4,308 @@ import ear from "../src/index.js";
 
 test("edges-faces all data, triangle cut by edge", () => {
 	const graph = ear.graph.populate({
-		vertices_coords: [[0, 0], [0.5, 0.5], [0, 1], [-1, 0.5]],
-		edges_vertices: [[0, 1], [1, 2], [2, 0], [1, 3]],
+		vertices_coords: [
+			[0, 0],
+			[0.5, 0.5],
+			[0, 1],
+			[-1, 0.5],
+		],
+		edges_vertices: [
+			[0, 1],
+			[1, 2],
+			[2, 0],
+			[1, 3],
+		],
 		edges_assignment: Array.from("BBBB"),
 		faces_vertices: [[0, 1, 2]],
 	});
-	const {
-		verticesVertices,
-		verticesEdges,
-		edgesEdges,
-		facesVertices,
-	} = ear.graph.getOverlappingComponents(graph);
+	const { verticesVertices, verticesEdges, edgesEdges, facesVertices } =
+		ear.graph.getOverlappingComponents(graph);
 	expect(ear.general.lookupArrayToArrayArray(verticesVertices)).toMatchObject([
-		[0], [1], [2], [3],
+		[0],
+		[1],
+		[2],
+		[3],
 	]);
 	expect(ear.general.lookupArrayToArrayArray(verticesEdges)).toMatchObject([
-		[], [], [], [],
-	]);
-	expect(ear.general.lookupArrayToArrayArray(edgesEdges)).toMatchObject([
-		[], [], [3], [2],
-	]);
-	expect(ear.general.lookupArrayToArrayArray(facesVertices)).toMatchObject([
+		[],
+		[],
+		[],
 		[],
 	]);
+	expect(ear.general.lookupArrayToArrayArray(edgesEdges)).toMatchObject([
+		[],
+		[],
+		[3],
+		[2],
+	]);
+	expect(ear.general.lookupArrayToArrayArray(facesVertices)).toMatchObject([[]]);
 });
 
 test("edges-faces all data, square cut by edge through vertex", () => {
 	// square cut by edge between two of its vertices
-	const {
-		verticesVertices,
-		verticesEdges,
-		edgesEdges,
-		facesVertices,
-	} = ear.graph.getOverlappingComponents(ear.graph.populate({
-		vertices_coords: [[0, 0], [1, 0], [1, 1], [0, 1]],
-		edges_vertices: [[0, 1], [1, 2], [2, 3], [3, 0], [0, 2]],
-		edges_assignment: Array.from("BBBBB"),
-		faces_vertices: [[0, 1, 2, 3]],
-	}));
+	const { verticesVertices, verticesEdges, edgesEdges, facesVertices } =
+		ear.graph.getOverlappingComponents(
+			ear.graph.populate({
+				vertices_coords: [
+					[0, 0],
+					[1, 0],
+					[1, 1],
+					[0, 1],
+				],
+				edges_vertices: [
+					[0, 1],
+					[1, 2],
+					[2, 3],
+					[3, 0],
+					[0, 2],
+				],
+				edges_assignment: Array.from("BBBBB"),
+				faces_vertices: [[0, 1, 2, 3]],
+			}),
+		);
 	expect(ear.general.lookupArrayToArrayArray(verticesVertices)).toMatchObject([
-		[0], [1], [2], [3],
+		[0],
+		[1],
+		[2],
+		[3],
 	]);
 	expect(ear.general.lookupArrayToArrayArray(verticesEdges)).toMatchObject([
-		[], [], [], [],
-	]);
-	expect(ear.general.lookupArrayToArrayArray(edgesEdges)).toMatchObject([
-		[], [], [], [], [],
-	]);
-	expect(ear.general.lookupArrayToArrayArray(facesVertices)).toMatchObject([
+		[],
+		[],
+		[],
 		[],
 	]);
+	expect(ear.general.lookupArrayToArrayArray(edgesEdges)).toMatchObject([
+		[],
+		[],
+		[],
+		[],
+		[],
+	]);
+	expect(ear.general.lookupArrayToArrayArray(facesVertices)).toMatchObject([[]]);
 });
 
 test("edges-faces all data, square cut by edge through vertex", () => {
 	// square cut by edge between one of its vertices, through another vertex
-	const {
-		verticesVertices,
-		verticesEdges,
-		edgesEdges,
-		facesVertices,
-	} = ear.graph.getOverlappingComponents(ear.graph.populate({
-		vertices_coords: [[0, 0], [1, 0], [1, 1], [0, 1], [2, 2]],
-		edges_vertices: [[0, 1], [1, 2], [2, 3], [3, 0], [0, 4]],
-		edges_assignment: Array.from("BBBBB"),
-		faces_vertices: [[0, 1, 2, 3]],
-	}));
+	const { verticesVertices, verticesEdges, edgesEdges, facesVertices } =
+		ear.graph.getOverlappingComponents(
+			ear.graph.populate({
+				vertices_coords: [
+					[0, 0],
+					[1, 0],
+					[1, 1],
+					[0, 1],
+					[2, 2],
+				],
+				edges_vertices: [
+					[0, 1],
+					[1, 2],
+					[2, 3],
+					[3, 0],
+					[0, 4],
+				],
+				edges_assignment: Array.from("BBBBB"),
+				faces_vertices: [[0, 1, 2, 3]],
+			}),
+		);
 	expect(ear.general.lookupArrayToArrayArray(verticesVertices)).toMatchObject([
-		[0], [1], [2], [3], [4],
+		[0],
+		[1],
+		[2],
+		[3],
+		[4],
 	]);
 	expect(ear.general.lookupArrayToArrayArray(verticesEdges)).toMatchObject([
-		[], [], [4], [], [],
-	]);
-	expect(ear.general.lookupArrayToArrayArray(edgesEdges)).toMatchObject([
-		[], [], [], [], [],
-	]);
-	expect(ear.general.lookupArrayToArrayArray(facesVertices)).toMatchObject([
+		[],
+		[],
+		[4],
+		[],
 		[],
 	]);
+	expect(ear.general.lookupArrayToArrayArray(edgesEdges)).toMatchObject([
+		[],
+		[],
+		[],
+		[],
+		[],
+	]);
+	expect(ear.general.lookupArrayToArrayArray(facesVertices)).toMatchObject([[]]);
 });
 
 test("edges-faces all data, square cut by edge through two vertices", () => {
 	// square cut by edge between one of its vertices, through another vertex
-	const {
-		verticesVertices,
-		verticesEdges,
-		edgesEdges,
-		facesVertices,
-	} = ear.graph.getOverlappingComponents(ear.graph.populate({
-		vertices_coords: [[0, 0], [1, 0], [1, 1], [0, 1], [-1, -1], [2, 2]],
-		edges_vertices: [[0, 1], [1, 2], [2, 3], [3, 0], [4, 5]],
-		edges_assignment: Array.from("BBBBB"),
-		faces_vertices: [[0, 1, 2, 3]],
-	}));
+	const { verticesVertices, verticesEdges, edgesEdges, facesVertices } =
+		ear.graph.getOverlappingComponents(
+			ear.graph.populate({
+				vertices_coords: [
+					[0, 0],
+					[1, 0],
+					[1, 1],
+					[0, 1],
+					[-1, -1],
+					[2, 2],
+				],
+				edges_vertices: [
+					[0, 1],
+					[1, 2],
+					[2, 3],
+					[3, 0],
+					[4, 5],
+				],
+				edges_assignment: Array.from("BBBBB"),
+				faces_vertices: [[0, 1, 2, 3]],
+			}),
+		);
 	expect(ear.general.lookupArrayToArrayArray(verticesVertices)).toMatchObject([
-		[0], [1], [2], [3], [4], [5],
+		[0],
+		[1],
+		[2],
+		[3],
+		[4],
+		[5],
 	]);
 	expect(ear.general.lookupArrayToArrayArray(verticesEdges)).toMatchObject([
-		[4], [], [4], [], [], [],
-	]);
-	expect(ear.general.lookupArrayToArrayArray(edgesEdges)).toMatchObject([
-		[], [], [], [], [],
-	]);
-	expect(ear.general.lookupArrayToArrayArray(facesVertices)).toMatchObject([
+		[4],
+		[],
+		[4],
+		[],
+		[],
 		[],
 	]);
+	expect(ear.general.lookupArrayToArrayArray(edgesEdges)).toMatchObject([
+		[],
+		[],
+		[],
+		[],
+		[],
+	]);
+	expect(ear.general.lookupArrayToArrayArray(facesVertices)).toMatchObject([[]]);
 });
 
 test("overlapping components, two identical edges", () => {
 	const graph = ear.graph.populate({
-		vertices_coords: [[0, 0], [1, 0], [1, 0], [0, 0]],
-		edges_vertices: [[0, 1], [2, 3]],
+		vertices_coords: [
+			[0, 0],
+			[1, 0],
+			[1, 0],
+			[0, 0],
+		],
+		edges_vertices: [
+			[0, 1],
+			[2, 3],
+		],
 		faces_vertices: [],
 	});
-	const {
-		verticesVertices,
-		verticesEdges,
-		edgesEdges,
-		facesVertices,
-	} = ear.graph.getOverlappingComponents(graph);
+	const { verticesVertices, verticesEdges, edgesEdges, facesVertices } =
+		ear.graph.getOverlappingComponents(graph);
 	expect(ear.general.lookupArrayToArrayArray(verticesVertices)).toMatchObject([
-		[0, 3], [1, 2], [1, 2], [0, 3],
+		[0, 3],
+		[1, 2],
+		[1, 2],
+		[0, 3],
 	]);
 	expect(ear.general.lookupArrayToArrayArray(verticesEdges)).toMatchObject([
-		[], [], [], [],
+		[],
+		[],
+		[],
+		[],
 	]);
-	expect(ear.general.lookupArrayToArrayArray(edgesEdges)).toMatchObject([
-		[], [],
-	]);
+	expect(ear.general.lookupArrayToArrayArray(edgesEdges)).toMatchObject([[], []]);
 	expect(ear.general.lookupArrayToArrayArray(facesVertices)).toMatchObject([]);
 });
 
 test("overlapping components, two crossing edges", () => {
 	const graph = ear.graph.populate({
-		vertices_coords: [[0, 0], [1, 0], [0.5, 1], [0.5, -1]],
-		edges_vertices: [[0, 1], [2, 3]],
+		vertices_coords: [
+			[0, 0],
+			[1, 0],
+			[0.5, 1],
+			[0.5, -1],
+		],
+		edges_vertices: [
+			[0, 1],
+			[2, 3],
+		],
 		faces_vertices: [],
 	});
-	const {
-		verticesVertices,
-		verticesEdges,
-		edgesEdges,
-		facesVertices,
-	} = ear.graph.getOverlappingComponents(graph);
+	const { verticesVertices, verticesEdges, edgesEdges, facesVertices } =
+		ear.graph.getOverlappingComponents(graph);
 	expect(ear.general.lookupArrayToArrayArray(verticesVertices)).toMatchObject([
-		[0], [1], [2], [3],
+		[0],
+		[1],
+		[2],
+		[3],
 	]);
 	expect(ear.general.lookupArrayToArrayArray(verticesEdges)).toMatchObject([
-		[], [], [], [],
+		[],
+		[],
+		[],
+		[],
 	]);
-	expect(ear.general.lookupArrayToArrayArray(edgesEdges)).toMatchObject([
-		[1], [0],
-	]);
+	expect(ear.general.lookupArrayToArrayArray(edgesEdges)).toMatchObject([[1], [0]]);
 	expect(ear.general.lookupArrayToArrayArray(facesVertices)).toMatchObject([]);
 });
 
 test("overlapping components, two collinear overlapping edges", () => {
 	const graph = ear.graph.populate({
-		vertices_coords: [[0, 0], [2, 0], [1, 0], [3, 0]],
-		edges_vertices: [[0, 1], [2, 3]],
+		vertices_coords: [
+			[0, 0],
+			[2, 0],
+			[1, 0],
+			[3, 0],
+		],
+		edges_vertices: [
+			[0, 1],
+			[2, 3],
+		],
 		faces_vertices: [],
 	});
-	const {
-		verticesVertices,
-		verticesEdges,
-		edgesEdges,
-		facesVertices,
-	} = ear.graph.getOverlappingComponents(graph);
+	const { verticesVertices, verticesEdges, edgesEdges, facesVertices } =
+		ear.graph.getOverlappingComponents(graph);
 	expect(ear.general.lookupArrayToArrayArray(verticesVertices)).toMatchObject([
-		[0], [1], [2], [3],
+		[0],
+		[1],
+		[2],
+		[3],
 	]);
 	expect(ear.general.lookupArrayToArrayArray(verticesEdges)).toMatchObject([
-		[], [1], [0], [],
+		[],
+		[1],
+		[0],
+		[],
 	]);
-	expect(ear.general.lookupArrayToArrayArray(edgesEdges)).toMatchObject([
-		[], [],
-	]);
+	expect(ear.general.lookupArrayToArrayArray(edgesEdges)).toMatchObject([[], []]);
 	expect(ear.general.lookupArrayToArrayArray(facesVertices)).toMatchObject([]);
 });
 
 test("overlapping components, two adjacent faces one point overlap", () => {
 	const graph = ear.graph.populate({
-		vertices_coords: [[0, 0], [0.5, 0.5], [0, 1], [0, 1]],
-		edges_vertices: [[0, 3], [3, 1], [1, 2], [2, 0], [0, 1]],
+		vertices_coords: [
+			[0, 0],
+			[0.5, 0.5],
+			[0, 1],
+			[0, 1],
+		],
+		edges_vertices: [
+			[0, 3],
+			[3, 1],
+			[1, 2],
+			[2, 0],
+			[0, 1],
+		],
 		edges_assignment: Array.from("BBBBV"),
-		faces_vertices: [[0, 2, 1], [0, 1, 3]],
+		faces_vertices: [
+			[0, 2, 1],
+			[0, 1, 3],
+		],
 	});
 	const components = ear.graph.getOverlappingComponents(graph);
 
 	// console.log(components);
 	// vertex 2 and 3 are mutually overlapping
 	expect(components).toMatchObject({
-		verticesVertices: [[true], [, true], [,, true, true], [,, true, true]],
+		verticesVertices: [[true], [, true], [, , true, true], [, , true, true]],
 		verticesEdges: [[], [], [], []],
 		edgesEdges: [[], [], [], [], []],
 		facesVertices: [[], []],
@@ -203,35 +314,70 @@ test("overlapping components, two adjacent faces one point overlap", () => {
 
 test("overlapping components, two adjacent faces no overlap points, two crossing edges", () => {
 	const graph = ear.graph.populate({
-		vertices_coords: [[0, 0], [0.5, 0.5], [0, 1], [-0.1, 0.9]],
-		edges_vertices: [[0, 3], [3, 1], [1, 2], [2, 0], [0, 1]],
+		vertices_coords: [
+			[0, 0],
+			[0.5, 0.5],
+			[0, 1],
+			[-0.1, 0.9],
+		],
+		edges_vertices: [
+			[0, 3],
+			[3, 1],
+			[1, 2],
+			[2, 0],
+			[0, 1],
+		],
 		edges_assignment: Array.from("BBBBV"),
-		faces_vertices: [[0, 2, 1], [0, 1, 3]],
+		faces_vertices: [
+			[0, 2, 1],
+			[0, 1, 3],
+		],
 	});
 	const components = ear.graph.getOverlappingComponents(graph);
 
 	// edge 1 and 3 are mutually overlapping
 	expect(components).toMatchObject({
-		verticesVertices: [[true], [, true], [,, true], [,,, true]],
+		verticesVertices: [[true], [, true], [, , true], [, , , true]],
 		verticesEdges: [[], [], [], []],
-		edgesEdges: [[], [,,, true], [], [, true], []],
+		edgesEdges: [[], [, , , true], [], [, true], []],
 		facesVertices: [[], []],
 	});
 });
 
 test("overlapping components, two separate faces, identical", () => {
 	const graph = ear.graph.populate({
-		vertices_coords: [[0, 0], [0.5, 0.5], [0, 1], [0, 0], [0.5, 0.5], [0, 1]],
-		edges_vertices: [[0, 1], [1, 2], [2, 0], [3, 4], [4, 5], [5, 3]],
+		vertices_coords: [
+			[0, 0],
+			[0.5, 0.5],
+			[0, 1],
+			[0, 0],
+			[0.5, 0.5],
+			[0, 1],
+		],
+		edges_vertices: [
+			[0, 1],
+			[1, 2],
+			[2, 0],
+			[3, 4],
+			[4, 5],
+			[5, 3],
+		],
 		edges_assignment: Array.from("BBBBBB"),
-		faces_vertices: [[0, 1, 2], [3, 4, 5]],
+		faces_vertices: [
+			[0, 1, 2],
+			[3, 4, 5],
+		],
 	});
 	const components = ear.graph.getOverlappingComponents(graph);
 
 	expect(components).toMatchObject({
 		verticesVertices: [
-			[true,,, true], [, true,,, true], [,, true,,, true],
-			[true,,, true], [, true,,, true], [,, true,,, true],
+			[true, , , true],
+			[, true, , , true],
+			[, , true, , , true],
+			[true, , , true],
+			[, true, , , true],
+			[, , true, , , true],
 		],
 		verticesEdges: [[], [], [], [], [], []],
 		edgesEdges: [[], [], [], [], [], []],

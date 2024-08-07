@@ -69,7 +69,7 @@ export const multiplyMatrices2 = (m1, m2) => [
  * @param {number[]} m a matrix as an array of numbers
  * @returns {number} the determinant of the matrix
  */
-export const determinant2 = m => m[0] * m[3] - m[1] * m[2];
+export const determinant2 = (m) => m[0] * m[3] - m[1] * m[2];
 
 /**
  * @description invert a 2x3 matrix
@@ -78,10 +78,12 @@ export const determinant2 = m => m[0] * m[3] - m[1] * m[2];
  */
 export const invertMatrix2 = (m) => {
 	const det = determinant2(m);
-	if (Math.abs(det) < 1e-12
-		|| Number.isNaN(det)
-		|| !Number.isFinite(m[4])
-		|| !Number.isFinite(m[5])) {
+	if (
+		Math.abs(det) < 1e-12 ||
+		Number.isNaN(det) ||
+		!Number.isFinite(m[4]) ||
+		!Number.isFinite(m[5])
+	) {
 		return undefined;
 	}
 	return [
@@ -120,9 +122,8 @@ export const makeMatrix2Scale = (scale = [1, 1], origin = [0, 0]) => [
  * @param {[number, number]} origin homothetic center of the scale, default [0, 0]
  * @returns {number[]} matrix
  */
-export const makeMatrix2UniformScale = (scale = 1, origin = [0, 0]) => (
-	makeMatrix2Scale([scale, scale], origin)
-);
+export const makeMatrix2UniformScale = (scale = 1, origin = [0, 0]) =>
+	makeMatrix2Scale([scale, scale], origin);
 
 /**
  * @param {number} angle the angle of rotation, origin of transformation
@@ -132,14 +133,7 @@ export const makeMatrix2UniformScale = (scale = 1, origin = [0, 0]) => (
 export const makeMatrix2Rotate = (angle, origin = [0, 0]) => {
 	const cos = Math.cos(angle);
 	const sin = Math.sin(angle);
-	return [
-		cos,
-		sin,
-		-sin,
-		cos,
-		origin[0],
-		origin[1],
-	];
+	return [cos, sin, -sin, cos, origin[0], origin[1]];
 };
 
 /**

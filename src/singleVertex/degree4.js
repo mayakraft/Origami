@@ -11,12 +11,11 @@
  * @param {string[]} assignments an array of FOLD assignments, in uppercase.
  * @returns {number} the index of the odd-one-out assignment.
  */
-const oddAssignmentIndex = (assignments) => (
-	assignments.filter(a => a === "M").length
-	> assignments.filter(a => a === "V").length
+const oddAssignmentIndex = (assignments) =>
+	assignments.filter((a) => a === "M").length >
+	assignments.filter((a) => a === "V").length
 		? assignments.indexOf("V")
-		: assignments.indexOf("M")
-);
+		: assignments.indexOf("M");
 
 /**
  * @description Fold a degree-4 single vertex in 3D.
@@ -32,8 +31,10 @@ const oddAssignmentIndex = (assignments) => (
  * or "undefined" if the operation could not be completed.
  */
 export const foldDegree4 = (sectors, assignments, foldAngle = 0) => {
-	const odd = oddAssignmentIndex(assignments.map(a => a.toUpperCase()));
-	if (odd === -1) { return undefined; }
+	const odd = oddAssignmentIndex(assignments.map((a) => a.toUpperCase()));
+	if (odd === -1) {
+		return undefined;
+	}
 	const a = sectors[(odd + 1) % sectors.length];
 	const b = sectors[(odd + 2) % sectors.length];
 
@@ -42,14 +43,14 @@ export const foldDegree4 = (sectors, assignments, foldAngle = 0) => {
 	// const pbc = Math.PI * foldAngle; // when input was between 0 and 1.
 	const pbc = Math.max(-Math.PI, Math.min(Math.PI, foldAngle));
 
-	const cosE = -Math.cos(a) * Math.cos(b)
-		+ Math.sin(a) * Math.sin(b) * Math.cos(Math.PI - pbc);
-	const res = Math.cos(Math.PI - pbc)
-		- ((Math.sin(Math.PI - pbc) ** 2) * Math.sin(a) * Math.sin(b))
-		/ (1 - cosE);
+	const cosE =
+		-Math.cos(a) * Math.cos(b) + Math.sin(a) * Math.sin(b) * Math.cos(Math.PI - pbc);
+	const res =
+		Math.cos(Math.PI - pbc) -
+		(Math.sin(Math.PI - pbc) ** 2 * Math.sin(a) * Math.sin(b)) / (1 - cosE);
 
 	const pab = -Math.acos(res) + Math.PI;
-	return (odd % 2 === 0
+	return odd % 2 === 0
 		? [pab, pbc, pab, pbc].map((n, i) => (odd === i ? -n : n))
-		: [pbc, pab, pbc, pab].map((n, i) => (odd === i ? -n : n)));
+		: [pbc, pab, pbc, pab].map((n, i) => (odd === i ? -n : n));
 };

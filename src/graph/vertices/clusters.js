@@ -19,7 +19,9 @@ import { getDimensionQuick } from "../../fold/spec.js";
  * clusters: [ [0, 5], [1], [3], [2, 4]]
  */
 export const getVerticesClusters = ({ vertices_coords }, epsilon = EPSILON) => {
-	if (!vertices_coords) { return []; }
+	if (!vertices_coords) {
+		return [];
+	}
 	const dimensions = getDimensionQuick({ vertices_coords });
 	const dimensionArray = Array.from(Array(dimensions));
 
@@ -36,7 +38,7 @@ export const getVerticesClusters = ({ vertices_coords }, epsilon = EPSILON) => {
 	const vertices = vertices_coords
 		.map((point, i) => ({ i, d: point[0] }))
 		.sort((a, b) => a.d - b.d)
-		.map(a => a.i)
+		.map((a) => a.i)
 		.filter(() => true);
 
 	// for each X and Y axis, there is an array of two values: [0, 0].
@@ -48,10 +50,14 @@ export const getVerticesClusters = ({ vertices_coords }, epsilon = EPSILON) => {
 	 * @description Test if a vertex is inside the current cluster's bounding box
 	 * @param {number} index an index in vertices_coords
 	 */
-	const isInsideCluster = (index) => dimensionArray
-		.map((_, d) => vertices_coords[index][d] > ranges[d][0]
-			&& vertices_coords[index][d] < ranges[d][1])
-		.reduce((a, b) => a && b, true);
+	const isInsideCluster = (index) =>
+		dimensionArray
+			.map(
+				(_, d) =>
+					vertices_coords[index][d] > ranges[d][0] &&
+					vertices_coords[index][d] < ranges[d][1],
+			)
+			.reduce((a, b) => a && b, true);
 
 	// "rangeStart" is the index of the cluster which is still within epsilon
 	// range of the most recently added point, every update to cluster will
@@ -64,29 +70,26 @@ export const getVerticesClusters = ({ vertices_coords }, epsilon = EPSILON) => {
 	const updateRange = (cluster) => {
 		// find the start index of the values within epsilon of the newest point
 		const newVertex = cluster[cluster.length - 1];
-		while (vertices_coords[newVertex][0]
-			- vertices_coords[cluster[rangeStart]][0] > epsilon) {
+		while (
+			vertices_coords[newVertex][0] - vertices_coords[cluster[rangeStart]][0] >
+			epsilon
+		) {
 			rangeStart += 1;
 		}
 
 		// the subset of points within the epsilon of the newest point
-		const points = cluster.slice(rangeStart, cluster.length)
-			.map(v => vertices_coords[v]);
+		const points = cluster
+			.slice(rangeStart, cluster.length)
+			.map((v) => vertices_coords[v]);
 
 		// set all dimensions of the range.
 		// for the X-axis, we know that the values are sorted, so, we can
 		// make a little shortcut and only grab the first and last entry.
-		ranges[0] = [
-			points[0][0] - epsilon,
-			points[points.length - 1][0] + epsilon,
-		];
+		ranges[0] = [points[0][0] - epsilon, points[points.length - 1][0] + epsilon];
 		// set the new ranges with the min and max padded with the epsilon
 		for (let d = 1; d < dimensions; d += 1) {
-			const scalars = points.map(p => p[d]);
-			ranges[d] = [
-				Math.min(...scalars) - epsilon,
-				Math.max(...scalars) + epsilon,
-			];
+			const scalars = points.map((p) => p[d]);
+			ranges[d] = [Math.min(...scalars) - epsilon, Math.max(...scalars) + epsilon];
 		}
 	};
 
@@ -124,8 +127,7 @@ export const getVerticesClusters = ({ vertices_coords }, epsilon = EPSILON) => {
 		// the next few vertices to its right are still within the cluster.
 		// however, if we move too far away in the X direction from the cluster,
 		// we know this cluster is finished and we can start a new one.
-		while (walk < vertices.length
-			&& vertices_coords[vertices[walk]][0] < ranges[0][1]) {
+		while (walk < vertices.length && vertices_coords[vertices[walk]][0] < ranges[0][1]) {
 			// if the point is inside the bounding box of the cluster, add it.
 			if (isInsideCluster(vertices[walk])) {
 				const newVertex = vertices.splice(walk, 1).shift();

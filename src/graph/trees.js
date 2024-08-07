@@ -27,22 +27,25 @@
  * where each array contains an array of tree nodes at that depth.
  */
 export const minimumSpanningTrees = (array_array = [], rootIndices = []) => {
-	if (array_array.length === 0) { return []; }
+	if (array_array.length === 0) {
+		return [];
+	}
 	const trees = [];
 
 	// this serves two functions: a hash lookup to ensure we aren't using the
 	// same node twice, and when we need to start a new tree, query from here.
 	/** @type {{[key: number]: boolean}} */
 	const unvisited = {};
-	array_array.forEach((_, i) => { unvisited[i] = true; });
+	array_array.forEach((_, i) => {
+		unvisited[i] = true;
+	});
 
 	do {
 		// pick a starting index. grab the first available (unvisited) item from
 		// the user's root list. if there is none, get the first unvisited index.
-		const rootIndex = rootIndices.filter(i => unvisited[i]).shift();
-		const startIndex = rootIndex !== undefined
-			? rootIndex
-			: parseInt(Object.keys(unvisited).shift(), 10);
+		const rootIndex = rootIndices.filter((i) => unvisited[i]).shift();
+		const startIndex =
+			rootIndex !== undefined ? rootIndex : parseInt(Object.keys(unvisited).shift(), 10);
 
 		// this also invalidates "rootIndex" for any subsequent disjoint sets.
 		delete unvisited[startIndex];
@@ -58,10 +61,11 @@ export const minimumSpanningTrees = (array_array = [], rootIndices = []) => {
 
 			// for each current level's indices, gather all their children
 			// but filter out any which already appeared in a previous level.
-			const nextLevel = currentLevel
-				.flatMap(current => array_array[current.index]
-					.filter(i => unvisited[i] && i !== null && i !== undefined)
-					.map(index => ({ index, parent: current.index })));
+			const nextLevel = currentLevel.flatMap((current) =>
+				array_array[current.index]
+					.filter((i) => unvisited[i] && i !== null && i !== undefined)
+					.map((index) => ({ index, parent: current.index })),
+			);
 
 			// the above list we just made might contain duplicates.
 			// Iterate through the list and mark any duplicates to be removed
@@ -69,7 +73,9 @@ export const minimumSpanningTrees = (array_array = [], rootIndices = []) => {
 			/** @type {{[key: number]: boolean}} */
 			const duplicates = {};
 			nextLevel.forEach((el, i) => {
-				if (!unvisited[el.index]) { duplicates[i] = true; }
+				if (!unvisited[el.index]) {
+					duplicates[i] = true;
+				}
 				delete unvisited[el.index];
 			});
 

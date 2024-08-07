@@ -47,7 +47,10 @@ test("foldToSvg CP all assignments, no opacity", () => {
 	const graph = ear.graph.getFramesByClassName(fold, "creasePattern")[0];
 	const svg = ear.convert.foldToSvg(graph);
 	const serializer = new xmldom.XMLSerializer();
-	fs.writeFileSync("./tests/tmp/svg-crane-cp-bmvfcj.svg", serializer.serializeToString(svg));
+	fs.writeFileSync(
+		"./tests/tmp/svg-crane-cp-bmvfcj.svg",
+		serializer.serializeToString(svg),
+	);
 });
 
 test("foldToSvg CP foldAngles and opacity", () => {
@@ -82,7 +85,10 @@ test("foldToSvg, custom methods on SVG element", () => {
 	svg.strokeDasharray("0.1");
 	svg.circle(0.5, 0.5, 0.5).fill("#f003").stroke("purple");
 	const serializer = new xmldom.XMLSerializer();
-	fs.writeFileSync("./tests/tmp/svg-crane-folded-style.svg", serializer.serializeToString(svg));
+	fs.writeFileSync(
+		"./tests/tmp/svg-crane-folded-style.svg",
+		serializer.serializeToString(svg),
+	);
 });
 
 test("foldToSvg, 3D fold", () => {
@@ -91,5 +97,8 @@ test("foldToSvg, 3D fold", () => {
 	const graph = ear.graph.getFramesByClassName(fold, "foldedForm")[0];
 	const svg = ear.convert.foldToSvg(graph, { faces: true });
 	const serializer = new xmldom.XMLSerializer();
-	fs.writeFileSync("./tests/tmp/svg-crane-3d-folded-style.svg", serializer.serializeToString(svg));
+	fs.writeFileSync(
+		"./tests/tmp/svg-crane-3d-folded-style.svg",
+		serializer.serializeToString(svg),
+	);
 });

@@ -14,10 +14,8 @@ import { replace } from "../replace.js";
  * @param {number} [epsilon=1e-6] an optional epsilon
  * @returns {number[][]} arrays of clusters of similar vertices.
  */
-export const duplicateVertices = ({ vertices_coords }, epsilon) => (
-	getVerticesClusters({ vertices_coords }, epsilon)
-		.filter(arr => arr.length > 1)
-);
+export const duplicateVertices = ({ vertices_coords }, epsilon) =>
+	getVerticesClusters({ vertices_coords }, epsilon).filter((arr) => arr.length > 1);
 
 /**
  * @description This will shrink the number of vertices in the graph,
@@ -45,11 +43,10 @@ export const removeDuplicateVertices = (graph, epsilon = EPSILON, makeAverage = 
 	const remove_indices = [];
 
 	// clusters is array of indices, for example: [ [4, 13, 7], [0, 9] ]
-	const clusters = getVerticesClusters(graph, epsilon)
-		.filter(arr => arr.length > 1);
+	const clusters = getVerticesClusters(graph, epsilon).filter((arr) => arr.length > 1);
 
 	// for each cluster of n, all indices from [1...n] will be replaced with [0]
-	clusters.forEach(cluster => {
+	clusters.forEach((cluster) => {
 		// replace() must maintain index > value, ensure index[0] is the
 		// smallest of the set (most of the time it is)
 		if (Math.min(...cluster) !== cluster[0]) {
@@ -68,11 +65,11 @@ export const removeDuplicateVertices = (graph, epsilon = EPSILON, makeAverage = 
 	// otherwise, this will use the value of the lowest index vertex.
 	if (makeAverage) {
 		clusters
-			.map(arr => arr.map(i => graph.vertices_coords[i]))
-			.map(arr => average(...arr))
+			.map((arr) => arr.map((i) => graph.vertices_coords[i]))
+			.map((arr) => average(...arr))
 			.forEach(([a, b, c], i) => {
 				/** @type {[number, number]|[number, number, number]} */
-				const point = (dimensions === 2 ? [a, b] : [a, b, c]);
+				const point = dimensions === 2 ? [a, b] : [a, b, c];
 				graph.vertices_coords[clusters[i][0]] = point;
 			});
 	}

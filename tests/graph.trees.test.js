@@ -12,9 +12,10 @@ test("minimumSpanningTrees, faces", () => {
 	const trees = ear.graph.minimumSpanningTrees(faces_faces);
 	expect(trees.flat(2).length).toBe(faces_faces.length);
 	expect(trees.length).toBe(5);
-	trees.forEach(tree => expect(tree[0].length).toBe(1));
-	expect(ear.general.uniqueElements(trees.flat(2).map(el => el.index)).length)
-		.toBe(faces_faces.length);
+	trees.forEach((tree) => expect(tree[0].length).toBe(1));
+	expect(ear.general.uniqueElements(trees.flat(2).map((el) => el.index)).length).toBe(
+		faces_faces.length,
+	);
 });
 
 test("minimumSpanningTrees, vertices", () => {
@@ -27,9 +28,10 @@ test("minimumSpanningTrees, vertices", () => {
 	const trees = ear.graph.minimumSpanningTrees(vertices_vertices);
 	expect(trees.flat(2).length).toBe(vertices_vertices.length);
 	expect(trees.length).toBe(5);
-	trees.forEach(tree => expect(tree[0].length).toBe(1));
-	expect(ear.general.uniqueElements(trees.flat(2).map(el => el.index)).length)
-		.toBe(vertices_vertices.length);
+	trees.forEach((tree) => expect(tree[0].length).toBe(1));
+	expect(ear.general.uniqueElements(trees.flat(2).map((el) => el.index)).length).toBe(
+		vertices_vertices.length,
+	);
 });
 
 // tree object is an array inside an array, looks like:
@@ -73,12 +75,13 @@ test("face walk tree, crane", () => {
 	// test that every face and edge was only ever visited once
 	const uniqueFace = {};
 	uniqueFace[startingFace] = true;
-	tree.slice(1).forEach(level => level
-		.forEach(el => {
+	tree.slice(1).forEach((level) =>
+		level.forEach((el) => {
 			expect(uniqueFace[el.parent]).toBe(true);
 			expect(uniqueFace[el.index]).toBe(undefined);
 			uniqueFace[el.index] = true;
-		}));
+		}),
+	);
 
 	// try to check edges vertices data
 	// tree.slice(1)
@@ -103,7 +106,10 @@ test("face walk tree, empty graph", () => {
 
 test("face walk tree, no edges_vertices", () => {
 	const faces_faces = ear.graph.makeFacesFaces({
-		faces_vertices: [[0, 1, 3], [2, 3, 1]],
+		faces_vertices: [
+			[0, 1, 3],
+			[2, 3, 1],
+		],
 	});
 	const result = ear.graph.minimumSpanningTrees(faces_faces)[0];
 	expect(result.length).toBe(2);
@@ -113,10 +119,15 @@ test("face walk tree, no edges_vertices", () => {
 });
 
 test("face walk tree, empty edges_vertices. same as test above", () => {
-	const result = ear.graph.minimumSpanningTrees(ear.graph.makeFacesFaces({
-		edges_vertices: [],
-		faces_vertices: [[0, 1, 3], [2, 3, 1]],
-	}))[0];
+	const result = ear.graph.minimumSpanningTrees(
+		ear.graph.makeFacesFaces({
+			edges_vertices: [],
+			faces_vertices: [
+				[0, 1, 3],
+				[2, 3, 1],
+			],
+		}),
+	)[0];
 	expect(result.length).toBe(2);
 	expect(result[1].length).toBe(1);
 	expect(result[1][0].index).toBe(1);
@@ -128,10 +139,15 @@ test("face walk tree, empty edges_vertices. same as test above", () => {
 });
 
 test("face walk tree, empty edges_vertices. same as test above", () => {
-	const result = ear.graph.minimumSpanningTrees(ear.graph.makeFacesFaces({
-		edges_vertices: [],
-		faces_vertices: [[0, 1, 3], [2, 3, 1]],
-	}))[0];
+	const result = ear.graph.minimumSpanningTrees(
+		ear.graph.makeFacesFaces({
+			edges_vertices: [],
+			faces_vertices: [
+				[0, 1, 3],
+				[2, 3, 1],
+			],
+		}),
+	)[0];
 	expect(result.length).toBe(2);
 	expect(result[1].length).toBe(1);
 	expect(result[1][0].index).toBe(1);
@@ -144,24 +160,39 @@ test("face walk tree, empty edges_vertices. same as test above", () => {
 
 test("face walk tree, finding an edge match. bad edge formations", () => {
 	// good edge
-	const result0 = ear.graph.minimumSpanningTrees(ear.graph.makeFacesFaces({
-		edges_vertices: [[1, 3]],
-		faces_vertices: [[0, 1, 3], [2, 3, 1]],
-	}))[0];
+	const result0 = ear.graph.minimumSpanningTrees(
+		ear.graph.makeFacesFaces({
+			edges_vertices: [[1, 3]],
+			faces_vertices: [
+				[0, 1, 3],
+				[2, 3, 1],
+			],
+		}),
+	)[0];
 	// expect(result0[1][0].edge_vertices[0]).toBe(3);
 	// expect(result0[1][0].edge_vertices[1]).toBe(1);
 
 	// bad edge formation
-	const result1 = ear.graph.minimumSpanningTrees(ear.graph.makeFacesFaces({
-		edges_vertices: [[3, 1, 0]],
-		faces_vertices: [[0, 1, 3], [2, 3, 1]],
-	}))[0];
+	const result1 = ear.graph.minimumSpanningTrees(
+		ear.graph.makeFacesFaces({
+			edges_vertices: [[3, 1, 0]],
+			faces_vertices: [
+				[0, 1, 3],
+				[2, 3, 1],
+			],
+		}),
+	)[0];
 	// expect(result1[1][0].edge_vertices[0]).toBe(3);
 	// expect(result1[1][0].edge_vertices[1]).toBe(1);
-	const result2 = ear.graph.minimumSpanningTrees(ear.graph.makeFacesFaces({
-		edges_vertices: [[3, 0, 1]],
-		faces_vertices: [[0, 1, 3], [2, 3, 1]],
-	}))[0];
+	const result2 = ear.graph.minimumSpanningTrees(
+		ear.graph.makeFacesFaces({
+			edges_vertices: [[3, 0, 1]],
+			faces_vertices: [
+				[0, 1, 3],
+				[2, 3, 1],
+			],
+		}),
+	)[0];
 	// expect(result2[1][0].edge_vertices[0]).toBe(3);
 	// expect(result2[1][0].edge_vertices[1]).toBe(1);
 });

@@ -1,49 +1,17 @@
 /**
  * Rabbit Ear (c) Kraft
  */
-import {
-	include,
-	includeL,
-	includeS,
-} from "../math/compare.js";
-import {
-	subtract2,
-	rotate90,
-  scale2,
-  add2,
-  resize2,
-} from "../math/vector.js";
-import {
-	makeMatrix2Reflect,
-	multiplyMatrix2Vector2,
-} from "../math/matrix2.js";
-import {
-	overlapLinePoint,
-	overlapConvexPolygonPoint,
-} from "../math/overlap.js";
-import {
-	intersectLineLine,
-	intersectPolygonLine,
-} from "../math/intersect.js";
-import {
-	clipLineConvexPolygon,
-} from "../math/clip.js";
-import {
-	getFacesUnderPoint,
-} from "../graph/overlap.js";
-import {
-	intersectLine,
-	intersectLineVerticesEdges,
-} from "../graph/intersect.js";
-import {
-	pointsToLine2,
-} from "../math/convert.js";
-import {
-	doRangesOverlap,
-} from "../math/range.js";
-import {
-  axiom3,
-} from "./axioms.js";
+import { include, includeL, includeS } from "../math/compare.js";
+import { subtract2, rotate90, scale2, add2, resize2 } from "../math/vector.js";
+import { makeMatrix2Reflect, multiplyMatrix2Vector2 } from "../math/matrix2.js";
+import { overlapLinePoint, overlapConvexPolygonPoint } from "../math/overlap.js";
+import { intersectLineLine, intersectPolygonLine } from "../math/intersect.js";
+import { clipLineConvexPolygon } from "../math/clip.js";
+import { getFacesUnderPoint } from "../graph/overlap.js";
+import { intersectLine, intersectLineVerticesEdges } from "../graph/intersect.js";
+import { pointsToLine2 } from "../math/convert.js";
+import { doRangesOverlap } from "../math/range.js";
+import { axiom3 } from "./axioms.js";
 import { convexHull } from "../math/convexHull.js";
 
 /**
@@ -79,21 +47,19 @@ export const validateAxiom1 = (graph, point1, point2) => {
 	// return result as the "a" parameter, sorted in increasing order
 	const line = pointsToLine2(point1, point2);
 	const intersections = intersectLineVerticesEdges(graph, line, includeS);
-	const vParams = intersections.vertices.filter(a => a !== undefined);
-	const eParams = intersections
-		.edges
-		.filter(a => a !== undefined)
-		.map(({ a }) => a);
+	const vParams = intersections.vertices.filter((a) => a !== undefined);
+	const eParams = intersections.edges.filter((a) => a !== undefined).map(({ a }) => a);
 	const params = vParams.concat(eParams).sort((m, n) => m - n);
 
 	// a new list of points that lie at the midpoints of all edge intersections
-	const betweenPoints = params.length < 2
-		? []
-		: Array.from(Array(params.length - 1))
-			.map((_, i) => (params[i] + params[i + 1]) / 2)
-			.map(param => add2(line.origin, scale2(line.vector, param)));
+	const betweenPoints =
+		params.length < 2
+			? []
+			: Array.from(Array(params.length - 1))
+					.map((_, i) => (params[i] + params[i + 1]) / 2)
+					.map((param) => add2(line.origin, scale2(line.vector, param)));
 	const pointsInside = [point1, point2, ...betweenPoints]
-		.map(point => isPointInGraph(graph, point))
+		.map((point) => isPointInGraph(graph, point))
 		.reduce((a, b) => a && b, true);
 	return [pointsInside];
 };
@@ -110,7 +76,7 @@ export const validateAxiom1 = (graph, point1, point2) => {
  */
 export const validateAxiom2 = (graph, point1, point2) => [
 	[point1, point2]
-		.map(point => isPointInGraph(graph, point))
+		.map((point) => isPointInGraph(graph, point))
 		.reduce((a, b) => a && b, true),
 ];
 
@@ -126,17 +92,12 @@ export const validateAxiom2 = (graph, point1, point2) => [
 export const validateAxiom3 = (graph, solutions, line1, line2) => {
 	// bad code
 	// needs work
-  const vertices_coords2D = graph.vertices_coords.map(resize2);
-  const polygon = convexHull(vertices_coords2D)
-  	.map(v => vertices_coords2D[v]);
+	const vertices_coords2D = graph.vertices_coords.map(resize2);
+	const polygon = convexHull(vertices_coords2D).map((v) => vertices_coords2D[v]);
 
-	const segments = [line1, line2]
-		.map(line => clipLineConvexPolygon(
-			polygon,
-			line,
-			include,
-			includeL,
-		));
+	const segments = [line1, line2].map((line) =>
+		clipLineConvexPolygon(polygon, line, include, includeL),
+	);
 
 	// if line parameters lie outside polygon, no solution possible
 	if (segments[0] === undefined || segments[1] === undefined) {
@@ -153,49 +114,47 @@ export const validateAxiom3 = (graph, solutions, line1, line2) => {
 	//       line,
 	//       includeS,
 	//       excludeL));
-	const results_clip = solutions.map(line => (line === undefined
-		? undefined
-		: clipLineConvexPolygon(
-			polygon,
-			line,
-			include,
-			includeL,
-		)));
+	const results_clip = solutions.map((line) =>
+		line === undefined
+			? undefined
+			: clipLineConvexPolygon(polygon, line, include, includeL),
+	);
 	const results_inside = [0, 1].map((i) => results_clip[i] !== undefined);
 	// test B:
 	// make sure that for each of the results, the result lies between two
 	// of the parameters, in other words, reflect the segment 0 both ways
 	// (both fold solutions) and make sure there is overlap with segment 1
-	const seg0Reflect = solutions.map(foldLine => (foldLine === undefined
-		? undefined
-		: [
-			reflectPoint(foldLine, segments[0][0]),
-			reflectPoint(foldLine, segments[0][1]),
-		]));
-	const reflectMatch = seg0Reflect.map(seg => (seg === undefined
-		? false
-		: (overlapLinePoint(
-			{ vector: subtract2(segments[1][1], segments[1][0]), origin: segments[1][0] },
-			seg[0],
-			includeS,
-		)
-		|| overlapLinePoint(
-			{ vector: subtract2(segments[1][1], segments[1][0]), origin: segments[1][0] },
-			seg[1],
-			includeS,
-		)
-		|| overlapLinePoint(
-			{ vector: subtract2(seg[1], seg[0]), origin: seg[0] },
-			segments[1][0],
-			includeS,
-		)
-		|| overlapLinePoint(
-			{ vector: subtract2(seg[1], seg[0]), origin: seg[0] },
-			segments[1][1],
-			includeS,
-		))));
+	const seg0Reflect = solutions.map((foldLine) =>
+		foldLine === undefined
+			? undefined
+			: [reflectPoint(foldLine, segments[0][0]), reflectPoint(foldLine, segments[0][1])],
+	);
+	const reflectMatch = seg0Reflect.map((seg) =>
+		seg === undefined
+			? false
+			: overlapLinePoint(
+					{ vector: subtract2(segments[1][1], segments[1][0]), origin: segments[1][0] },
+					seg[0],
+					includeS,
+				) ||
+				overlapLinePoint(
+					{ vector: subtract2(segments[1][1], segments[1][0]), origin: segments[1][0] },
+					seg[1],
+					includeS,
+				) ||
+				overlapLinePoint(
+					{ vector: subtract2(seg[1], seg[0]), origin: seg[0] },
+					segments[1][0],
+					includeS,
+				) ||
+				overlapLinePoint(
+					{ vector: subtract2(seg[1], seg[0]), origin: seg[0] },
+					segments[1][1],
+					includeS,
+				),
+	);
 	// valid if A and B
-	return [0, 1].map(i => reflectMatch[i] === true && results_inside[i] === true);
+	return [0, 1].map((i) => reflectMatch[i] === true && results_inside[i] === true);
 };
 
 /**
@@ -223,7 +182,9 @@ export const validateAxiom4 = (graph, line, point) => {
 
 	// if there is no intersection, the axiom produced no result
 	// todo: should this mean, technically, that it's valid? (no result)
-	if (!point) { return [false]; }
+	if (!point) {
+		return [false];
+	}
 
 	// create a line collinear to the input line, but the line's origin
 	// parameter is at the intersection point. this will allow us to
@@ -239,32 +200,32 @@ export const validateAxiom4 = (graph, line, point) => {
 	// reflect one ray's segments across the line, test if there is
 	// at least one overlap between either sets of segments.
 	const intersections = intersectLineVerticesEdges(graph, intersectLine);
-	const vParams = intersections.vertices.filter(a => a !== undefined);
-	const eParams = intersections
-		.edges
-		.filter(a => a !== undefined)
-		.map(({ a }) => a);
+	const vParams = intersections.vertices.filter((a) => a !== undefined);
+	const eParams = intersections.edges.filter((a) => a !== undefined).map(({ a }) => a);
 	const params = vParams.concat(eParams).sort((m, n) => m - n);
 
-	const paramPairs = (params.length < 2
-		? []
-		: Array.from(Array(params.length - 1))
-			.map((_, i) => [params[i], params[i + 1]]));
+	const paramPairs =
+		params.length < 2
+			? []
+			: Array.from(Array(params.length - 1)).map((_, i) => [params[i], params[i + 1]]);
 	const betweenPoints = paramPairs
-			.map(([a, b]) => (a + b) / 2)
-			.map(param => add2(intersectLine.origin, scale2(intersectLine.vector, param)));
-	const betweenPointsInside = betweenPoints
-		.map(point => isPointInGraph(graph, point));
+		.map(([a, b]) => (a + b) / 2)
+		.map((param) => add2(intersectLine.origin, scale2(intersectLine.vector, param)));
+	const betweenPointsInside = betweenPoints.map((point) => isPointInGraph(graph, point));
 
 	const paramsRanges = paramPairs
 		.filter((_, i) => betweenPointsInside[i])
-		.flatMap(pair => (pair[0] < 0 && pair[1] > 0
-			? [[pair[0], 0], [0, pair[1]]]
-			: [pair]));
+		.flatMap((pair) =>
+			pair[0] < 0 && pair[1] > 0
+				? [
+						[pair[0], 0],
+						[0, pair[1]],
+					]
+				: [pair],
+		);
 
 	// split the segments into two sets, behind and in front of the intersection
-	const positiveSet = paramsRanges
-		.filter(([a, b]) => a >= 0 && b >= 0);
+	const positiveSet = paramsRanges.filter(([a, b]) => a >= 0 && b >= 0);
 	// make the negative set positive (reflect the line across the intersection)
 	const negativeSet = paramsRanges
 		.filter(([a, b]) => a <= 0 && b <= 0)
@@ -302,17 +263,18 @@ export const validateAxiom4 = (graph, line, point) => {
 export const validateAxiom5 = (graph, solutions, line, point1, point2) => {
 	// todo
 	const vertices_coords2D = graph.vertices_coords.map(resize2);
-  const polygon = convexHull(vertices_coords2D)
-  	.map(v => vertices_coords2D[v]);
+	const polygon = convexHull(vertices_coords2D).map((v) => vertices_coords2D[v]);
 
-	if (solutions.length === 0) { return []; }
+	if (solutions.length === 0) {
+		return [];
+	}
 	const testParamPoints = [point1, point2]
-		.map(point => overlapConvexPolygonPoint(polygon, point, include).overlap)
+		.map((point) => overlapConvexPolygonPoint(polygon, point, include).overlap)
 		.reduce((a, b) => a && b, true);
 	const testReflections = solutions
-		.map(foldLine => reflectPoint(foldLine, point2))
-		.map(point => overlapConvexPolygonPoint(polygon, point, include).overlap);
-	return testReflections.map(ref => ref && testParamPoints);
+		.map((foldLine) => reflectPoint(foldLine, point2))
+		.map((point) => overlapConvexPolygonPoint(polygon, point, include).overlap);
+	return testReflections.map((ref) => ref && testParamPoints);
 };
 
 /**
@@ -329,20 +291,23 @@ export const validateAxiom5 = (graph, solutions, line, point1, point2) => {
 export const validateAxiom6 = function (graph, solutions, line1, line2, point1, point2) {
 	// todo
 	const vertices_coords2D = graph.vertices_coords.map(resize2);
-  const polygon = convexHull(vertices_coords2D)
-  	.map(v => vertices_coords2D[v]);
+	const polygon = convexHull(vertices_coords2D).map((v) => vertices_coords2D[v]);
 
-	if (solutions.length === 0) { return []; }
+	if (solutions.length === 0) {
+		return [];
+	}
 	const testParamPoints = [point1, point2]
-		.map(point => overlapConvexPolygonPoint(polygon, point, include).overlap)
+		.map((point) => overlapConvexPolygonPoint(polygon, point, include).overlap)
 		.reduce((a, b) => a && b, true);
-	if (!testParamPoints) { return solutions.map(() => false); }
+	if (!testParamPoints) {
+		return solutions.map(() => false);
+	}
 	const testReflect0 = solutions
-		.map(foldLine => reflectPoint(foldLine, point1))
-		.map(point => overlapConvexPolygonPoint(polygon, point, include).overlap);
+		.map((foldLine) => reflectPoint(foldLine, point1))
+		.map((point) => overlapConvexPolygonPoint(polygon, point, include).overlap);
 	const testReflect1 = solutions
-		.map(foldLine => reflectPoint(foldLine, point2))
-		.map(point => overlapConvexPolygonPoint(polygon, point, include).overlap);
+		.map((foldLine) => reflectPoint(foldLine, point2))
+		.map((point) => overlapConvexPolygonPoint(polygon, point, include).overlap);
 	return solutions.map((_, i) => testReflect0[i] && testReflect1[i]);
 };
 
@@ -359,30 +324,20 @@ export const validateAxiom6 = function (graph, solutions, line1, line2, point1, 
 export const validateAxiom7 = (graph, solutions, line1, line2, point) => {
 	// todo
 	const vertices_coords2D = graph.vertices_coords.map(resize2);
-  const polygon = convexHull(vertices_coords2D)
-  	.map(v => vertices_coords2D[v]);
+	const polygon = convexHull(vertices_coords2D).map((v) => vertices_coords2D[v]);
 
-  // check if the point parameter is inside the polygon
-	const paramPointTest = overlapConvexPolygonPoint(
-		polygon,
-		point,
-		include,
-	).overlap;
+	// check if the point parameter is inside the polygon
+	const paramPointTest = overlapConvexPolygonPoint(polygon, point, include).overlap;
 	// check if the reflected point on the fold line is inside the polygon
-	if (!solutions.length) { return [false]; }
+	if (!solutions.length) {
+		return [false];
+	}
 	const reflected = reflectPoint(solutions[0], point);
 	const reflectTest = overlapConvexPolygonPoint(polygon, reflected, include).overlap;
 	// check if the line to fold onto itself is somewhere inside the polygon
-	const paramLineTest = (
-		intersectPolygonLine(polygon, line2, includeL).length >= 2
-	);
+	const paramLineTest = intersectPolygonLine(polygon, line2, includeL).length >= 2;
 	// same test we do for axiom 4
-	const intersect = intersectLineLine(
-		line2,
-		solutions[0],
-		includeL,
-		includeL,
-	).point;
+	const intersect = intersectLineLine(line2, solutions[0], includeL, includeL).point;
 	const intersectInsideTest = intersect
 		? overlapConvexPolygonPoint(polygon, intersect, include).overlap
 		: false;

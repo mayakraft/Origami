@@ -1,24 +1,11 @@
 /**
  * Rabbit Ear (c) Kraft
  */
-import {
-	convexHull,
-} from "../math/convexHull.js";
-import {
-	magnitude2,
-	dot2,
-	subtract2,
-	resize2,
-} from "../math/vector.js";
-import {
-	perpendicularBalancedSegment,
-} from "./general.js";
-import {
-	boundingBox,
-} from "../math/polygon.js";
-import {
-	clipLineConvexPolygon,
-} from "../math/clip.js";
+import { convexHull } from "../math/convexHull.js";
+import { magnitude2, dot2, subtract2, resize2 } from "../math/vector.js";
+import { perpendicularBalancedSegment } from "./general.js";
+import { boundingBox } from "../math/polygon.js";
+import { clipLineConvexPolygon } from "../math/clip.js";
 
 /**
  * @description Given a segment representing an arrow endpoints,
@@ -34,7 +21,9 @@ import {
  * @returns {Arrow} an arrow definition including a head but no tail.
  */
 export const arrowFromSegment = (points, options = {}) => {
-	if (points === undefined) { return undefined; }
+	if (points === undefined) {
+		return undefined;
+	}
 	const vector = subtract2(points[1], points[0]);
 	const length = magnitude2(vector);
 
@@ -99,10 +88,10 @@ export const arrowFromSegmentInPolygon = (polygon, segment, options = {}) => {
  * @returns {Arrow} an arrow definition including a head but no tail.
  */
 export const arrowFromLine = (polygon, line, options) => {
-	const segment = clipLineConvexPolygon(polygon, line)
+	const segment = clipLineConvexPolygon(polygon, line);
 	return segment === undefined
 		? undefined
-		: arrowFromSegmentInPolygon(polygon, segment, options)
+		: arrowFromSegmentInPolygon(polygon, segment, options);
 };
 
 /**
@@ -119,7 +108,9 @@ export const arrowFromLine = (polygon, line, options) => {
  */
 export const foldLineArrowInPolygon = (polygon, foldLine, options) => {
 	const segment = perpendicularBalancedSegment(polygon, foldLine);
-	if (segment === undefined) { return undefined; }
+	if (segment === undefined) {
+		return undefined;
+	}
 	return arrowFromSegmentInPolygon(polygon, segment, options);
 };
 
@@ -137,6 +128,6 @@ export const foldLineArrowInPolygon = (polygon, foldLine, options) => {
  */
 export const foldLineArrow = ({ vertices_coords }, foldLine, options) => {
 	const vertices_coords2 = vertices_coords.map(resize2);
-	const hull = convexHull(vertices_coords2).map(v => vertices_coords2[v]);
+	const hull = convexHull(vertices_coords2).map((v) => vertices_coords2[v]);
 	return foldLineArrowInPolygon(hull, foldLine, options);
 };

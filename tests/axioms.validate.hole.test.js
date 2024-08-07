@@ -5,35 +5,43 @@ import ear from "../src/index.js";
 test("validate axiom 1, square with hole", () => {
 	const FOLD = fs.readFileSync("./tests/files/fold/square-with-hole.fold", "utf-8");
 	const graph = JSON.parse(FOLD);
-	const params = [[0.5, 0.5], [2.5, 0.5]];
-	expect(ear.axiom.validateAxiom1(graph, ...params))
-		.toMatchObject([true]);
+	const params = [
+		[0.5, 0.5],
+		[2.5, 0.5],
+	];
+	expect(ear.axiom.validateAxiom1(graph, ...params)).toMatchObject([true]);
 });
 
 test("validate axiom 1, square with hole, crosses hole", () => {
 	// axiom 1 must have a direct line of sight
 	const FOLD = fs.readFileSync("./tests/files/fold/square-with-hole.fold", "utf-8");
 	const graph = JSON.parse(FOLD);
-	const params = [[0.5, 1.5], [2.5, 1.5]];
-	expect(ear.axiom.validateAxiom1(graph, ...params))
-		.toMatchObject([false]);
+	const params = [
+		[0.5, 1.5],
+		[2.5, 1.5],
+	];
+	expect(ear.axiom.validateAxiom1(graph, ...params)).toMatchObject([false]);
 });
 
 test("validate axiom 2, square with hole", () => {
 	const FOLD = fs.readFileSync("./tests/files/fold/square-with-hole.fold", "utf-8");
 	const graph = JSON.parse(FOLD);
-	const params = [[0.5, 0.5], [2.5, 0.5]];
-	expect(ear.axiom.validateAxiom2(graph, ...params))
-		.toMatchObject([true]);
+	const params = [
+		[0.5, 0.5],
+		[2.5, 0.5],
+	];
+	expect(ear.axiom.validateAxiom2(graph, ...params)).toMatchObject([true]);
 });
 
 test("validate axiom 2, square with hole, crosses hole", () => {
 	// axiom 2 is allowed to not have a direct line of sight
 	const FOLD = fs.readFileSync("./tests/files/fold/square-with-hole.fold", "utf-8");
 	const graph = JSON.parse(FOLD);
-	const params = [[0.5, 1.5], [2.5, 1.5]];
-	expect(ear.axiom.validateAxiom2(graph, ...params))
-		.toMatchObject([true]);
+	const params = [
+		[0.5, 1.5],
+		[2.5, 1.5],
+	];
+	expect(ear.axiom.validateAxiom2(graph, ...params)).toMatchObject([true]);
 });
 
 test("validate axiom 4, square with hole, projection crosses hole", () => {
@@ -42,8 +50,7 @@ test("validate axiom 4, square with hole, projection crosses hole", () => {
 	const graph = JSON.parse(FOLD);
 	const line = ear.math.pointsToLine2([0, 0.5], [3, 0.5]);
 	const point = [1.5, 2.5];
-	expect(ear.axiom.validateAxiom4(graph, line, point))
-		.toMatchObject([true]);
+	expect(ear.axiom.validateAxiom4(graph, line, point)).toMatchObject([true]);
 });
 
 test("validate axiom 4, square with hole, point in hole", () => {
@@ -52,8 +59,7 @@ test("validate axiom 4, square with hole, point in hole", () => {
 	const graph = JSON.parse(FOLD);
 	const line = ear.math.pointsToLine2([0, 0.5], [3, 0.5]);
 	const point = [1.5, 1.5];
-	expect(ear.axiom.validateAxiom4(graph, line, point))
-		.toMatchObject([false]);
+	expect(ear.axiom.validateAxiom4(graph, line, point)).toMatchObject([false]);
 });
 
 test("validate axiom 4, square with hole, projection in hole", () => {
@@ -62,8 +68,7 @@ test("validate axiom 4, square with hole, projection in hole", () => {
 	const graph = JSON.parse(FOLD);
 	const line = ear.math.pointsToLine2([0, 0.5], [2.5, 3]);
 	const point = [3, 0];
-	expect(ear.axiom.validateAxiom4(graph, line, point))
-		.toMatchObject([true]);
+	expect(ear.axiom.validateAxiom4(graph, line, point)).toMatchObject([true]);
 });
 
 test("validate axiom 4, square with hole, projection on hole boundary", () => {
@@ -71,8 +76,7 @@ test("validate axiom 4, square with hole, projection on hole boundary", () => {
 	const graph = JSON.parse(FOLD);
 	const line = ear.math.pointsToLine2([0, 0.5], [2.5, 3]);
 	const point = [2.5, 0];
-	expect(ear.axiom.validateAxiom4(graph, line, point))
-		.toMatchObject([true]);
+	expect(ear.axiom.validateAxiom4(graph, line, point)).toMatchObject([true]);
 });
 
 test("validate axiom 4, square with hole, no segments overlap", () => {
@@ -81,8 +85,7 @@ test("validate axiom 4, square with hole, no segments overlap", () => {
 	const graph = JSON.parse(FOLD);
 	const line = ear.math.pointsToLine2([0, 0], [3, 3]);
 	const point = [2, 0];
-	expect(ear.axiom.validateAxiom4(graph, line, point))
-		.toMatchObject([false]);
+	expect(ear.axiom.validateAxiom4(graph, line, point)).toMatchObject([false]);
 });
 
 test("validate axiom 4, square with hole, segments overlap, mirror image", () => {
@@ -91,8 +94,7 @@ test("validate axiom 4, square with hole, segments overlap, mirror image", () =>
 	const graph = JSON.parse(FOLD);
 	const line = ear.math.pointsToLine2([0, 0], [3, 3]);
 	const point = [3, 0];
-	expect(ear.axiom.validateAxiom4(graph, line, point))
-		.toMatchObject([true]);
+	expect(ear.axiom.validateAxiom4(graph, line, point)).toMatchObject([true]);
 });
 
 test("validate axiom 4, square with hole, segments overlap", () => {
@@ -101,6 +103,5 @@ test("validate axiom 4, square with hole, segments overlap", () => {
 	const graph = JSON.parse(FOLD);
 	const line = ear.math.pointsToLine2([0, 0], [3, 3]);
 	const point = [2.25, 0];
-	expect(ear.axiom.validateAxiom4(graph, line, point))
-		.toMatchObject([true]);
+	expect(ear.axiom.validateAxiom4(graph, line, point)).toMatchObject([true]);
 });

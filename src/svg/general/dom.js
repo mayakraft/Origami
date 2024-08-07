@@ -1,7 +1,7 @@
 /* SVG (c) Kraft */
-import RabbitEarWindow from '../environment/window.js';
-import { transformStringToMatrix } from './transforms.js';
-import { svg_multiplyMatrices2 } from './algebra.js';
+import RabbitEarWindow from "../environment/window.js";
+import { transformStringToMatrix } from "./transforms.js";
+import { svg_multiplyMatrices2 } from "./algebra.js";
 
 /**
  * Rabbit Ear (c) Kraft
@@ -14,7 +14,7 @@ import { svg_multiplyMatrices2 } from './algebra.js';
  * @returns {Element|null} the document element or null if unsuccessful.
  */
 const xmlStringToElement = (input, mimeType = "text/xml") => {
-	const result = (new (RabbitEarWindow().DOMParser)()).parseFromString(input, mimeType);
+	const result = new (RabbitEarWindow().DOMParser)().parseFromString(input, mimeType);
 	return result ? result.documentElement : null;
 };
 
@@ -48,9 +48,7 @@ const findElementTypeInParents = (element, nodeName) => {
 	}
 	/** @type {Element} */
 	const parent = element.parentElement;
-	return parent
-		? findElementTypeInParents(parent, nodeName)
-		: null;
+	return parent ? findElementTypeInParents(parent, nodeName) : null;
 };
 
 // polyfil for adding to a classlist
@@ -59,7 +57,9 @@ const polyfillClassListAdd = (el, ...classes) => {
 	const getClass = el.getAttribute("class");
 	const classArray = getClass ? getClass.split(" ") : [];
 	classArray.push(...classes);
-	classArray.forEach(str => { hash[str] = true; });
+	classArray.forEach((str) => {
+		hash[str] = true;
+	});
 	const classString = Object.keys(hash).join(" ");
 	el.setAttribute("class", classString);
 };
@@ -71,7 +71,9 @@ const polyfillClassListAdd = (el, ...classes) => {
  * @param {...string} classes a list of class strings to be added to the element
  */
 const addClass = (el, ...classes) => {
-	if (!el || !classes.length) { return undefined; }
+	if (!el || !classes.length) {
+		return undefined;
+	}
 	return el.classList
 		? el.classList.add(...classes)
 		: polyfillClassListAdd(el, ...classes);
@@ -86,11 +88,10 @@ const addClass = (el, ...classes) => {
  * @param {Element|ChildNode} el an element
  * @returns {(Element|ChildNode)[]} a flat list of all elements
  */
-const flattenDomTree = (el) => (
+const flattenDomTree = (el) =>
 	el.childNodes == null || !el.childNodes.length
 		? [el]
-		: Array.from(el.childNodes).flatMap(child => flattenDomTree(child))
-);
+		: Array.from(el.childNodes).flatMap((child) => flattenDomTree(child));
 
 const nodeSpecificAttrs = {
 	svg: ["viewBox", "xmlns", "version"],
@@ -103,19 +104,22 @@ const nodeSpecificAttrs = {
 	path: ["d"],
 };
 
-const getAttributes = element => {
+const getAttributes = (element) => {
 	const attributeValue = element.attributes;
-	if (attributeValue == null) { return []; }
+	if (attributeValue == null) {
+		return [];
+	}
 	const attributes = Array.from(attributeValue);
 	return nodeSpecificAttrs[element.nodeName]
-		? attributes
-			.filter(a => !nodeSpecificAttrs[element.nodeName].includes(a.name))
+		? attributes.filter((a) => !nodeSpecificAttrs[element.nodeName].includes(a.name))
 		: attributes;
 };
 
 const objectifyAttributes = (list) => {
 	const obj = {};
-	list.forEach((a) => { obj[a.nodeName] = a.value; });
+	list.forEach((a) => {
+		obj[a.nodeName] = a.value;
+	});
 	return obj;
 };
 
@@ -150,11 +154,18 @@ const attrAssign = (parentAttrs, element) => {
  * a flat array of objects containing the element and an object describing
  * the attributes.
  */
-const flattenDomTreeWithStyle = (element, attributes = {}) => (
+const flattenDomTreeWithStyle = (element, attributes = {}) =>
 	element.childNodes == null || !element.childNodes.length
 		? [{ element, attributes }]
-		: Array.from(element.childNodes)
-			.flatMap(child => flattenDomTreeWithStyle(child, attrAssign(attributes, child)))
-);
+		: Array.from(element.childNodes).flatMap((child) =>
+				flattenDomTreeWithStyle(child, attrAssign(attributes, child)),
+			);
 
-export { addClass, findElementTypeInParents, flattenDomTree, flattenDomTreeWithStyle, getRootParent, xmlStringToElement };
+export {
+	addClass,
+	findElementTypeInParents,
+	flattenDomTree,
+	flattenDomTreeWithStyle,
+	getRootParent,
+	xmlStringToElement,
+};

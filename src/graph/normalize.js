@@ -1,9 +1,7 @@
 /**
  * Rabbit Ear (c) Kraft
  */
-import {
-	remapKey,
-} from "./maps.js";
+import { remapKey } from "./maps.js";
 
 /**
  * @description This method will re-index all component arrays so that
@@ -19,9 +17,15 @@ export const normalize = (graph) => {
 	let v = 0;
 	let e = 0;
 	let f = 0;
-	graph.vertices_coords.forEach((_, i) => { maps.vertices[i] = v++; });
-	graph.edges_vertices.forEach((_, i) => { maps.edges[i] = e++; });
-	graph.faces_vertices.forEach((_, i) => { maps.faces[i] = f++; });
+	graph.vertices_coords.forEach((_, i) => {
+		maps.vertices[i] = v++;
+	});
+	graph.edges_vertices.forEach((_, i) => {
+		maps.edges[i] = e++;
+	});
+	graph.faces_vertices.forEach((_, i) => {
+		maps.faces[i] = f++;
+	});
 	remapKey(graph, "vertices", maps.vertices);
 	remapKey(graph, "edges", maps.edges);
 	remapKey(graph, "faces", maps.faces);

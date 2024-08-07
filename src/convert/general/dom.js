@@ -11,7 +11,9 @@ import window from "../../environment/window.js";
  * @returns {Element} the parent of the child
  */
 export const invisibleParent = (child) => {
-	if (!window().document.body) { return undefined; }
+	if (!window().document.body) {
+		return undefined;
+	}
 
 	// create an invisible element, add the svg, then call getComputedStyle
 	const parent = window().document.createElement("div");

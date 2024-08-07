@@ -1,43 +1,20 @@
 /**
  * Rabbit Ear (c) Kraft
  */
-import {
-	makeEdgesIsFolded,
-} from "../../fold/spec.js";
-import {
-	subtract2,
-	subtract3,
-	resize2,
-	resize3,
-} from "../../math/vector.js";
+import { makeEdgesIsFolded } from "../../fold/spec.js";
+import { subtract2, subtract3, resize2, resize3 } from "../../math/vector.js";
 import {
 	identity2x3,
 	makeMatrix2Reflect,
 	multiplyMatrices2,
 } from "../../math/matrix2.js";
-import {
-	identity3x4,
-	makeMatrix3Rotate,
-	multiplyMatrices3,
-} from "../../math/matrix3.js";
-import {
-	makeVerticesToEdge,
-} from "../make/lookup.js";
-import {
-	makeEdgesFoldAngle,
-} from "../make/edgesFoldAngle.js";
-import {
-	makeEdgesAssignmentSimple,
-} from "../make/edgesAssignment.js";
-import {
-	makeFacesFaces,
-} from "../make/facesFaces.js";
-import {
-	rotateCircularArray,
-} from "../../general/array.js";
-import {
-	minimumSpanningTrees,
-} from "../trees.js";
+import { identity3x4, makeMatrix3Rotate, multiplyMatrices3 } from "../../math/matrix3.js";
+import { makeVerticesToEdge } from "../make/lookup.js";
+import { makeEdgesFoldAngle } from "../make/edgesFoldAngle.js";
+import { makeEdgesAssignmentSimple } from "../make/edgesAssignment.js";
+import { makeFacesFaces } from "../make/facesFaces.js";
+import { rotateCircularArray } from "../../general/array.js";
+import { minimumSpanningTrees } from "../trees.js";
 
 /**
  * @description Given two lists of vertices intended to represent adjacent
@@ -54,11 +31,13 @@ import {
  */
 export const facesSharedEdgesVertices = (verticesA, verticesB) => {
 	const hash = {};
-	verticesB.forEach(v => { hash[v] = true; });
-	const inCommon = verticesA.map(v => (hash[v] ? v : undefined));
+	verticesB.forEach((v) => {
+		hash[v] = true;
+	});
+	const inCommon = verticesA.map((v) => (hash[v] ? v : undefined));
 	return rotateCircularArray(inCommon, inCommon.indexOf(undefined))
 		.map((v, i, arr) => [v, arr[(i + 1) % arr.length]])
-		.filter(pair => pair[0] !== undefined && pair[1] !== undefined);
+		.filter((pair) => pair[0] !== undefined && pair[1] !== undefined);
 };
 
 const unassigned_angle = { U: true, u: true };
@@ -76,8 +55,12 @@ const unassigned_angle = { U: true, u: true };
  */
 export const makeFacesMatrix = (
 	{
-		vertices_coords, edges_vertices, edges_foldAngle,
-		edges_assignment, faces_vertices, faces_faces,
+		vertices_coords,
+		edges_vertices,
+		edges_foldAngle,
+		edges_assignment,
+		faces_vertices,
+		faces_faces,
 	},
 	rootFaces,
 ) => {
@@ -97,18 +80,16 @@ export const makeFacesMatrix = (
 	}
 	const edge_map = makeVerticesToEdge({ edges_vertices });
 	const faces_matrix = faces_vertices.map(() => [...identity3x4]);
-	minimumSpanningTrees(faces_faces, rootFaces)
-		.forEach(tree => tree
+	minimumSpanningTrees(faces_faces, rootFaces).forEach((tree) =>
+		tree
 			.slice(1) // remove the first level, it has no parent face
-			.forEach(level => level
-				.forEach((entry) => {
+			.forEach((level) =>
+				level.forEach((entry) => {
 					const edge_vertices = facesSharedEdgesVertices(
 						faces_vertices[entry.index],
 						faces_vertices[entry.parent],
 					).shift();
-					const coords = edge_vertices
-						.map(v => vertices_coords[v])
-						.map(resize3);
+					const coords = edge_vertices.map((v) => vertices_coords[v]).map(resize3);
 					const edgeKey = edge_vertices.join(" ");
 					const edge = edge_map[edgeKey];
 					// if the assignment is unassigned, assume it is a flat fold.
@@ -120,10 +101,15 @@ export const makeFacesMatrix = (
 						subtract3(coords[1], coords[0]), // line-vector
 						coords[0], // line-origin
 					);
-					faces_matrix[entry.index] = multiplyMatrices3(faces_matrix[entry.parent], local_matrix);
+					faces_matrix[entry.index] = multiplyMatrices3(
+						faces_matrix[entry.parent],
+						local_matrix,
+					);
 					// to build the inverse matrix, switch these two parameters
 					// .multiplyMatrices3(local_matrix, faces_matrix[entry.parent]);
-				})));
+				}),
+			),
+	);
 	return faces_matrix;
 };
 
@@ -140,8 +126,12 @@ export const makeFacesMatrix = (
  */
 export const makeFacesMatrix2 = (
 	{
-		vertices_coords, edges_vertices, edges_foldAngle,
-		edges_assignment, faces_vertices, faces_faces,
+		vertices_coords,
+		edges_vertices,
+		edges_foldAngle,
+		edges_assignment,
+		faces_vertices,
+		faces_faces,
 	},
 	rootFaces,
 ) => {
@@ -163,14 +153,18 @@ export const makeFacesMatrix2 = (
 	// For this reason, treating "unassigned" as a folded edge, this method's
 	// functionality is better considered to be specific to makeFacesMatrix2,
 	// instead of a generalized method.
-	const edges_is_folded = makeEdgesIsFolded({ edges_vertices, edges_foldAngle, edges_assignment });
+	const edges_is_folded = makeEdgesIsFolded({
+		edges_vertices,
+		edges_foldAngle,
+		edges_assignment,
+	});
 	const edge_map = makeVerticesToEdge({ edges_vertices });
 	const faces_matrix = faces_vertices.map(() => identity2x3);
-	minimumSpanningTrees(faces_faces, rootFaces)
-		.forEach(tree => tree
+	minimumSpanningTrees(faces_faces, rootFaces).forEach((tree) =>
+		tree
 			.slice(1) // remove the first level, it has no parent face
-			.forEach(level => level
-				.forEach((entry) => {
+			.forEach((level) =>
+				level.forEach((entry) => {
 					const edge_vertices = facesSharedEdgesVertices(
 						faces_vertices[entry.index],
 						faces_vertices[entry.parent],
@@ -179,7 +173,7 @@ export const makeFacesMatrix2 = (
 					// 	faces_vertices[entry.index],
 					// 	faces_vertices[entry.parent],
 					// )).find(pair => edge_map[pair.join(" ")] !== undefined)
-					const coords = edge_vertices.map(v => vertices_coords[v]);
+					const coords = edge_vertices.map((v) => vertices_coords[v]);
 					const edgeKey = edge_vertices.join(" ");
 					const edge = edge_map[edgeKey];
 					const reflect_vector = subtract2(coords[1], coords[0]);
@@ -187,9 +181,14 @@ export const makeFacesMatrix2 = (
 					const local_matrix = edges_is_folded[edge]
 						? makeMatrix2Reflect(reflect_vector, reflect_origin)
 						: identity2x3;
-					faces_matrix[entry.index] = multiplyMatrices2(faces_matrix[entry.parent], local_matrix);
+					faces_matrix[entry.index] = multiplyMatrices2(
+						faces_matrix[entry.parent],
+						local_matrix,
+					);
 					// to build the inverse matrix, switch these two parameters
 					// .multiplyMatrices2(local_matrix, faces_matrix[entry.parent]);
-				})));
+				}),
+			),
+	);
 	return faces_matrix;
 };

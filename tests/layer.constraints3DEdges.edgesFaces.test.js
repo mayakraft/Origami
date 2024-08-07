@@ -3,18 +3,11 @@ import { expect, test } from "vitest";
 import ear from "../src/index.js";
 
 const solveOverlapFacesWith3DEdge = (graph, epsilon) => {
-	const {
-		faces_plane,
-		faces_winding,
-		clusters_graph,
-	} = ear.layer.constraints3DFaceClusters(graph, epsilon);
+	const { faces_plane, faces_winding, clusters_graph } =
+		ear.layer.constraints3DFaceClusters(graph, epsilon);
 	return ear.layer.solveOverlapFacesWith3DEdge(
 		graph,
-		ear.layer.getOverlapFacesWith3DEdge(
-			graph,
-			{ clusters_graph, faces_plane },
-			epsilon,
-		),
+		ear.layer.getOverlapFacesWith3DEdge(graph, { clusters_graph, faces_plane }, epsilon),
 		faces_winding,
 	);
 };
@@ -26,20 +19,20 @@ test("getOverlapFacesWith3DEdge, layers edge-face", () => {
 	);
 	const fold = JSON.parse(foldfile);
 	const frames = ear.graph.getFileFramesAsArray(fold);
-	const foldedForms = frames.map(frame => ({
+	const foldedForms = frames.map((frame) => ({
 		...frame,
 		vertices_coords: ear.graph.makeVerticesCoordsFolded(frame),
 	}));
-	foldedForms.forEach(folded => ear.graph.populate(folded));
+	foldedForms.forEach((folded) => ear.graph.populate(folded));
 
-	const graphsEdgeFace3DOverlaps = foldedForms
-		.map(folded => ear.layer.getOverlapFacesWith3DEdge(
+	const graphsEdgeFace3DOverlaps = foldedForms.map((folded) =>
+		ear.layer.getOverlapFacesWith3DEdge(
 			folded,
 			ear.layer.constraints3DFaceClusters(folded),
-		));
+		),
+	);
 
-	const orders = foldedForms
-		.map(folded => solveOverlapFacesWith3DEdge(folded));
+	const orders = foldedForms.map((folded) => solveOverlapFacesWith3DEdge(folded));
 
 	expect(graphsEdgeFace3DOverlaps).toMatchObject([
 		[{ edge: 6, tortilla: 1, coplanar: 3, angled: 2 }],
@@ -69,29 +62,37 @@ test("getOverlapFacesWith3DEdge, layers edge-edge", () => {
 	);
 	const fold = JSON.parse(foldfile);
 	const frames = ear.graph.getFileFramesAsArray(fold);
-	const foldedForms = frames.map(frame => ({
+	const foldedForms = frames.map((frame) => ({
 		...frame,
 		vertices_coords: ear.graph.makeVerticesCoordsFolded(frame),
 	}));
-	foldedForms.forEach(folded => ear.graph.populate(folded));
+	foldedForms.forEach((folded) => ear.graph.populate(folded));
 
-	const graphsEdgeFace3DOverlaps = foldedForms
-		.map(folded => ear.layer.getOverlapFacesWith3DEdge(
+	const graphsEdgeFace3DOverlaps = foldedForms.map((folded) =>
+		ear.layer.getOverlapFacesWith3DEdge(
 			folded,
 			ear.layer.constraints3DFaceClusters(folded),
-		));
+		),
+	);
 
 	// all frames overlap edges at edges, none will have a result
 	expect(graphsEdgeFace3DOverlaps).toMatchObject([
-		[], [], [], [], [], [], [], [], [], [], [],
+		[],
+		[],
+		[],
+		[],
+		[],
+		[],
+		[],
+		[],
+		[],
+		[],
+		[],
 	]);
 });
 
 test("getOverlapFacesWith3DEdge, cube-octagon", () => {
-	const foldfile = fs.readFileSync(
-		"./tests/files/fold/cube-octagon.fold",
-		"utf-8",
-	);
+	const foldfile = fs.readFileSync("./tests/files/fold/cube-octagon.fold", "utf-8");
 	const fold = JSON.parse(foldfile);
 	// the second folded frame is the one without the flat assignments
 	const folded = ear.graph.getFramesByClassName(fold, "foldedForm")[1];
@@ -207,10 +208,7 @@ test("getOverlapFacesWith3DEdge, cube-octagon", () => {
 });
 
 test("getOverlapFacesWith3DEdge, maze-u", () => {
-	const foldfile = fs.readFileSync(
-		"./tests/files/fold/maze-u.fold",
-		"utf-8",
-	);
+	const foldfile = fs.readFileSync("./tests/files/fold/maze-u.fold", "utf-8");
 	const fold = JSON.parse(foldfile);
 	const folded = ear.graph.getFramesByClassName(fold, "foldedForm")[0];
 	ear.graph.populate(folded);
@@ -291,7 +289,66 @@ test("getOverlapFacesWith3DEdge, maze-u", () => {
 		{ edge: 219, tortilla: 101, coplanar: 92, angled: 96 },
 	]);
 	expect(orders).toMatchObject({
-		"6 17":1,"4 17":1,"5 17":1,"11 17":1,"16 17":1,"17 18":2,"17 22":2,"17 26":2,"17 30":2,"17 35":2,"40 42":1,"39 42":1,"42 48":2,"4 42":1,"42 57":2,"42 58":2,"42 62":2,"6 42":1,"42 43":2,"41 42":1,"40 51":1,"39 51":1,"48 51":1,"4 51":1,"51 57":2,"51 58":2,"51 62":2,"6 51":1,"43 51":1,"41 51":1,"6 74":1,"35 74":1,"63 74":1,"67 74":1,"73 74":1,"72 74":1,"74 79":2,"74 82":2,"74 86":2,"74 90":2,"59 93":1,"58 93":1,"62 93":1,"6 93":1,"93 105":2,"93 106":2,"93 109":2,"90 93":1,"93 94":2,"92 93":1,"59 101":1,"58 101":1,"62 101":1,"6 101":1,"101 105":2,"101 106":2,"101 109":2,"90 101":1,"94 101":1,"92 101":1
+		"6 17": 1,
+		"4 17": 1,
+		"5 17": 1,
+		"11 17": 1,
+		"16 17": 1,
+		"17 18": 2,
+		"17 22": 2,
+		"17 26": 2,
+		"17 30": 2,
+		"17 35": 2,
+		"40 42": 1,
+		"39 42": 1,
+		"42 48": 2,
+		"4 42": 1,
+		"42 57": 2,
+		"42 58": 2,
+		"42 62": 2,
+		"6 42": 1,
+		"42 43": 2,
+		"41 42": 1,
+		"40 51": 1,
+		"39 51": 1,
+		"48 51": 1,
+		"4 51": 1,
+		"51 57": 2,
+		"51 58": 2,
+		"51 62": 2,
+		"6 51": 1,
+		"43 51": 1,
+		"41 51": 1,
+		"6 74": 1,
+		"35 74": 1,
+		"63 74": 1,
+		"67 74": 1,
+		"73 74": 1,
+		"72 74": 1,
+		"74 79": 2,
+		"74 82": 2,
+		"74 86": 2,
+		"74 90": 2,
+		"59 93": 1,
+		"58 93": 1,
+		"62 93": 1,
+		"6 93": 1,
+		"93 105": 2,
+		"93 106": 2,
+		"93 109": 2,
+		"90 93": 1,
+		"93 94": 2,
+		"92 93": 1,
+		"59 101": 1,
+		"58 101": 1,
+		"62 101": 1,
+		"6 101": 1,
+		"101 105": 2,
+		"101 106": 2,
+		"101 109": 2,
+		"90 101": 1,
+		"94 101": 1,
+		"92 101": 1,
 	});
 });
 

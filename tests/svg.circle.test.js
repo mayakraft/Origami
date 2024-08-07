@@ -9,15 +9,18 @@ test("circle arguments", () => {
 	expect(ear.svg.circle(5).getAttribute("r")).toBe("5");
 	expect(ear.svg.circle(2, 3).getAttribute("cx")).toBe("2");
 	expect(ear.svg.circle(2, 3).getAttribute("cy")).toBe("3");
-	expect(ear.svg.circle(2, 3).getAttribute("r") === null
-		|| ear.svg.circle(2, 3).getAttribute("r") === "").toBe(true);
+	expect(
+		ear.svg.circle(2, 3).getAttribute("r") === null ||
+			ear.svg.circle(2, 3).getAttribute("r") === "",
+	).toBe(true);
 
 	expect(ear.svg.circle(1, 2, 3).getAttribute("cx")).toBe("1");
 	expect(ear.svg.circle(1, 2, 3).getAttribute("cy")).toBe("2");
 	expect(ear.svg.circle(1, 2, 3).getAttribute("r")).toBe("3");
 
-	expect(parseFloat(ear.svg.circle(1, 2, 3, 4).getAttribute("r")))
-		.toBeCloseTo(2 * Math.sqrt(2));
+	expect(parseFloat(ear.svg.circle(1, 2, 3, 4).getAttribute("r"))).toBeCloseTo(
+		2 * Math.sqrt(2),
+	);
 	expect(ear.svg.circle(1, 2, 3, 4).getAttribute("cx")).toBe("1");
 	expect(ear.svg.circle(1, 2, 3, 4).getAttribute("cy")).toBe("2");
 });

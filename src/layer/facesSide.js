@@ -1,28 +1,12 @@
 /**
  * Rabbit Ear (c) Kraft
  */
-import {
-	cross2,
-	subtract2,
-	resize3,
-} from "../math/vector.js";
-import {
-	multiplyMatrix4Vector3,
-	multiplyMatrix4Line3,
-} from "../math/matrix4.js";
-import {
-	pointsToLine,
-} from "../math/convert.js";
-import {
-	edgeToLine2,
-} from "../graph/edges/lines.js";
-import {
-	makeFacesCenter2DQuick,
-	makeFacesCenter3DQuick,
-} from "../graph/make/faces.js";
-import {
-	uniqueElements,
-} from "../general/array.js";
+import { cross2, subtract2, resize3 } from "../math/vector.js";
+import { multiplyMatrix4Vector3, multiplyMatrix4Line3 } from "../math/matrix4.js";
+import { pointsToLine } from "../math/convert.js";
+import { edgeToLine2 } from "../graph/edges/lines.js";
+import { makeFacesCenter2DQuick, makeFacesCenter3DQuick } from "../graph/make/faces.js";
+import { uniqueElements } from "../general/array.js";
 import { invertFlatToArrayMap } from "../graph/maps.js";
 
 /**
@@ -36,24 +20,27 @@ import { invertFlatToArrayMap } from "../graph/maps.js";
  * a +1 or -1 for each face indicating which side of the edge the face lies on.
  */
 export const makeEdgesFacesSide = ({
-	vertices_coords, edges_vertices, edges_faces, faces_center,
+	vertices_coords,
+	edges_vertices,
+	edges_faces,
+	faces_center,
 }) => {
 	// convert edges into a line form with a vector and origin
 	const edgesLine = edges_vertices
-		.map(verts => verts.map(v => vertices_coords[v]))
+		.map((verts) => verts.map((v) => vertices_coords[v]))
 		.map(([a, b]) => pointsToLine(a, b));
 
 	// for each edge, for each of it's adjacent faces (either 1 or 2),
 	// which side of the edge's vector does that face lie on?
 	// compute the cross product of the edge's vector with the vector
 	// from the edge origin to the face's center. return +1 or -1
-	return edges_faces
-		.map((faces, i) => faces
-			.map(face => cross2(
-				subtract2(faces_center[face], edgesLine[i].origin),
-				edgesLine[i].vector,
-			))
-			.map(cross => Math.sign(cross)));
+	return edges_faces.map((faces, i) =>
+		faces
+			.map((face) =>
+				cross2(subtract2(faces_center[face], edgesLine[i].origin), edgesLine[i].vector),
+			)
+			.map((cross) => Math.sign(cross)),
+	);
 };
 
 /**
@@ -72,23 +59,31 @@ export const makeEdgePairsFacesSide = (
 	// there are two edges involved in a taco, grab the first one.
 	// we have to use the same origin/vector so that the face-sidedness is
 	// consistent globally, not local to its edge.
-	const edgePairsLine = edgePairs
-		.map(([edge]) => edgeToLine2({ vertices_coords, edges_vertices }, edge));
+	const edgePairsLine = edgePairs.map(([edge]) =>
+		edgeToLine2({ vertices_coords, edges_vertices }, edge),
+	);
 
-	return edgePairs
-		// convert pairs of edges into pairs of face-pairs (two faces for each edge)
-		.map(pair => pair.map(edge => edges_faces[edge]))
-		// cross product of every edge-pair's line vector against
-		// every face's vector (vector from edge origin to face center)
-		.map((faces, i) => faces
-			.map(face_pair => face_pair
-				.map(face => faces_center[face])
-				.map(center => cross2(
-					subtract2(center, edgePairsLine[i].origin),
-					edgePairsLine[i].vector,
-				))
-				.map(Math.sign)))
-		.map(arr => [[arr[0][0], arr[0][1]], [arr[1][0], arr[1][1]]]);
+	return (
+		edgePairs
+			// convert pairs of edges into pairs of face-pairs (two faces for each edge)
+			.map((pair) => pair.map((edge) => edges_faces[edge]))
+			// cross product of every edge-pair's line vector against
+			// every face's vector (vector from edge origin to face center)
+			.map((faces, i) =>
+				faces.map((face_pair) =>
+					face_pair
+						.map((face) => faces_center[face])
+						.map((center) =>
+							cross2(subtract2(center, edgePairsLine[i].origin), edgePairsLine[i].vector),
+						)
+						.map(Math.sign),
+				),
+			)
+			.map((arr) => [
+				[arr[0][0], arr[0][1]],
+				[arr[1][0], arr[1][1]],
+			])
+	);
 };
 
 /**
@@ -121,13 +116,14 @@ export const makeEdgesFacesSide2D = (
 	// cross product of the vector to the faces' center with the vector of
 	// the shared line that this edge runs along.
 	// the result is +1 or -1, the sign of the result of the cross product.
-	return edges_faces
-		.map((faces, e) => faces
-			.map(face => {
+	return edges_faces.map((faces, e) =>
+		faces
+			.map((face) => {
 				const { vector, origin } = lines[edges_line[e]];
 				return cross2(subtract2(faces_center[face], origin), vector);
 			})
-			.map(Math.sign));
+			.map(Math.sign),
+	);
 };
 
 /**
@@ -155,17 +151,15 @@ export const makeEdgesFacesSide3D = (
 		// this method will always return 3D points, necessary for the
 		// multiply matrix and vector method
 		// eslint-disable-next-line no-param-reassign
-		faces_center = makeFacesCenter3DQuick({ vertices_coords, faces_vertices })
-			.map((center, f) => multiplyMatrix4Vector3(
-				planes_transform[faces_plane[f]],
-				center,
-			));
+		faces_center = makeFacesCenter3DQuick({ vertices_coords, faces_vertices }).map(
+			(center, f) => multiplyMatrix4Vector3(planes_transform[faces_plane[f]], center),
+		);
 	}
 
 	// for every line, a list of all planes that this line is a member of
 	const lines_planes = invertFlatToArrayMap(edges_line)
-		.map(edges => edges.flatMap(e => edges_faces[e].map(f => faces_plane[f])))
-		.map(planes => uniqueElements(planes));
+		.map((edges) => edges.flatMap((e) => edges_faces[e].map((f) => faces_plane[f])))
+		.map((planes) => uniqueElements(planes));
 
 	// ensure lines's vectors and origins are in 3D.
 	const lines3D = lines.map(({ vector, origin }) => ({
@@ -176,16 +170,19 @@ export const makeEdgesFacesSide3D = (
 	// fill lines planes
 	/** @type {VecLine[][]} */
 	const lines2DInPlane = lines.map(() => []);
-	lines_planes.forEach((planes, l) => planes.forEach(p => {
-		const { vector, origin } = lines3D[l];
-		lines2DInPlane[l][p] = multiplyMatrix4Line3(planes_transform[p], vector, origin);
-	}));
+	lines_planes.forEach((planes, l) =>
+		planes.forEach((p) => {
+			const { vector, origin } = lines3D[l];
+			lines2DInPlane[l][p] = multiplyMatrix4Line3(planes_transform[p], vector, origin);
+		}),
+	);
 
-	return edges_faces
-		.map((faces, e) => faces
-			.map(face => {
+	return edges_faces.map((faces, e) =>
+		faces
+			.map((face) => {
 				const { vector, origin } = lines2DInPlane[edges_line[e]][faces_plane[face]];
 				return cross2(subtract2(faces_center[face], origin), vector);
 			})
-			.map(Math.sign));
+			.map(Math.sign),
+	);
 };

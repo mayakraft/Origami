@@ -132,7 +132,7 @@ const finalize_faces = (graph, svg_faces, group, options = {}) => {
 	// set the style of each individual face, depending on the
 	// face's visible side (front/back) and foldedForm vs. crease pattern
 	faces_winding
-		.map(w => (w ? facesSideNames[0] : facesSideNames[1]))
+		.map((w) => (w ? facesSideNames[0] : facesSideNames[1]))
 		.forEach((className, i) => {
 			// counter-clockwise faces are "face up", their front facing the camera
 			// clockwise faces means "flipped", their back is facing the camera.
@@ -148,9 +148,7 @@ const finalize_faces = (graph, svg_faces, group, options = {}) => {
 			const foldedFaceStyle = orderIsCertain
 				? FACE_STYLE.foldedForm.ordered[className]
 				: FACE_STYLE.foldedForm.unordered[className];
-			const faceStyle = isFolded
-				? foldedFaceStyle
-				: FACE_STYLE.creasePattern[className];
+			const faceStyle = isFolded ? foldedFaceStyle : FACE_STYLE.creasePattern[className];
 
 			// set the face style (front/back in the context of CP or foldedForm)
 			setKeysAndValues(svg_faces[i], faceStyle);
@@ -162,7 +160,7 @@ const finalize_faces = (graph, svg_faces, group, options = {}) => {
 	// get a list of face indices, 0...N-1, or in the case of a layer order
 	// existing, give us these indices in layer-sorted order.
 	// using this order, append the faces to the parent group.
-	linearize2DFaces(graph).forEach(f => group.appendChild(svg_faces[f]));
+	linearize2DFaces(graph).forEach((f) => group.appendChild(svg_faces[f]));
 
 	// set style attributes of the group
 	const groupStyleFolded = orderIsCertain
@@ -183,8 +181,8 @@ const finalize_faces = (graph, svg_faces, group, options = {}) => {
  */
 export const facesVerticesPolygon = (graph, options) => {
 	const svg_faces = graph.faces_vertices
-		.map(fv => fv.map(v => [0, 1].map(i => graph.vertices_coords[v][i])))
-		.map(face => SVG.polygon(face));
+		.map((fv) => fv.map((v) => [0, 1].map((i) => graph.vertices_coords[v][i])))
+		.map((face) => SVG.polygon(face));
 	svg_faces.forEach((face, i) => face.setAttributeNS(null, "index", `${i}`));
 	return finalize_faces(graph, svg_faces, SVG.g(), options);
 };
@@ -199,13 +197,16 @@ export const facesVerticesPolygon = (graph, options) => {
  */
 export const facesEdgesPolygon = function (graph, options) {
 	const svg_faces = graph.faces_edges
-		.map(face_edges => face_edges
-			.map(edge => graph.edges_vertices[edge])
-			.map((vi, i, arr) => {
-				const next = arr[(i + 1) % arr.length];
-				return (vi[1] === next[0] || vi[1] === next[1] ? vi[0] : vi[1]);
-			}).map(v => [0, 1].map(i => graph.vertices_coords[v][i])))
-		.map(face => SVG.polygon(face));
+		.map((face_edges) =>
+			face_edges
+				.map((edge) => graph.edges_vertices[edge])
+				.map((vi, i, arr) => {
+					const next = arr[(i + 1) % arr.length];
+					return vi[1] === next[0] || vi[1] === next[1] ? vi[0] : vi[1];
+				})
+				.map((v) => [0, 1].map((i) => graph.vertices_coords[v][i])),
+		)
+		.map((face) => SVG.polygon(face));
 	svg_faces.forEach((face, i) => face.setAttributeNS(null, "index", `${i}`));
 	return finalize_faces(graph, svg_faces, SVG.g(), options);
 };

@@ -28,16 +28,25 @@ test("alternating deviation, equal pairs", () => {
 	testArrays(
 		[0, 0],
 		ear.singleVertex.alternatingSumDifference(
-			ear.math.counterClockwiseSectors2([[1, 0], [0, 1], [-1, 0], [0, -1]]),
+			ear.math.counterClockwiseSectors2([
+				[1, 0],
+				[0, 1],
+				[-1, 0],
+				[0, -1],
+			]),
 		),
 	);
 });
 
 test("alternating deviation, non-equal pairs", () => {
 	// two Math.PI +/- 1
-	const arr2 = Array(2).fill(Math.PI).map((v, i) => v + (i % 2 ? 1 : -1));
+	const arr2 = Array(2)
+		.fill(Math.PI)
+		.map((v, i) => v + (i % 2 ? 1 : -1));
 	// four Math.PI/2 +/- 1/2
-	const arr4 = Array(4).fill(Math.PI / 2).map((v, i) => v + (i % 2 ? 1 / 2 : -1 / 2));
+	const arr4 = Array(4)
+		.fill(Math.PI / 2)
+		.map((v, i) => v + (i % 2 ? 1 / 2 : -1 / 2));
 	testArrays([-1, 1], ear.singleVertex.alternatingSumDifference(arr2));
 	testArrays([-1, 1], ear.singleVertex.alternatingSumDifference(arr4));
 });
@@ -45,9 +54,7 @@ test("alternating deviation, non-equal pairs", () => {
 test("kawasaki solutions radians", () => {
 	testArrays(
 		[undefined, undefined, 1.25 * Math.PI],
-		ear.singleVertex.kawasakiSolutionsRadians([
-			0, Math.PI / 2, (Math.PI / 4) * 3,
-		]),
+		ear.singleVertex.kawasakiSolutionsRadians([0, Math.PI / 2, (Math.PI / 4) * 3]),
 	);
 });
 

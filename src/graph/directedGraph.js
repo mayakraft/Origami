@@ -1,12 +1,8 @@
 /**
  * Rabbit Ear (c) Kraft
  */
-import {
-	uniqueSortedNumbers,
-} from "../general/array.js";
-import {
-	invertFlatMap,
-} from "./maps.js";
+import { uniqueSortedNumbers } from "../general/array.js";
+import { invertFlatMap } from "./maps.js";
 
 /**
  * @description Perform a topological sort on a directed acyclic graph.
@@ -24,13 +20,19 @@ export const topologicalSortQuick = (directedEdges) => {
 	// array where indices are vertices and values are arrays of vertices
 	// which are "parents" of this vertex (other vertices point to this one).
 	const verticesParents = [];
-	vertices.forEach(v => { verticesParents[v] = []; });
-	directedEdges.forEach(edge => { verticesParents[edge[1]].push(edge[0]); });
+	vertices.forEach((v) => {
+		verticesParents[v] = [];
+	});
+	directedEdges.forEach((edge) => {
+		verticesParents[edge[1]].push(edge[0]);
+	});
 	const ordering = [];
 	const visited = {};
 	/** @param {number} vertex */
 	const recurse = (vertex) => {
-		if (visited[vertex]) { return; }
+		if (visited[vertex]) {
+			return;
+		}
 		visited[vertex] = true;
 		verticesParents[vertex].forEach(recurse);
 		ordering.push(vertex);
@@ -51,7 +53,6 @@ export const topologicalSortQuick = (directedEdges) => {
 export const topologicalSort = (directedEdges) => {
 	const ordering = topologicalSortQuick(directedEdges);
 	const orderMap = invertFlatMap(ordering);
-	const violations = directedEdges
-		.filter(([a, b]) => orderMap[a] > orderMap[b]);
+	const violations = directedEdges.filter(([a, b]) => orderMap[a] > orderMap[b]);
 	return violations.length ? undefined : ordering;
 };

@@ -1,7 +1,7 @@
 /* SVG (c) Kraft */
-import classes_attributes from './classes_attributes.js';
-import classes_nodes from './classes_nodes.js';
-import { str_viewBox, str_points, str_id, str_svg } from '../environment/strings.js';
+import classes_attributes from "./classes_attributes.js";
+import classes_nodes from "./classes_nodes.js";
+import { str_viewBox, str_points, str_id, str_svg } from "../environment/strings.js";
 
 /**
  * Rabbit Ear (c) Kraft
@@ -53,30 +53,38 @@ const nodes_attributes = {
 // "stroke" or "fill" which end up getting repeatedly applied to many
 // elements. This way the library can be shipped in a smaller state and
 // build upon initialization.
-const additionalNodeAttributes = [{
-	nodes: [str_svg, "defs", "g"].concat(classes_nodes.visible, classes_nodes.text),
-	attr: classes_attributes.presentation,
-}, {
-	nodes: ["filter"],
-	attr: classes_attributes.effects,
-}, {
-	// todo: should we include "svg" here?
-	nodes: classes_nodes.childrenOfText.concat("text"),
-	attr: classes_attributes.text,
-}, {
-	nodes: classes_nodes.filter,
-	attr: classes_attributes.effects,
-}, {
-	nodes: classes_nodes.gradients,
-	attr: classes_attributes.gradient,
-}];
+const additionalNodeAttributes = [
+	{
+		nodes: [str_svg, "defs", "g"].concat(classes_nodes.visible, classes_nodes.text),
+		attr: classes_attributes.presentation,
+	},
+	{
+		nodes: ["filter"],
+		attr: classes_attributes.effects,
+	},
+	{
+		// todo: should we include "svg" here?
+		nodes: classes_nodes.childrenOfText.concat("text"),
+		attr: classes_attributes.text,
+	},
+	{
+		nodes: classes_nodes.filter,
+		attr: classes_attributes.effects,
+	},
+	{
+		nodes: classes_nodes.gradients,
+		attr: classes_attributes.gradient,
+	},
+];
 
 // for every node in the set, add all attributes associated with the node.
-additionalNodeAttributes
-	.forEach(el => el.nodes
-		.forEach(nodeName => {
-			if (!nodes_attributes[nodeName]) { nodes_attributes[nodeName] = []; }
-			nodes_attributes[nodeName].push(...el.attr);
-		}));
+additionalNodeAttributes.forEach((el) =>
+	el.nodes.forEach((nodeName) => {
+		if (!nodes_attributes[nodeName]) {
+			nodes_attributes[nodeName] = [];
+		}
+		nodes_attributes[nodeName].push(...el.attr);
+	}),
+);
 
 export { nodes_attributes as default };

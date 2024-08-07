@@ -29,13 +29,13 @@ test("one depth with one 'and' and two 'or' branches", () => {
 		branches: [
 			[
 				{
-					orders: { "3 4": 1 }
+					orders: { "3 4": 1 },
 				},
 				{
-					orders: { "3 4": 2 }
-				}
-			]
-		]
+					orders: { "3 4": 2 },
+				},
+			],
+		],
 	};
 	const result = ear.layer.gatherAll(layerSolution);
 
@@ -58,21 +58,21 @@ test("one depth with two 'and' and two 'or' branches", () => {
 		branches: [
 			[
 				{
-					orders: { "3 4": 1 }
+					orders: { "3 4": 1 },
 				},
 				{
-					orders: { "3 4": 2 }
-				}
+					orders: { "3 4": 2 },
+				},
 			],
 			[
 				{
-					orders: { "5 6": 1 }
+					orders: { "5 6": 1 },
 				},
 				{
-					orders: { "5 6": 2 }
-				}
-			]
-		]
+					orders: { "5 6": 2 },
+				},
+			],
+		],
 	};
 	const result = ear.layer.gatherAll(layerSolution);
 
@@ -100,17 +100,17 @@ test("single-entry structure that mimics the Kabuto result", () => {
 					branches: [
 						[
 							{
-								orders: { "5 6": 1 }
+								orders: { "5 6": 1 },
 							},
 							{
-								orders: { "5 6": 2 }
-							}
-						]
-					]
+								orders: { "5 6": 2 },
+							},
+						],
+					],
 				},
 				{
-					orders: { "3 4": 2, "5 6": 1 }
-				}
+					orders: { "3 4": 2, "5 6": 1 },
+				},
 			],
 			[
 				{
@@ -118,19 +118,19 @@ test("single-entry structure that mimics the Kabuto result", () => {
 					branches: [
 						[
 							{
-								orders: { "9 10": 1 }
+								orders: { "9 10": 1 },
 							},
 							{
-								orders: { "9 10": 2 }
-							}
-						]
-					]
+								orders: { "9 10": 2 },
+							},
+						],
+					],
 				},
 				{
-					orders: { "7 8": 2, "9 10": 1 }
-				}
-			]
-		]
+					orders: { "7 8": 2, "9 10": 1 },
+				},
+			],
+		],
 	};
 	const result = ear.layer.gatherAll(layerSolution);
 

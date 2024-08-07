@@ -1,5 +1,5 @@
 /* SVG (c) Kraft */
-import { svg_sub2, svg_add2, svg_scale2 } from '../../../general/algebra.js';
+import { svg_sub2, svg_add2, svg_scale2 } from "../../../general/algebra.js";
 
 /**
  * Rabbit Ear (c) Kraft

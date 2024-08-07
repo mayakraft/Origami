@@ -24,14 +24,13 @@ const s = Math.SQRT1_2;
 // 	{u:[ t, n], d:0},
 // ]
 test("16 angles of lines, through the origin", () => {
-	const angles = Array.from(Array(16))
-		.map((_, i) => ((Math.PI * 2) / 16) * i);
-	const vectors = angles.map(a => [Math.cos(a), Math.sin(a)]);
+	const angles = Array.from(Array(16)).map((_, i) => ((Math.PI * 2) / 16) * i);
+	const vectors = angles.map((a) => [Math.cos(a), Math.sin(a)]);
 	const origins = angles.map(() => [0, 0]);
 	vectors
 		.map((vector, i) => ({ vector, origin: origins[i] }))
-		.map(vec_or => ear.math.vecLineToUniqueLine(vec_or))
-		.map(norm_dist => ear.math.uniqueLineToVecLine(norm_dist))
+		.map((vec_or) => ear.math.vecLineToUniqueLine(vec_or))
+		.map((norm_dist) => ear.math.uniqueLineToVecLine(norm_dist))
 		.forEach((el, i) => {
 			expect(el.vector[0]).toBeCloseTo(vectors[i][0]);
 			expect(el.vector[1]).toBeCloseTo(vectors[i][1]);
@@ -59,15 +58,16 @@ test("16 angles of lines, through the origin", () => {
 // 	{u:[ t, n], d:1},
 // ];
 test("16 angles of lines, not through the origin, dir 1", () => {
-	const angles = Array.from(Array(16))
-		.map((_, i) => ((Math.PI * 2) / 16) * i);
-	const vectors = angles.map(a => [Math.cos(a), Math.sin(a)]);
-	const origins = angles
-		.map(a => [Math.cos(a + Math.PI / 2), Math.sin(a + Math.PI / 2)]);
+	const angles = Array.from(Array(16)).map((_, i) => ((Math.PI * 2) / 16) * i);
+	const vectors = angles.map((a) => [Math.cos(a), Math.sin(a)]);
+	const origins = angles.map((a) => [
+		Math.cos(a + Math.PI / 2),
+		Math.sin(a + Math.PI / 2),
+	]);
 	vectors
 		.map((vector, i) => ({ vector, origin: origins[i] }))
-		.map(vec_or => ear.math.vecLineToUniqueLine(vec_or))
-		.map(norm_dist => ear.math.uniqueLineToVecLine(norm_dist))
+		.map((vec_or) => ear.math.vecLineToUniqueLine(vec_or))
+		.map((norm_dist) => ear.math.uniqueLineToVecLine(norm_dist))
 		.forEach((el, i) => {
 			expect(el.vector[0]).toBeCloseTo(vectors[i][0]);
 			expect(el.vector[1]).toBeCloseTo(vectors[i][1]);
@@ -77,15 +77,16 @@ test("16 angles of lines, not through the origin, dir 1", () => {
 });
 
 test("16 angles of lines, not through the origin, dir 2", () => {
-	const angles = Array.from(Array(16))
-		.map((_, i) => ((Math.PI * 2) / 16) * i);
-	const vectors = angles.map(a => [Math.cos(a), Math.sin(a)]);
-	const origins = angles
-		.map(a => [Math.cos(a - Math.PI / 2), Math.sin(a - Math.PI / 2)]);
+	const angles = Array.from(Array(16)).map((_, i) => ((Math.PI * 2) / 16) * i);
+	const vectors = angles.map((a) => [Math.cos(a), Math.sin(a)]);
+	const origins = angles.map((a) => [
+		Math.cos(a - Math.PI / 2),
+		Math.sin(a - Math.PI / 2),
+	]);
 	vectors
 		.map((vector, i) => ({ vector, origin: origins[i] }))
-		.map(vec_or => ear.math.vecLineToUniqueLine(vec_or))
-		.map(norm_dist => ear.math.uniqueLineToVecLine(norm_dist))
+		.map((vec_or) => ear.math.vecLineToUniqueLine(vec_or))
+		.map((norm_dist) => ear.math.uniqueLineToVecLine(norm_dist))
 		.forEach((el, i) => {
 			expect(el.vector[0]).toBeCloseTo(vectors[i][0]);
 			expect(el.vector[1]).toBeCloseTo(vectors[i][1]);

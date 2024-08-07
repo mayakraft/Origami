@@ -12,18 +12,79 @@ test("edgesToLines and edgesToLines3", () => {
 	const edgesLine = ear.graph.edgesToLines(folded);
 	const edgesLine3 = ear.graph.edgesToLines3(folded);
 
-	edgesLine.forEach((_, i) => [0, 1, 2].forEach(n => {
-		expect(edgesLine[i].vector[n]).toBeCloseTo(edgesLine3[i].vector[n]);
-		expect(edgesLine[i].origin[n]).toBeCloseTo(edgesLine3[i].origin[n]);
-	}));
+	edgesLine.forEach((_, i) =>
+		[0, 1, 2].forEach((n) => {
+			expect(edgesLine[i].vector[n]).toBeCloseTo(edgesLine3[i].vector[n]);
+			expect(edgesLine[i].origin[n]).toBeCloseTo(edgesLine3[i].origin[n]);
+		}),
+	);
 });
 
 test("edgesLine with empty arrays", () => {
-	expect(ear.graph.getEdgesLine({
-		vertices_coords: [,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,],
-		edges_vertices: [,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,]
-	})).toMatchObject({ lines: [], edges_line: [] });
-})
+	expect(
+		ear.graph.getEdgesLine({
+			vertices_coords: [, , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , ,],
+			edges_vertices: [
+				,
+				,
+				,
+				,
+				,
+				,
+				,
+				,
+				,
+				,
+				,
+				,
+				,
+				,
+				,
+				,
+				,
+				,
+				,
+				,
+				,
+				,
+				,
+				,
+				,
+				,
+				,
+				,
+				,
+				,
+				,
+				,
+				,
+				,
+				,
+				,
+				,
+				,
+				,
+				,
+				,
+				,
+				,
+				,
+				,
+				,
+				,
+				,
+				,
+				,
+				,
+				,
+				,
+				,
+				,
+				,
+			],
+		}),
+	).toMatchObject({ lines: [], edges_line: [] });
+});
 
 test("fish base", () => {
 	const graph = ear.graph.fish();
@@ -46,68 +107,89 @@ test("fish base", () => {
 		{ vector: [0, 1], origin: [1, 0] }, // right
 		{ vector: [-1, 0], origin: [1, 1] }, // top
 	];
-	lines.forEach((line, i) => expect(
-		ear.math.epsilonEqualVectors(line.vector, expected[i].vector),
-	).toBe(true));
-	lines.forEach((line, i) => expect(
-		ear.math.epsilonEqualVectors(line.origin, expected[i].origin),
-	).toBe(true));
+	lines.forEach((line, i) =>
+		expect(ear.math.epsilonEqualVectors(line.vector, expected[i].vector)).toBe(true),
+	);
+	lines.forEach((line, i) =>
+		expect(ear.math.epsilonEqualVectors(line.origin, expected[i].origin)).toBe(true),
+	);
 });
 
 test("maze folding", () => {
 	const svg = fs.readFileSync("./tests/files/svg/maze-8x8.svg", "utf-8");
 	const graph = ear.convert.svgEdgeGraph(svg);
-	fs.writeFileSync(
-		"./tests/tmp/planarizeEdgeGraph.fold",
-		JSON.stringify(graph),
-		"utf8",
-	);
+	fs.writeFileSync("./tests/tmp/planarizeEdgeGraph.fold", JSON.stringify(graph), "utf8");
 	const { lines, edges_line } = ear.graph.getEdgesLine(graph);
 	const edgesValid = graph.edges_vertices
-		.map(ev => ev.map(v => graph.vertices_coords[v]))
-		.map((coords, i) => coords
-			.map(coord => ear.math.overlapLinePoint(lines[edges_line[i]], coord)))
-		.map(pair => pair[0] && pair[1])
+		.map((ev) => ev.map((v) => graph.vertices_coords[v]))
+		.map((coords, i) =>
+			coords.map((coord) => ear.math.overlapLinePoint(lines[edges_line[i]], coord)),
+		)
+		.map((pair) => pair[0] && pair[1])
 		.map((valid, i) => (!valid ? i : undefined))
-		.filter(a => a !== undefined);
+		.filter((a) => a !== undefined);
 	expect(edgesValid.length).toBe(0);
 });
 
 test("parallel same distance 3d", () => {
 	const graph = {
 		vertices_coords: [
-			[1, 2, 3], [7, 2, 6], // random values
-			[-1, 5, 5], [1, 5, 5],
-			[8, 3, 5], [1, 3, 2], // random values
-			[-1, -5, 5], [1, -5, 5],
-			[9, 2, 7], [2, 8, 4], // random values
-			[-1, -5, -5], [1, -5, -5],
-			[8, 5, 9], [4, 5, 1], // random values
-			[-1, 5, -5], [1, 5, -5],
+			[1, 2, 3],
+			[7, 2, 6], // random values
+			[-1, 5, 5],
+			[1, 5, 5],
+			[8, 3, 5],
+			[1, 3, 2], // random values
+			[-1, -5, 5],
+			[1, -5, 5],
+			[9, 2, 7],
+			[2, 8, 4], // random values
+			[-1, -5, -5],
+			[1, -5, -5],
+			[8, 5, 9],
+			[4, 5, 1], // random values
+			[-1, 5, -5],
+			[1, 5, -5],
 		],
 		edges_vertices: [
-			[0, 1], [2, 3], [4, 5], [6, 7], [8, 9], [10, 11], [12, 13], [14, 15],
+			[0, 1],
+			[2, 3],
+			[4, 5],
+			[6, 7],
+			[8, 9],
+			[10, 11],
+			[12, 13],
+			[14, 15],
 		],
 	};
 	const result = ear.graph.getEdgesLine(graph);
 	const lines_edges = ear.graph.invertFlatToArrayMap(result.edges_line);
-	lines_edges.forEach(el => expect(el.length).toBe(1));
+	lines_edges.forEach((el) => expect(el.length).toBe(1));
 	expect(result.lines.length).toBe(8);
 });
 
 test("parallel same distance 3d", () => {
 	const graph = {
 		vertices_coords: [
-			[-1, 5, 5], [1, 5, 5],
-			[-1, -5, 5], [1, -5, 5],
-			[-1, -5, -5], [1, -5, -5],
-			[-1, 5, -5], [1, 5, -5],
+			[-1, 5, 5],
+			[1, 5, 5],
+			[-1, -5, 5],
+			[1, -5, 5],
+			[-1, -5, -5],
+			[1, -5, -5],
+			[-1, 5, -5],
+			[1, 5, -5],
 		],
-		edges_vertices: [[0, 1], [2, 3], [4, 5], [6, 7]],
+		edges_vertices: [
+			[0, 1],
+			[2, 3],
+			[4, 5],
+			[6, 7],
+		],
 	};
 	const result = ear.graph.getEdgesLine(graph);
 	const lines_edges = ear.graph.invertFlatToArrayMap(result.edges_line);
-	lines_edges.forEach(el => expect(el.length).toBe(1));
+	lines_edges.forEach((el) => expect(el.length).toBe(1));
 	expect(result.lines.length).toBe(4);
 });
 
@@ -115,16 +197,15 @@ test("getEdgesLine, parallel lines at same distance in 3D, circle XY", () => {
 	const graph = {
 		vertices_coords: Array.from(Array(16))
 			.map((_, i) => (i / 16) * (Math.PI * 2))
-			.flatMap(a => [
+			.flatMap((a) => [
 				[Math.cos(a), Math.sin(a), -1],
 				[Math.cos(a), Math.sin(a), 1],
 			]),
-		edges_vertices: Array.from(Array(16))
-			.map((_, i) => [i * 2, i * 2 + 1]),
+		edges_vertices: Array.from(Array(16)).map((_, i) => [i * 2, i * 2 + 1]),
 	};
 	const result = ear.graph.getEdgesLine(graph);
 	const lines_edges = ear.graph.invertFlatToArrayMap(result.edges_line);
-	lines_edges.forEach(el => expect(el.length).toBe(1));
+	lines_edges.forEach((el) => expect(el.length).toBe(1));
 	expect(result.lines.length).toBe(16);
 });
 
@@ -132,16 +213,15 @@ test("getEdgesLine, parallel lines at same distance in 3D, circle XZ", () => {
 	const graph = {
 		vertices_coords: Array.from(Array(16))
 			.map((_, i) => (i / 16) * (Math.PI * 2))
-			.flatMap(a => [
+			.flatMap((a) => [
 				[Math.cos(a), -1, Math.sin(a)],
 				[Math.cos(a), 1, Math.sin(a)],
 			]),
-		edges_vertices: Array.from(Array(16))
-			.map((_, i) => [i * 2, i * 2 + 1]),
+		edges_vertices: Array.from(Array(16)).map((_, i) => [i * 2, i * 2 + 1]),
 	};
 	const result = ear.graph.getEdgesLine(graph);
 	const lines_edges = ear.graph.invertFlatToArrayMap(result.edges_line);
-	lines_edges.forEach(el => expect(el.length).toBe(1));
+	lines_edges.forEach((el) => expect(el.length).toBe(1));
 	expect(result.lines.length).toBe(16);
 });
 
@@ -149,16 +229,15 @@ test("getEdgesLine, parallel lines at same distance in 3D, circle YZ", () => {
 	const graph = {
 		vertices_coords: Array.from(Array(16))
 			.map((_, i) => (i / 16) * (Math.PI * 2))
-			.flatMap(a => [
+			.flatMap((a) => [
 				[-1, Math.cos(a), Math.sin(a)],
 				[1, Math.cos(a), Math.sin(a)],
 			]),
-		edges_vertices: Array.from(Array(16))
-			.map((_, i) => [i * 2, i * 2 + 1]),
+		edges_vertices: Array.from(Array(16)).map((_, i) => [i * 2, i * 2 + 1]),
 	};
 	const result = ear.graph.getEdgesLine(graph);
 	const lines_edges = ear.graph.invertFlatToArrayMap(result.edges_line);
-	lines_edges.forEach(el => expect(el.length).toBe(1));
+	lines_edges.forEach((el) => expect(el.length).toBe(1));
 	expect(result.lines.length).toBe(16);
 });
 
@@ -174,10 +253,7 @@ test("getEdgesLine, Mooser's train, one fourth of carriage only", () => {
 	};
 	ear.graph.populate(folded);
 
-	const {
-		lines,
-		edges_line,
-	} = ear.graph.getEdgesLine(folded);
+	const { lines, edges_line } = ear.graph.getEdgesLine(folded);
 
 	const bruteForce = ear.graph.getEdgesLineBruteForce(folded);
 
@@ -240,10 +316,12 @@ test("getEdgesLine, Mooser's train, one fourth of carriage only", () => {
 
 	expect(expectedLines.length).toBe(bruteForce.lines.length);
 
-	lines.forEach((_, i) => [0, 1, 2].forEach(d => {
-		expect(lines[i].vector[d]).toBeCloseTo(expectedLines[i].vector[d]);
-		expect(lines[i].origin[d]).toBeCloseTo(expectedLines[i].origin[d]);
-	}));
+	lines.forEach((_, i) =>
+		[0, 1, 2].forEach((d) => {
+			expect(lines[i].vector[d]).toBeCloseTo(expectedLines[i].vector[d]);
+			expect(lines[i].origin[d]).toBeCloseTo(expectedLines[i].origin[d]);
+		}),
+	);
 
 	expect(lines_edges).toMatchObject([
 		// outside edge
@@ -300,25 +378,19 @@ test("getEdgesLine, Mooser's train, one fourth of carriage only", () => {
 		[50],
 		[79],
 		[80, 81],
-		[78]
+		[78],
 	]);
 });
 
 test("getEdgesLine, Mooser's train, carriage only", () => {
-	const FOLD = fs.readFileSync(
-		"./tests/files/fold/moosers-train-carriage.fold",
-		"utf-8",
-	);
+	const FOLD = fs.readFileSync("./tests/files/fold/moosers-train-carriage.fold", "utf-8");
 	const graph = JSON.parse(FOLD);
 	const folded = {
 		...graph,
 		vertices_coords: ear.graph.makeVerticesCoordsFolded(graph),
-	}
+	};
 
-	const {
-		lines,
-		edges_line,
-	} = ear.graph.getEdgesLine(folded);
+	const { lines, edges_line } = ear.graph.getEdgesLine(folded);
 
 	const lines_edges = ear.graph.invertFlatToArrayMap(edges_line);
 
@@ -517,7 +589,7 @@ test("getEdgesLine, Mooser's train, carriage only", () => {
 		[92, 293],
 		[187],
 		[164, 165, 180, 186, 201, 219, 220, 260],
-		[276, 277, 278, 279, 280, 281, 282, 283, 284, 285, 286, 287, 288]
+		[276, 277, 278, 279, 280, 281, 282, 283, 284, 285, 286, 287, 288],
 	];
 
 	// console.log(JSON.stringify(lines.map(({ vector, origin }) => ({
@@ -527,10 +599,12 @@ test("getEdgesLine, Mooser's train, carriage only", () => {
 	// console.log(JSON.stringify(edges_line));
 	// console.log(JSON.stringify(lines_edges));
 
-	lines.forEach((_, i) => [0, 1, 2].forEach(d => {
-		expect(lines[i].vector[d]).toBeCloseTo(expectedLines[i].vector[d]);
-		expect(lines[i].origin[d]).toBeCloseTo(expectedLines[i].origin[d]);
-	}));
+	lines.forEach((_, i) =>
+		[0, 1, 2].forEach((d) => {
+			expect(lines[i].vector[d]).toBeCloseTo(expectedLines[i].vector[d]);
+			expect(lines[i].origin[d]).toBeCloseTo(expectedLines[i].origin[d]);
+		}),
+	);
 
 	expect(lines_edges).toMatchObject(expectedLinesEdges);
 });
@@ -542,7 +616,57 @@ test("Mooser's train 3d edges_line", () => {
 
 	expect(lines.length).toBe(301);
 	expect(edges_line).toMatchObject([
-		19,19,19,76,59,13,91,19,19,13,42,19,19,36,115,99,19,19,19,163,144,13,174,19,19,13,131,19,19,36,198,184,210,19,19,13,237,247,19,19,19,13,256,264,19,19,19,13,273,19,19,279,24,36,22,22,22,75,58,15,90,22,22,15,41,22,22,37,114,98,22,22,22,162,143,15,173,22,22,15,130,22,22,37,197,183,209,22,22,15,236,246,22,22,22,15,255,263,22,22,22,15,272,22,22,279,23,37,274,274,151,151,151,151,16,16,16,16,16,16,16,16,16,16,16,16,16,152,6,153,7,279,279,279,279,279,279,281,280,152,281,153,280,279,279,279,279,6,281,7,280,265,265,19,22,265,265,186,187,299,300,297,298,289,290,277,278,238,239,267,267,258,258,270,271,261,262,191,192,175,176,216,216,19,22,19,22,198,197,47,198,46,197,219,220,66,198,65,197,248,248,19,22,214,224,215,225,248,248,216,216,219,220,19,198,22,197,216,216,154,155,221,222,214,215,176,175,250,250,241,241,253,254,244,245,187,186,155,154,230,230,204,204,234,235,207,208,176,175,149,150,199,199,199,199,199,199,196,198,196,197,194,195,200,201,184,183,115,114,99,98,36,24,37,23,19,22,19,22,19,22,19,22,184,47,183,46,115,47,114,46,99,47,98,46,24,36,47,23,37,46,184,183,115,114,99,98,24,23,164,164,132,132,77,77,40,40,19,184,22,183,19,115,22,114,19,99,22,98,19,24,22,23,164,164,132,132,77,77,40,40,121,122,101,102,62,63,26,27,168,168,125,125,85,85,31,31,157,157,138,138,70,70,50,50,171,172,128,129,88,89,38,39,160,161,141,142,73,74,55,56,135,136,92,93,67,68,2,3,108,109,109,108,53,54,54,53,185,185,116,116,100,100,25,25,185,185,185,185,116,116,116,116,100,100,100,100,25,25,25,25,182,184,182,183,113,115,113,114,97,99,97,98,8,24,8,23,20,21,180,181,111,112,95,96,4,5,188,189,117,118,103,104,28,29,151,0,151,0,279,279,279,279,265,265,274,274,279,279,274,274,0,274,0,274,279,279,238,239,191,192,290,289,298,297,186,187,227,228,9,10,11,12,267,267,258,258,266,266,257,257,268,186,269,187,259,187,260,186,248,248,0,0,216,216,193,0,193,0,216,216,19,22,211,211,198,197,0,211,0,211,216,219,216,220,216,216,177,178,176,175,222,221,154,155,145,146,9,10,11,12,250,250,241,241,249,249,240,240,251,175,252,176,242,176,243,175,9,10,11,12,230,230,204,204,229,229,203,203,231,155,232,154,205,154,206,155,196,196,198,197,199,199,199,199,199,199,200,201,194,195,179,0,179,0,110,0,110,0,94,0,94,0,14,1,0,14,1,0,164,164,132,132,77,77,40,40,19,22,19,22,19,22,19,22,184,183,115,114,99,98,36,24,37,23,164,165,164,166,132,133,132,134,77,78,77,79,40,48,40,49,147,148,80,81,82,83,17,18,121,122,101,102,62,63,26,27,105,106,119,120,43,44,60,61,9,10,9,10,9,10,9,10,11,12,11,12,11,12,11,12,168,168,125,125,85,85,31,31,157,157,138,138,70,70,50,50,167,167,124,124,84,84,30,30,156,156,137,137,69,69,45,45,169,121,170,122,126,101,127,102,86,62,87,63,32,26,33,27,158,122,159,121,139,102,140,101,71,63,72,62,51,27,52,26,182,182,113,113,97,97,8,8,184,183,115,114,99,98,24,23,185,185,116,116,100,100,25,25,185,185,185,185,116,116,116,116,100,100,100,100,25,25,25,25,20,21,188,189,117,118,103,104,28,29,180,181,111,112,95,96,4,5,19,22,34,35,57,36,37,36,37,233,202,199,20,21,36,37,19,22,19,22,36,37,66,65,66,65,190,123,107,64,185,116,100,25,20,21,0,0,0,0,14,14,36,37,196,20,21,14,14,0,0,0,0,36,37,182,113,97,8,20,21,293,292,225,226,212,226,224,213,278,293,292,277,288,275,296,294,296,295,288,276,284,282,283,285,278,278,287,274,287,277,277,286,274,286,281,281,280,280,291,291,291,293,293,286,286,292,292,287,287,212,218,223,213,217,223,225,215,223,224,214,223,223
+		19, 19, 19, 76, 59, 13, 91, 19, 19, 13, 42, 19, 19, 36, 115, 99, 19, 19, 19, 163, 144,
+		13, 174, 19, 19, 13, 131, 19, 19, 36, 198, 184, 210, 19, 19, 13, 237, 247, 19, 19, 19,
+		13, 256, 264, 19, 19, 19, 13, 273, 19, 19, 279, 24, 36, 22, 22, 22, 75, 58, 15, 90,
+		22, 22, 15, 41, 22, 22, 37, 114, 98, 22, 22, 22, 162, 143, 15, 173, 22, 22, 15, 130,
+		22, 22, 37, 197, 183, 209, 22, 22, 15, 236, 246, 22, 22, 22, 15, 255, 263, 22, 22, 22,
+		15, 272, 22, 22, 279, 23, 37, 274, 274, 151, 151, 151, 151, 16, 16, 16, 16, 16, 16,
+		16, 16, 16, 16, 16, 16, 16, 152, 6, 153, 7, 279, 279, 279, 279, 279, 279, 281, 280,
+		152, 281, 153, 280, 279, 279, 279, 279, 6, 281, 7, 280, 265, 265, 19, 22, 265, 265,
+		186, 187, 299, 300, 297, 298, 289, 290, 277, 278, 238, 239, 267, 267, 258, 258, 270,
+		271, 261, 262, 191, 192, 175, 176, 216, 216, 19, 22, 19, 22, 198, 197, 47, 198, 46,
+		197, 219, 220, 66, 198, 65, 197, 248, 248, 19, 22, 214, 224, 215, 225, 248, 248, 216,
+		216, 219, 220, 19, 198, 22, 197, 216, 216, 154, 155, 221, 222, 214, 215, 176, 175,
+		250, 250, 241, 241, 253, 254, 244, 245, 187, 186, 155, 154, 230, 230, 204, 204, 234,
+		235, 207, 208, 176, 175, 149, 150, 199, 199, 199, 199, 199, 199, 196, 198, 196, 197,
+		194, 195, 200, 201, 184, 183, 115, 114, 99, 98, 36, 24, 37, 23, 19, 22, 19, 22, 19,
+		22, 19, 22, 184, 47, 183, 46, 115, 47, 114, 46, 99, 47, 98, 46, 24, 36, 47, 23, 37,
+		46, 184, 183, 115, 114, 99, 98, 24, 23, 164, 164, 132, 132, 77, 77, 40, 40, 19, 184,
+		22, 183, 19, 115, 22, 114, 19, 99, 22, 98, 19, 24, 22, 23, 164, 164, 132, 132, 77, 77,
+		40, 40, 121, 122, 101, 102, 62, 63, 26, 27, 168, 168, 125, 125, 85, 85, 31, 31, 157,
+		157, 138, 138, 70, 70, 50, 50, 171, 172, 128, 129, 88, 89, 38, 39, 160, 161, 141, 142,
+		73, 74, 55, 56, 135, 136, 92, 93, 67, 68, 2, 3, 108, 109, 109, 108, 53, 54, 54, 53,
+		185, 185, 116, 116, 100, 100, 25, 25, 185, 185, 185, 185, 116, 116, 116, 116, 100,
+		100, 100, 100, 25, 25, 25, 25, 182, 184, 182, 183, 113, 115, 113, 114, 97, 99, 97, 98,
+		8, 24, 8, 23, 20, 21, 180, 181, 111, 112, 95, 96, 4, 5, 188, 189, 117, 118, 103, 104,
+		28, 29, 151, 0, 151, 0, 279, 279, 279, 279, 265, 265, 274, 274, 279, 279, 274, 274, 0,
+		274, 0, 274, 279, 279, 238, 239, 191, 192, 290, 289, 298, 297, 186, 187, 227, 228, 9,
+		10, 11, 12, 267, 267, 258, 258, 266, 266, 257, 257, 268, 186, 269, 187, 259, 187, 260,
+		186, 248, 248, 0, 0, 216, 216, 193, 0, 193, 0, 216, 216, 19, 22, 211, 211, 198, 197,
+		0, 211, 0, 211, 216, 219, 216, 220, 216, 216, 177, 178, 176, 175, 222, 221, 154, 155,
+		145, 146, 9, 10, 11, 12, 250, 250, 241, 241, 249, 249, 240, 240, 251, 175, 252, 176,
+		242, 176, 243, 175, 9, 10, 11, 12, 230, 230, 204, 204, 229, 229, 203, 203, 231, 155,
+		232, 154, 205, 154, 206, 155, 196, 196, 198, 197, 199, 199, 199, 199, 199, 199, 200,
+		201, 194, 195, 179, 0, 179, 0, 110, 0, 110, 0, 94, 0, 94, 0, 14, 1, 0, 14, 1, 0, 164,
+		164, 132, 132, 77, 77, 40, 40, 19, 22, 19, 22, 19, 22, 19, 22, 184, 183, 115, 114, 99,
+		98, 36, 24, 37, 23, 164, 165, 164, 166, 132, 133, 132, 134, 77, 78, 77, 79, 40, 48,
+		40, 49, 147, 148, 80, 81, 82, 83, 17, 18, 121, 122, 101, 102, 62, 63, 26, 27, 105,
+		106, 119, 120, 43, 44, 60, 61, 9, 10, 9, 10, 9, 10, 9, 10, 11, 12, 11, 12, 11, 12, 11,
+		12, 168, 168, 125, 125, 85, 85, 31, 31, 157, 157, 138, 138, 70, 70, 50, 50, 167, 167,
+		124, 124, 84, 84, 30, 30, 156, 156, 137, 137, 69, 69, 45, 45, 169, 121, 170, 122, 126,
+		101, 127, 102, 86, 62, 87, 63, 32, 26, 33, 27, 158, 122, 159, 121, 139, 102, 140, 101,
+		71, 63, 72, 62, 51, 27, 52, 26, 182, 182, 113, 113, 97, 97, 8, 8, 184, 183, 115, 114,
+		99, 98, 24, 23, 185, 185, 116, 116, 100, 100, 25, 25, 185, 185, 185, 185, 116, 116,
+		116, 116, 100, 100, 100, 100, 25, 25, 25, 25, 20, 21, 188, 189, 117, 118, 103, 104,
+		28, 29, 180, 181, 111, 112, 95, 96, 4, 5, 19, 22, 34, 35, 57, 36, 37, 36, 37, 233,
+		202, 199, 20, 21, 36, 37, 19, 22, 19, 22, 36, 37, 66, 65, 66, 65, 190, 123, 107, 64,
+		185, 116, 100, 25, 20, 21, 0, 0, 0, 0, 14, 14, 36, 37, 196, 20, 21, 14, 14, 0, 0, 0,
+		0, 36, 37, 182, 113, 97, 8, 20, 21, 293, 292, 225, 226, 212, 226, 224, 213, 278, 293,
+		292, 277, 288, 275, 296, 294, 296, 295, 288, 276, 284, 282, 283, 285, 278, 278, 287,
+		274, 287, 277, 277, 286, 274, 286, 281, 281, 280, 280, 291, 291, 291, 293, 293, 286,
+		286, 292, 292, 287, 287, 212, 218, 223, 213, 217, 223, 225, 215, 223, 224, 214, 223,
+		223,
 	]);
 });
 

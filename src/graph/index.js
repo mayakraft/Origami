@@ -18,6 +18,7 @@ import * as foldGraph from "./fold/foldGraph.js";
 import * as foldGraphIntoSegments from "./fold/foldGraphIntoSegments.js";
 import * as foldGraphIntoSubgraph from "./fold/foldGraphIntoSubgraph.js";
 import * as reverseFold from "./fold/reverseFold.js";
+import * as simpleFold from "./fold/simpleFold.js";
 import * as squashFold from "./fold/squashFold.js";
 import * as splitEdge from "./split/splitEdge.js";
 import * as splitFace from "./split/splitFace.js";
@@ -92,6 +93,7 @@ const graphMethods = {
 	...foldGraphIntoSegments,
 	...foldGraphIntoSubgraph,
 	...reverseFold,
+	...simpleFold,
 	...squashFold,
 	...verticesClusters,
 	...verticesCollinear,

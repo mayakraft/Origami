@@ -1,13 +1,7 @@
 /**
  * Rabbit Ear (c) Kraft
  */
-import {
-	normalize3,
-	cross3,
-	subtract3,
-	parallel,
-	resize3,
-} from "../math/vector.js";
+import { normalize3, cross3, subtract3, parallel, resize3 } from "../math/vector.js";
 
 /**
  * @description Make one vector for every face that represents the
@@ -24,9 +18,8 @@ export const makeFacesNormal = ({ vertices_coords, faces_vertices }) => {
 	const vertices_coords3D = vertices_coords.map(resize3);
 
 	return faces_vertices
-		.map(vertices => vertices
-			.map(vertex => vertices_coords3D[vertex]))
-		.map(polygon => {
+		.map((vertices) => vertices.map((vertex) => vertices_coords3D[vertex]))
+		.map((polygon) => {
 			// we have to ensure that the two edges we choose are not parallel
 			let a;
 			let b;
@@ -59,17 +52,18 @@ export const makeVerticesNormal = ({ vertices_coords, faces_vertices, faces_norm
 
 	// for every vertex's face, add the vector to the vertex's vector
 	/** @type {[number, number, number][]} */
-	const vertices_normals = vertices_coords
-		.map(/** @returns {[number, number, number]} */() => [0, 0, 0]);
+	const vertices_normals = vertices_coords.map(
+		/** @returns {[number, number, number]} */ () => [0, 0, 0],
+	);
 
-	faces_vertices
-		.forEach((vertices, f) => vertices
-			.forEach(v => {
-				vertices_normals[v][0] += faces_normal[f][0];
-				vertices_normals[v][1] += faces_normal[f][1];
-				vertices_normals[v][2] += faces_normal[f][2];
-			}));
+	faces_vertices.forEach((vertices, f) =>
+		vertices.forEach((v) => {
+			vertices_normals[v][0] += faces_normal[f][0];
+			vertices_normals[v][1] += faces_normal[f][1];
+			vertices_normals[v][2] += faces_normal[f][2];
+		}),
+	);
 
 	// normalize all summed vectors and return them
-	return vertices_normals.map(v => normalize3(v));
+	return vertices_normals.map((v) => normalize3(v));
 };

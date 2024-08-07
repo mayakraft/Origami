@@ -17,32 +17,31 @@ export const makeFacesFaces = ({ faces_vertices }) => {
 
 	// for every face's faces_vertices, pair a vertex with the next vertex,
 	// join the pairs of vertices into a space-separated string
-	const facesVerticesKeys = faces_vertices
-		.map(face => face
-			.map((v, i, arr) => [v, arr[(i + 1) % arr.length]])
-			.map(pair => pair.join(" ")));
+	const facesVerticesKeys = faces_vertices.map((face) =>
+		face.map((v, i, arr) => [v, arr[(i + 1) % arr.length]]).map((pair) => pair.join(" ")),
+	);
 
-	facesVerticesKeys
-		.flat()
-		.forEach(key => { vertexPairToFaces[key] = []; });
+	facesVerticesKeys.flat().forEach((key) => {
+		vertexPairToFaces[key] = [];
+	});
 
-	facesVerticesKeys
-		.forEach((keys, f) => keys
-			.forEach(key => vertexPairToFaces[key].push(f)));
+	facesVerticesKeys.forEach((keys, f) =>
+		keys.forEach((key) => vertexPairToFaces[key].push(f)),
+	);
 
 	// in the case of faces with leaf edges whose vertices double back
 	// on themselves, the face would choose itself as an adjacent face.
 	// filter to prevent this from happening, replace these instances with
 	// "undefined".
-	return faces_vertices
-		.map((face, f1) => face
+	return faces_vertices.map((face, f1) =>
+		face
 			.map((v, i, arr) => [arr[(i + 1) % arr.length], v])
-			.map(pair => pair.join(" "))
-			.map(key => vertexPairToFaces[key])
-			.map(faces => (faces === undefined ? [undefined] : faces))
-			.flatMap(faces => faces.filter(f2 => f1 !== f2).shift()));
+			.map((pair) => pair.join(" "))
+			.map((key) => vertexPairToFaces[key])
+			.map((faces) => (faces === undefined ? [undefined] : faces))
+			.flatMap((faces) => faces.filter((f2) => f1 !== f2).shift()),
+	);
 };
-
 
 /**
  * @description faces_faces is an array of edge-adjacent face indices for each face.
@@ -56,13 +55,15 @@ export const makeFacesFacesFromEdges = ({ faces_edges }) => {
 	const edgesMap = {};
 	// fill edgesMap with keys for all edges, values empty array
 	// this assumes that faces do not visit the same edge twice
-	faces_edges.forEach(edges => edges.forEach(edge => { edgesMap[edge] = []; }));
-	faces_edges.forEach((edges, f) => edges.forEach(edge => edgesMap[edge].push(f)));
-	return faces_edges
-		.map((edges, f) => edges
-			.map(edge => edgesMap[edge]
-				.filter(face => face !== f)
-				.shift()));
+	faces_edges.forEach((edges) =>
+		edges.forEach((edge) => {
+			edgesMap[edge] = [];
+		}),
+	);
+	faces_edges.forEach((edges, f) => edges.forEach((edge) => edgesMap[edge].push(f)));
+	return faces_edges.map((edges, f) =>
+		edges.map((edge) => edgesMap[edge].filter((face) => face !== f).shift()),
+	);
 };
 
 // export const makeFacesFacesManifold = ({ faces_vertices }) => {

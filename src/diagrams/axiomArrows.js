@@ -1,36 +1,14 @@
 /**
  * Rabbit Ear (c) Kraft
  */
-import {
-	includeS,
-} from "../math/compare.js";
-import {
-	pointsToLine2,
-} from "../math/convert.js";
-import {
-	convexHull,
-} from "../math/convexHull.js";
-import {
-	resize2,
-} from "../math/vector.js";
-import {
-	makeMatrix2Reflect,
-	multiplyMatrix2Vector2,
-} from "../math/matrix2.js";
-import {
-	intersectLineLine,
-} from "../math/intersect.js";
-import {
-	clipLineConvexPolygon,
-} from "../math/clip.js";
-import {
-	axiom1,
-	axiom3,
-	axiom4,
-	axiom5,
-	axiom6,
-	axiom7,
-} from "../axioms/axioms.js";
+import { includeS } from "../math/compare.js";
+import { pointsToLine2 } from "../math/convert.js";
+import { convexHull } from "../math/convexHull.js";
+import { resize2 } from "../math/vector.js";
+import { makeMatrix2Reflect, multiplyMatrix2Vector2 } from "../math/matrix2.js";
+import { intersectLineLine } from "../math/intersect.js";
+import { clipLineConvexPolygon } from "../math/clip.js";
+import { axiom1, axiom3, axiom4, axiom5, axiom6, axiom7 } from "../axioms/axioms.js";
 import {
 	perpendicularBalancedSegment,
 	betweenTwoSegments,
@@ -47,9 +25,8 @@ import {
  * @param {VecLine2} line
  * @param {[number, number]} point a 2D point to be reflected
  */
-export const diagramReflectPoint = ({ vector, origin }, point) => (
-	multiplyMatrix2Vector2(makeMatrix2Reflect(vector, origin), point)
-);
+export const diagramReflectPoint = ({ vector, origin }, point) =>
+	multiplyMatrix2Vector2(makeMatrix2Reflect(vector, origin), point);
 
 /**
  * @description Create a 2D convex hull around a FOLD object.
@@ -58,8 +35,8 @@ export const diagramReflectPoint = ({ vector, origin }, point) => (
  */
 const makeConvexPolygon2 = ({ vertices_coords }) => {
 	const vertices_coords2 = vertices_coords.map(resize2);
-	return convexHull(vertices_coords2).map(v => vertices_coords2[v]);
-}
+	return convexHull(vertices_coords2).map((v) => vertices_coords2[v]);
+};
 
 /**
  * @description Create an arrow which neatly describes the action of
@@ -72,7 +49,7 @@ const makeConvexPolygon2 = ({ vertices_coords }) => {
  * This will result in always one arrow.
  */
 export const axiom1Arrows = ({ vertices_coords }, point1, point2, options) => [
-	foldLineArrow({ vertices_coords }, axiom1(point1, point2).shift(), options)
+	foldLineArrow({ vertices_coords }, axiom1(point1, point2).shift(), options),
 ];
 
 /**
@@ -102,8 +79,7 @@ export const axiom2Arrows = ({ vertices_coords }, point1, point2, options) => {
  */
 export const axiom3Arrows = ({ vertices_coords }, line1, line2, options) => {
 	const hull = makeConvexPolygon2({ vertices_coords });
-	return axiom3(line1, line2)
-		.map(line => foldLineArrowInPolygon(hull, line, options));
+	return axiom3(line1, line2).map((line) => foldLineArrowInPolygon(hull, line, options));
 };
 
 // export const axiom3Arrows = ({ vertices_coords }, line1, line2, options) => {
@@ -187,8 +163,8 @@ export const axiom4Arrows = ({ vertices_coords }, line, point, options) => {
 export const axiom5Arrows = ({ vertices_coords }, line, point1, point2, options) => {
 	const hull = makeConvexPolygon2({ vertices_coords });
 	return axiom5(line, point1, point2)
-		.map(foldLine => [point2, diagramReflectPoint(foldLine, point2)])
-		.map(segment => arrowFromSegmentInPolygon(hull, segment, options));
+		.map((foldLine) => [point2, diagramReflectPoint(foldLine, point2)])
+		.map((segment) => arrowFromSegmentInPolygon(hull, segment, options));
 };
 
 /**
@@ -203,12 +179,20 @@ export const axiom5Arrows = ({ vertices_coords }, line, point1, point2, options)
  * @returns {Arrow[]} an array of definitions for arrows.
  * This will result in zero, two, four, or six arrows (two per solution).
  */
-export const axiom6Arrows = ({ vertices_coords }, line1, line2, point1, point2, options) => {
+export const axiom6Arrows = (
+	{ vertices_coords },
+	line1,
+	line2,
+	point1,
+	point2,
+	options,
+) => {
 	const hull = makeConvexPolygon2({ vertices_coords });
 	return axiom6(line1, line2, point1, point2)
-		.flatMap(foldLine => [point1, point2]
-			.map(point => [point, diagramReflectPoint(foldLine, point)]))
-		.map(segment => arrowFromSegmentInPolygon(hull, segment, options));
+		.flatMap((foldLine) =>
+			[point1, point2].map((point) => [point, diagramReflectPoint(foldLine, point)]),
+		)
+		.map((segment) => arrowFromSegmentInPolygon(hull, segment, options));
 };
 
 /**
@@ -225,7 +209,7 @@ export const axiom6Arrows = ({ vertices_coords }, line1, line2, point1, point2, 
 export const axiom7Arrows = ({ vertices_coords }, line1, line2, point, options) => {
 	const hull = makeConvexPolygon2({ vertices_coords });
 	return axiom7(line1, line2, point)
-		.flatMap(foldLine => [
+		.flatMap((foldLine) => [
 			[point, diagramReflectPoint(foldLine, point)],
 			perpendicularBalancedSegment(
 				hull,
@@ -233,6 +217,6 @@ export const axiom7Arrows = ({ vertices_coords }, line1, line2, point, options) 
 				intersectLineLine(foldLine, line2).point,
 			),
 		])
-		.filter(a => a !== undefined) // is this?
-		.map(segment => arrowFromSegmentInPolygon(hull, segment, options));
+		.filter((a) => a !== undefined) // is this?
+		.map((segment) => arrowFromSegmentInPolygon(hull, segment, options));
 };

@@ -3,32 +3,14 @@
  */
 import window from "../environment/window.js";
 import SVG from "../svg/index.js";
-import {
-	findElementTypeInParents,
-	addClass,
-} from "../svg/general/dom.js";
-import {
-	isFoldedForm,
-} from "../fold/spec.js";
-import {
-	boundingBox,
-} from "../graph/boundary.js";
-import {
-	boundingBoxToViewBox,
-	getStrokeWidth,
-} from "./general/svg.js";
-import {
-	drawVertices,
-} from "./svg/drawVertices.js";
-import {
-	drawEdges,
-} from "./svg/drawEdges.js";
-import {
-	drawFaces,
-} from "./svg/drawFaces.js";
-import {
-	drawBoundaries,
-} from "./svg/drawBoundaries.js";
+import { findElementTypeInParents, addClass } from "../svg/general/dom.js";
+import { isFoldedForm } from "../fold/spec.js";
+import { boundingBox } from "../graph/boundary.js";
+import { boundingBoxToViewBox, getStrokeWidth } from "./general/svg.js";
+import { drawVertices } from "./svg/drawVertices.js";
+import { drawEdges } from "./svg/drawEdges.js";
+import { drawFaces } from "./svg/drawFaces.js";
+import { drawBoundaries } from "./svg/drawBoundaries.js";
 
 // draw a graph component
 const draw = {
@@ -82,9 +64,13 @@ const applyTopLevelOptions = (element, groups, graph, options) => {
 	// we can skip this method if all of these are true:
 	// - there are no vertices
 	// - "strokeWidth" and "viewBox" are both false or undefined
-	if (!hasVertices
-		&& (options.strokeWidth === undefined || options.strokeWidth === false)
-		&& (options.viewBox === undefined || options.viewBox === false)) { return; }
+	if (
+		!hasVertices &&
+		(options.strokeWidth === undefined || options.strokeWidth === false) &&
+		(options.viewBox === undefined || options.viewBox === false)
+	) {
+		return;
+	}
 
 	// get the bounding box of all vertices, and the maximum of each dimension.
 	// these are needed for both strokeWidth and viewBox.
@@ -111,7 +97,7 @@ const applyTopLevelOptions = (element, groups, graph, options) => {
 		if (viewBoxString != null) {
 			// options.padding will be applied as a scale of vmax
 			const pad = options.padding * vmax;
-			const viewBox = viewBoxString.split(" ").map(n => parseFloat(n));
+			const viewBox = viewBoxString.split(" ").map((n) => parseFloat(n));
 			const newViewBox = [-pad, -pad, pad * 2, pad * 2]
 				.map((nudge, i) => viewBox[i] + nudge)
 				.join(" ");
@@ -127,23 +113,22 @@ const applyTopLevelOptions = (element, groups, graph, options) => {
 			: options["stroke-width"];
 
 		// options.strokeWidth will be applied as a scale of vmax
-		const strokeWidthValue = typeof strokeWidth === "number"
-			? vmax * strokeWidth
-			: getStrokeWidth(graph);
+		const strokeWidthValue =
+			typeof strokeWidth === "number" ? vmax * strokeWidth : getStrokeWidth(graph);
 		element.setAttributeNS(null, "stroke-width", strokeWidthValue);
 	}
 
 	// if vertices exist, set their radius, even if no options are supplied.
 	if (hasVertices) {
-		const userRadius = options.vertices && options.vertices.radius != null
-			? options.vertices.radius
-			: options.radius;
-		const radius = typeof userRadius === "string"
-			? parseFloat(userRadius)
-			: userRadius;
-		const r = typeof radius === "number" && !Number.isNaN(radius)
-			? vmax * radius
-			: vmax * DEFAULT_CIRCLE_RADIUS;
+		const userRadius =
+			options.vertices && options.vertices.radius != null
+				? options.vertices.radius
+				: options.radius;
+		const radius = typeof userRadius === "string" ? parseFloat(userRadius) : userRadius;
+		const r =
+			typeof radius === "number" && !Number.isNaN(radius)
+				? vmax * radius
+				: vmax * DEFAULT_CIRCLE_RADIUS;
 
 		// iterate and set all circles "r" attribute
 		for (let i = 0; i < groups[3].childNodes.length; i += 1) {
@@ -163,12 +148,13 @@ const applyTopLevelOptions = (element, groups, graph, options) => {
  * @returns {SVGElement[]} An array of four <g> elements: boundaries, faces,
  * edges, vertices, each of the graph components drawn into an SVG group.
  */
-const drawGroups = (graph, options = {}) => groupNames
-	.map(key => (options[key] === false ? (SVG.g()) : draw[key](graph, options[key])))
-	.map((group, i) => {
-		addClass(group, groupNames[i]);
-		return group;
-	});
+const drawGroups = (graph, options = {}) =>
+	groupNames
+		.map((key) => (options[key] === false ? SVG.g() : draw[key](graph, options[key])))
+		.map((group, i) => {
+			addClass(group, groupNames[i]);
+			return group;
+		});
 
 /**
  * @description renders a FOLD object into an SVG, ensuring visibility by
@@ -187,18 +173,16 @@ export const renderSVG = (graph, element, options = {}) => {
 	const groups = drawGroups(graph, options);
 
 	// for those which contain children, append them to the top-level element
-	groups.filter(group => group.childNodes.length > 0)
-		.forEach(group => element.appendChild(group));
+	groups
+		.filter((group) => group.childNodes.length > 0)
+		.forEach((group) => element.appendChild(group));
 
 	// apply top level options to the SVG (or group) itself
 	applyTopLevelOptions(element, groups, graph, options);
 
 	// classes in the FOLD object, if they exist, can be carried over
 	// and added to the svg elements too.
-	addClass(
-		element,
-		...[graph.file_classes || [], graph.frame_classes || []].flat(),
-	);
+	addClass(element, ...[graph.file_classes || [], graph.frame_classes || []].flat());
 
 	return element;
 };
@@ -259,6 +243,6 @@ export const foldToSvg = (file, options = {}) => {
 
 	// if the user requests it, convert the DOM element into a string
 	return options && options.string
-		? (new (window().XMLSerializer)()).serializeToString(element)
+		? new (window().XMLSerializer)().serializeToString(element)
 		: element;
 };

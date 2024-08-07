@@ -7,17 +7,19 @@ test("connectedComponents", () => {
 	const foldObject = JSON.parse(foldFile);
 	const graph = ear.graph.getFramesByClassName(foldObject, "foldedForm")[0];
 	const faceOrders = ear.layer.layer3D(graph).faceOrders();
-	const faces_set = ear.graph.connectedComponents(ear.graph.makeVerticesVerticesUnsorted({
-		edges_vertices: faceOrders.map(ord => [ord[0], ord[1]]),
-	}));
-	fs.writeFileSync(
-		`./tests/tmp/connectedFaces.json`,
-		JSON.stringify(faces_set, null, 2),
+	const faces_set = ear.graph.connectedComponents(
+		ear.graph.makeVerticesVerticesUnsorted({
+			edges_vertices: faceOrders.map((ord) => [ord[0], ord[1]]),
+		}),
 	);
+	fs.writeFileSync(`./tests/tmp/connectedFaces.json`, JSON.stringify(faces_set, null, 2));
 });
 
 test("connectedComponents on disjoint graphs", () => {
-	const foldFile = fs.readFileSync("./tests/files/fold/disjoint-triangles-3d.fold", "utf-8");
+	const foldFile = fs.readFileSync(
+		"./tests/files/fold/disjoint-triangles-3d.fold",
+		"utf-8",
+	);
 	const foldObject = JSON.parse(foldFile);
 	const graph = ear.graph.getFramesByClassName(foldObject, "foldedForm")[0];
 	const vertices_vertices = ear.graph.makeVerticesVertices(graph);

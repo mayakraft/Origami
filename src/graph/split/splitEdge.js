@@ -1,16 +1,9 @@
 /**
  * Rabbit Ear (c) Kraft
  */
-import {
-	midpoint,
-} from "../../math/vector.js";
-import {
-	makeVerticesToEdge,
-	makeVerticesToFace,
-} from "../make/lookup.js";
-import {
-	remove,
-} from "../remove.js";
+import { midpoint } from "../../math/vector.js";
+import { makeVerticesToEdge, makeVerticesToFace } from "../make/lookup.js";
+import { remove } from "../remove.js";
 import {
 	makeVerticesFacesForVertex,
 	makeFacesEdgesForVertex,
@@ -37,9 +30,13 @@ const makeNewEdges = (graph, edgeIndex, newVertex) => {
 		{ edges_vertices: [edge_vertices[0], newVertex] },
 		{ edges_vertices: [newVertex, edge_vertices[1]] },
 	];
-	new_edges.forEach(edgeDef => ["edges_assignment", "edges_foldAngle"]
-		.filter(key => graph[key] && graph[key][edgeIndex] !== undefined)
-		.forEach(key => { edgeDef[key] = graph[key][edgeIndex]; }));
+	new_edges.forEach((edgeDef) =>
+		["edges_assignment", "edges_foldAngle"]
+			.filter((key) => graph[key] && graph[key][edgeIndex] !== undefined)
+			.forEach((key) => {
+				edgeDef[key] = graph[key][edgeIndex];
+			}),
+	);
 	return new_edges;
 };
 
@@ -52,12 +49,10 @@ const makeNewEdges = (graph, edgeIndex, newVertex) => {
  * which was just now split by the addition of our new vertex.
  * @returns {undefined}
  */
-const updateVerticesVertices = (
-	{ vertices_vertices },
-	vertex,
-	vertices,
-) => {
-	if (!vertices_vertices) { return; }
+const updateVerticesVertices = ({ vertices_vertices }, vertex, vertices) => {
+	if (!vertices_vertices) {
+		return;
+	}
 
 	// create a new entry for this new vertex
 	// only 2 vertices, no need to worry about winding order.
@@ -65,13 +60,16 @@ const updateVerticesVertices = (
 
 	// for each incident vertex's vertices_vertices array, get the index
 	// of the other incident vertex, we will splice in our new vertex here.
-	const verticesSpliceIndex = vertices
-		.map((v, i, arr) => vertices_vertices[v].indexOf(arr[(i + 1) % arr.length]));
+	const verticesSpliceIndex = vertices.map((v, i, arr) =>
+		vertices_vertices[v].indexOf(arr[(i + 1) % arr.length]),
+	);
 
 	// update the incident vertices' existing entries in vertices_vertices.
-	vertices.forEach((v, i) => (verticesSpliceIndex[i] === -1
-		? vertices_vertices[v].push(vertex)
-		: vertices_vertices[v].splice(verticesSpliceIndex[i], 1, vertex)));
+	vertices.forEach((v, i) =>
+		verticesSpliceIndex[i] === -1
+			? vertices_vertices[v].push(vertex)
+			: vertices_vertices[v].splice(verticesSpliceIndex[i], 1, vertex),
+	);
 };
 
 /**
@@ -92,7 +90,9 @@ const updateVerticesEdges = (
 	vertices,
 	newEdges,
 ) => {
-	if (!vertices_edges) { return; }
+	if (!vertices_edges) {
+		return;
+	}
 
 	// our new vertex is adjacent to only the two new edges
 	vertices_edges[newVertex] = [...newEdges];
@@ -101,9 +101,9 @@ const updateVerticesEdges = (
 	// find the matching index, replace it with the edge from the same index.
 	// as "vertices" and "newEdges" are index-aligned.
 	vertices
-		.map(vertex => vertices_edges[vertex].indexOf(oldEdge))
+		.map((vertex) => vertices_edges[vertex].indexOf(oldEdge))
 		.map((index, i) => ({ index, vertex: vertices[i], edge: newEdges[i] }))
-		.filter(el => el.index !== -1)
+		.filter((el) => el.index !== -1)
 		.forEach(({ index, vertex, edge }) => {
 			vertices_edges[vertex][index] = edge;
 		});
@@ -122,7 +122,9 @@ const updateVerticesFaces = (
 	vertex,
 	faces,
 ) => {
-	if (!vertices_faces) { return; }
+	if (!vertices_faces) {
+		return;
+	}
 
 	// if no faces exist, we should not be building vertices_faces, but we can't
 	// proceed because everything after this point requires a faceMap.
@@ -144,9 +146,7 @@ const updateVerticesFaces = (
 
 	// if neither vertices_vertices or vertices_edges exists, we cannot
 	// respect the winding order anyway, simply add the faces to the entry.
-	vertices_faces[vertex] = vertex_faces === undefined
-		? [...faces]
-		: vertex_faces;
+	vertices_faces[vertex] = vertex_faces === undefined ? [...faces] : vertex_faces;
 };
 
 /**
@@ -158,8 +158,12 @@ const updateVerticesFaces = (
  * @returns {undefined}
  */
 const updateEdgesFaces = ({ edges_faces }, newEdges, faces) => {
-	if (!edges_faces) { return; }
-	newEdges.forEach(edge => { edges_faces[edge] = [...faces]; });
+	if (!edges_faces) {
+		return;
+	}
+	newEdges.forEach((edge) => {
+		edges_faces[edge] = [...faces];
+	});
 };
 
 /**
@@ -174,30 +178,36 @@ const updateEdgesFaces = ({ edges_faces }, newEdges, faces) => {
  * @returns {undefined}
  */
 const updateFacesVertices = ({ faces_vertices }, newVertex, incidentVertices, faces) => {
-	if (!faces_vertices) { return; }
+	if (!faces_vertices) {
+		return;
+	}
 
 	// provide two vertices, do these vertices match (in any order) to the
 	// incideVertices which made up the original edge before the splitting?
 	/** @param {number} a @param {number} b @returns {boolean} */
-	const matchFound = (a, b) => (
-		(a === incidentVertices[0] && b === incidentVertices[1])
-		|| (a === incidentVertices[1] && b === incidentVertices[0]));
+	const matchFound = (a, b) =>
+		(a === incidentVertices[0] && b === incidentVertices[1]) ||
+		(a === incidentVertices[1] && b === incidentVertices[0]);
 
 	faces
-		.map(i => faces_vertices[i])
-		.forEach(face_vertices => face_vertices
-			// iterate through the vertices of the face, search for a matching index
-			// where i and i+1 are both incident vertices, in which case return the
-			// i+1 index, as this will be the location we will splice into.
-			.map((vertex, i, arr) => (matchFound(vertex, arr[(i + 1) % arr.length])
-				? (i + 1) % arr.length
-				: undefined))
-			.filter(a => a !== undefined)
-			// it's possible for a non-convex face to walk twice across our edges
-			// in two different directions, if this happens, sort the splice indices
-			// from largest to smallest so that multiple splice calls will work.
-			.sort((a, b) => b - a)
-			.forEach(i => face_vertices.splice(i, 0, newVertex)));
+		.map((i) => faces_vertices[i])
+		.forEach((face_vertices) =>
+			face_vertices
+				// iterate through the vertices of the face, search for a matching index
+				// where i and i+1 are both incident vertices, in which case return the
+				// i+1 index, as this will be the location we will splice into.
+				.map((vertex, i, arr) =>
+					matchFound(vertex, arr[(i + 1) % arr.length])
+						? (i + 1) % arr.length
+						: undefined,
+				)
+				.filter((a) => a !== undefined)
+				// it's possible for a non-convex face to walk twice across our edges
+				// in two different directions, if this happens, sort the splice indices
+				// from largest to smallest so that multiple splice calls will work.
+				.sort((a, b) => b - a)
+				.forEach((i) => face_vertices.splice(i, 0, newVertex)),
+		);
 };
 
 /**
@@ -215,20 +225,25 @@ const updateFacesEdges = (
 	faces,
 	newEdges,
 ) => {
-	if (!faces_edges || !faces_vertices) { return; }
+	if (!faces_edges || !faces_vertices) {
+		return;
+	}
 
 	// create a vertex-pair ("a b" string) to edge lookup table that only
 	// includes the edges involved (both faces_edges and the new edges).
 	const allEdges = faces
-		.flatMap(f => faces_edges[f])
+		.flatMap((f) => faces_edges[f])
 		.concat(newEdges)
-		.filter(a => a !== undefined);
+		.filter((a) => a !== undefined);
 	const verticesToEdge = makeVerticesToEdge({ edges_vertices }, allEdges);
 
 	// iterate through faces vertices, pairwise adjacent vertices, create
 	// keys for the lookup table, convert the keys into edge indices.
-	makeFacesEdgesForVertex({ faces_vertices }, faces, verticesToEdge)
-		.forEach((edges, i) => { faces_edges[faces[i]] = edges; });
+	makeFacesEdgesForVertex({ faces_vertices }, faces, verticesToEdge).forEach(
+		(edges, i) => {
+			faces_edges[faces[i]] = edges;
+		},
+	);
 };
 
 /**
@@ -239,22 +254,25 @@ const updateFacesEdges = (
  * @returns {undefined}
  */
 const updateFacesFaces = ({ faces_vertices, faces_faces }, vertex, faces) => {
-	if (!faces_vertices || !faces_faces) { return; }
+	if (!faces_vertices || !faces_faces) {
+		return;
+	}
 
-	const facesSpliceIndex = faces
-		.map(f => faces_vertices[f].indexOf(vertex));
+	const facesSpliceIndex = faces.map((f) => faces_vertices[f].indexOf(vertex));
 
-	const facesGrabIndex = facesSpliceIndex
-		.map((index, i) => (index + faces_faces[faces[i]].length - 1)
-			% faces_faces[faces[i]].length);
+	const facesGrabIndex = facesSpliceIndex.map(
+		(index, i) =>
+			(index + faces_faces[faces[i]].length - 1) % faces_faces[faces[i]].length,
+	);
 
-	const facesCopyItem = facesGrabIndex
-		.map((index, i) => faces_faces[faces[i]][index]);
+	const facesCopyItem = facesGrabIndex.map((index, i) => faces_faces[faces[i]][index]);
 
 	// update the incident vertices' existing entries in vertices_vertices.
-	faces.forEach((f, i) => (facesSpliceIndex[i] === -1
-		? undefined
-		: faces_faces[f].splice(facesSpliceIndex[i], 0, facesCopyItem[i])));
+	faces.forEach((f, i) =>
+		facesSpliceIndex[i] === -1
+			? undefined
+			: faces_faces[f].splice(facesSpliceIndex[i], 0, facesCopyItem[i]),
+	);
 };
 
 /**
@@ -288,11 +306,7 @@ const updateFacesFaces = ({ faces_vertices, faces_faces }, vertex, faces) => {
  *   - "map" a nextmap, all values will be numbers except the value at
  *     the remove index, this will be an array containing both new indices.
  */
-export const splitEdge = (
-	graph,
-	oldEdge,
-	coords = undefined,
-) => {
+export const splitEdge = (graph, oldEdge, coords = undefined) => {
 	// the old edge's two vertices, one vertex will be placed in between these,
 	// and two new edges will be built to connect these to the new vertex.
 	const incidentVertices = graph.edges_vertices[oldEdge];
@@ -300,28 +314,29 @@ export const splitEdge = (
 	// if the user did not supply any coordinate parameter,
 	// as a convenience, select the the midpoint of the two points
 	if (!coords) {
-		const [a, b] = incidentVertices.map(v => graph.vertices_coords[v]);
+		const [a, b] = incidentVertices.map((v) => graph.vertices_coords[v]);
 		coords = midpoint(a, b);
 	}
 
 	// the index of the new vertex, added to the end of the existing vertex list
 	const vertex = graph.vertices_coords.length;
-	graph.vertices_coords[vertex] = coords.length === 3
-		? [coords[0], coords[1], coords[2]]
-		: [coords[0], coords[1]];
+	graph.vertices_coords[vertex] =
+		coords.length === 3 ? [coords[0], coords[1], coords[2]] : [coords[0], coords[1]];
 
 	// the new edge indices, they will be added to the end of the edges_ arrays.
 	// "newEdges" and "incidentVertices" are aligned in their indices 0 and 1,
 	// so that this vertex is in this edge. This is important for the update methods
-	const [e0, e1] = [0, 1].map(i => i + graph.edges_vertices.length);
+	const [e0, e1] = [0, 1].map((i) => i + graph.edges_vertices.length);
 	/** @type {[number, number]} */
 	const newEdges = [e0, e1];
 
 	// make 2 new edges_vertices, edges_assignment, and edges_foldAngle.
 	// add these fields to the graph.
-	makeNewEdges(graph, oldEdge, vertex)
-		.forEach((edge, i) => Object.keys(edge)
-			.forEach((key) => { graph[key][newEdges[i]] = edge[key]; }));
+	makeNewEdges(graph, oldEdge, vertex).forEach((edge, i) =>
+		Object.keys(edge).forEach((key) => {
+			graph[key][newEdges[i]] = edge[key];
+		}),
+	);
 
 	// at this point we are finished with:
 	// vertices_coords, edges_vertices, edges_assignment, edges_foldAngle
@@ -337,8 +352,9 @@ export const splitEdge = (
 	// note: "incidentFaces" may only include 1 face, in the case of a
 	// boundary edge. this needs to be taken account, for example,
 	// to ensure winding order matches across component arrays.
-	const incidentFaces = makeEdgesFacesForEdge(graph, oldEdge)
-		.filter(a => a !== undefined);
+	const incidentFaces = makeEdgesFacesForEdge(graph, oldEdge).filter(
+		(a) => a !== undefined,
+	);
 	updateFacesVertices(graph, vertex, incidentVertices, incidentFaces);
 	updateFacesEdges(graph, incidentFaces, newEdges);
 	updateVerticesFaces(graph, vertex, incidentFaces);
@@ -354,7 +370,9 @@ export const splitEdge = (
 	// at this point our graph is complete. prepare the changelog info to return
 
 	// shift our new edge indices since these relate to the graph before remove()
-	newEdges.forEach((_, i) => { newEdges[i] = edgeMap[newEdges[i]]; });
+	newEdges.forEach((_, i) => {
+		newEdges[i] = edgeMap[newEdges[i]];
+	});
 
 	// we had to run "remove" with the new edges added, but the edgeMap should
 	// relate to the graph before any changes. remove those new edge entries,

@@ -1,7 +1,7 @@
 /* SVG (c) Kraft */
-import curveArguments from './arguments.js';
-import curve_methods from './methods.js';
-import { str_path } from '../../../environment/strings.js';
+import curveArguments from "./arguments.js";
+import curve_methods from "./methods.js";
+import { str_path } from "../../../environment/strings.js";
 
 /**
  * Rabbit Ear (c) Kraft

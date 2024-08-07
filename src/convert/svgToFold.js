@@ -3,47 +3,23 @@
  */
 import window from "../environment/window.js";
 import Messages from "../environment/messages.js";
-import {
-	isBackend,
-} from "../environment/detect.js";
-import {
-	file_spec,
-	file_creator,
-} from "../fold/rabbitear.js";
-import {
-	resize2,
-} from "../math/vector.js";
-import {
-	multiplyMatrix2Vector2,
-} from "../math/matrix2.js";
-import {
-	cleanNumber,
-} from "../general/number.js";
-import {
-	planarBoundary,
-} from "../graph/boundary.js";
-import {
-	parseColorToHex,
-} from "../svg/colors/parseColor.js";
+import { isBackend } from "../environment/detect.js";
+import { file_spec, file_creator } from "../fold/rabbitear.js";
+import { resize2 } from "../math/vector.js";
+import { multiplyMatrix2Vector2 } from "../math/matrix2.js";
+import { cleanNumber } from "../general/number.js";
+import { planarBoundary } from "../graph/boundary.js";
+import { parseColorToHex } from "../svg/colors/parseColor.js";
 import {
 	getRootParent,
 	xmlStringToElement,
 	flattenDomTree,
 	flattenDomTreeWithStyle,
 } from "../svg/general/dom.js";
-import {
-	transformStringToMatrix,
-} from "../svg/general/transforms.js";
-import {
-	findEpsilonInObject,
-	invertVertical,
-} from "./general/options.js";
-import {
-	planarizeAllFaces,
-} from "../graph/planarize/planarize.js";
-import {
-	invisibleParent,
-} from "./general/dom.js";
+import { transformStringToMatrix } from "../svg/general/transforms.js";
+import { findEpsilonInObject, invertVertical } from "./general/options.js";
+import { planarizeAllFaces } from "../graph/planarize/planarize.js";
+import { invisibleParent } from "./general/dom.js";
 import {
 	colorToAssignment,
 	opacityToFoldAngle,
@@ -84,12 +60,15 @@ const parsers = {
  */
 const transformSegment = (segment, transform) => {
 	/** @type {[number, number][]} */
-	const seg = [[segment[0], segment[1]], [segment[2], segment[3]]];
-	if (!transform) { return seg; }
+	const seg = [
+		[segment[0], segment[1]],
+		[segment[2], segment[3]],
+	];
+	if (!transform) {
+		return seg;
+	}
 	const matrix = transformStringToMatrix(transform);
-	return matrix
-		? seg.map(p => multiplyMatrix2Vector2(matrix, p))
-		: seg;
+	return matrix ? seg.map((p) => multiplyMatrix2Vector2(matrix, p)) : seg;
 };
 
 /**
@@ -103,20 +82,24 @@ const transformSegment = (segment, transform) => {
  *   attributes: { [key: string]: string },
  * }[]} an array of objects with a segment coordinates and attributes
  */
-const flatSegments = (svgElement) => flattenDomTreeWithStyle(svgElement)
-	.filter(el => parsers[el.element.nodeName])
-	.flatMap(el => parsers[el.element.nodeName](el.element)
-		.map(segment => transformSegment(segment, el.attributes.transform))
-		.map(segment => ({ ...el, segment })));
+const flatSegments = (svgElement) =>
+	flattenDomTreeWithStyle(svgElement)
+		.filter((el) => parsers[el.element.nodeName])
+		.flatMap((el) =>
+			parsers[el.element.nodeName](el.element)
+				.map((segment) => transformSegment(segment, el.attributes.transform))
+				.map((segment) => ({ ...el, segment })),
+		);
 
 /**
  * @description does an Element contain a <style> as a child somewhere?
  * @param {Element} svgElement
  * @returns {boolean}
  */
-const containsStylesheet = (svgElement) => flattenDomTree(svgElement)
-	.map(el => el.nodeName === "style")
-	.reduce((a, b) => a || b, false);
+const containsStylesheet = (svgElement) =>
+	flattenDomTree(svgElement)
+		.map((el) => el.nodeName === "style")
+		.reduce((a, b) => a || b, false);
 
 /**
  * @description Given an SVG element (as a string or Element object),
@@ -143,31 +126,33 @@ const containsStylesheet = (svgElement) => flattenDomTree(svgElement)
  * - .opacity the opacity attribute taken from getComputedStyle if possible.
  */
 export const svgSegments = (svg) => {
-	const svgElement = typeof svg === "string"
-		? xmlStringToElement(svg, "image/svg+xml")
-		: svg;
+	const svgElement =
+		typeof svg === "string" ? xmlStringToElement(svg, "image/svg+xml") : svg;
 
 	if (containsStylesheet(svgElement) && isBackend) {
 		console.warn(Messages.backendStylesheet);
 	}
 	// ensure the svg is a child of the DOM so we can call getComputedStyle.
 	// If the element is already a child of the HTML document, do nothing.
-	const parent = getRootParent(svgElement) === window().document
-		? undefined
-		: invisibleParent(svgElement);
+	const parent =
+		getRootParent(svgElement) === window().document
+			? undefined
+			: invisibleParent(svgElement);
 
 	const segments = flatSegments(svgElement);
-	const segmentsWithAttrs = segments.map(el => ({
-		data: {
-			assignment: el.attributes["data-assignment"],
-			foldAngle: el.attributes["data-foldAngle"],
-		},
-		stroke: getEdgeStroke(el.element, el.attributes),
-		opacity: getEdgeOpacity(el.element, el.attributes),
-	})).map((addition, i) => ({
-		...segments[i],
-		...addition,
-	}));
+	const segmentsWithAttrs = segments
+		.map((el) => ({
+			data: {
+				assignment: el.attributes["data-assignment"],
+				foldAngle: el.attributes["data-foldAngle"],
+			},
+			stroke: getEdgeStroke(el.element, el.attributes),
+			opacity: getEdgeOpacity(el.element, el.attributes),
+		}))
+		.map((addition, i) => ({
+			...segments[i],
+			...addition,
+		}));
 
 	// we no longer need computed style, remove invisible svg from DOM.
 	if (parent && parent.parentNode) {
@@ -181,9 +166,11 @@ export const svgSegments = (svg) => {
  *
  */
 const getUserAssignmentOptions = (options) => {
-	if (!options || !options.assignments) { return undefined; }
+	if (!options || !options.assignments) {
+		return undefined;
+	}
 	const assignments = {};
-	Object.keys(options.assignments).forEach(key => {
+	Object.keys(options.assignments).forEach((key) => {
 		const hex = parseColorToHex(key).toUpperCase();
 		assignments[hex] = options.assignments[key];
 	});
@@ -193,8 +180,14 @@ const getUserAssignmentOptions = (options) => {
 /**
  *
  */
-const getEdgeAssignment = (dataAssignment, stroke = "#f0f", customAssignments = undefined) => {
-	if (dataAssignment) { return dataAssignment; }
+const getEdgeAssignment = (
+	dataAssignment,
+	stroke = "#f0f",
+	customAssignments = undefined,
+) => {
+	if (dataAssignment) {
+		return dataAssignment;
+	}
 	return colorToAssignment(stroke, customAssignments);
 };
 
@@ -202,7 +195,9 @@ const getEdgeAssignment = (dataAssignment, stroke = "#f0f", customAssignments = 
  *
  */
 const getEdgeFoldAngle = (dataFoldAngle, opacity = 1, assignment = undefined) => {
-	if (dataFoldAngle) { return parseFloat(dataFoldAngle); }
+	if (dataFoldAngle) {
+		return parseFloat(dataFoldAngle);
+	}
 	return opacityToFoldAngle(opacity, assignment);
 };
 
@@ -217,22 +212,18 @@ const makeAssignmentFoldAngle = (segments, options) => {
 	// if user specified customAssignments, ignore the data- attributes
 	// otherwise the user's assignments would be ignored.
 	if (customAssignments) {
-		segments.forEach(seg => {
+		segments.forEach((seg) => {
 			delete seg.data.assignment;
 			delete seg.data.foldAngle;
 		});
 	}
 	// convert SVG data into FOLD arrays
-	const edges_assignment = segments.map(segment => getEdgeAssignment(
-		segment.data.assignment,
-		segment.stroke,
-		customAssignments,
-	));
-	const edges_foldAngle = segments.map((segment, i) => getEdgeFoldAngle(
-		segment.data.foldAngle,
-		segment.opacity,
-		edges_assignment[i],
-	));
+	const edges_assignment = segments.map((segment) =>
+		getEdgeAssignment(segment.data.assignment, segment.stroke, customAssignments),
+	);
+	const edges_foldAngle = segments.map((segment, i) =>
+		getEdgeFoldAngle(segment.data.foldAngle, segment.opacity, edges_assignment[i]),
+	);
 	return {
 		edges_assignment,
 		edges_foldAngle,
@@ -259,16 +250,16 @@ const passthrough = (n) => n;
  */
 export const svgEdgeGraph = (svg, options) => {
 	const segments = svgSegments(svg); // , options);
-	const {
-		edges_assignment,
-		edges_foldAngle,
-	} = makeAssignmentFoldAngle(segments, options);
+	const { edges_assignment, edges_foldAngle } = makeAssignmentFoldAngle(
+		segments,
+		options,
+	);
 	// by default the parser will change numbers like 15.000000000001 into 15.
 	// to turn this off, options.fast = true
 	const fixNumber = options && options.fast ? passthrough : cleanNumber;
 	/** @type {[number, number][]} */
 	const vertices_coords = segments
-		.flatMap(el => el.segment)
+		.flatMap((el) => el.segment)
 		.map(([a, b]) => [fixNumber(a, 12), fixNumber(b, 12)]);
 	/** @type {[number, number][]} */
 	const edges_vertices = segments.map((_, i) => [i * 2, i * 2 + 1]);
@@ -310,7 +301,7 @@ export const svgToFold = (file, options) => {
 	// to turn this off, options.fast = true
 	const fixNumber = options && options.fast ? passthrough : cleanNumber;
 	planarGraph.vertices_coords = planarGraph.vertices_coords
-		.map(coord => coord.map(n => fixNumber(n, 12)))
+		.map((coord) => coord.map((n) => fixNumber(n, 12)))
 		.map(resize2);
 	// optionally, discover the boundary by walking.
 	if (typeof options !== "object" || options.boundary !== false) {
@@ -319,11 +310,18 @@ export const svgToFold = (file, options) => {
 		// colors (grayscale), so the assignment should go to the next in line.
 		planarGraph.edges_assignment
 			.map((_, i) => i)
-			.filter(i => planarGraph.edges_assignment[i] === "B"
-				|| planarGraph.edges_assignment[i] === "b")
-			.forEach(i => { planarGraph.edges_assignment[i] = "F"; });
+			.filter(
+				(i) =>
+					planarGraph.edges_assignment[i] === "B" ||
+					planarGraph.edges_assignment[i] === "b",
+			)
+			.forEach((i) => {
+				planarGraph.edges_assignment[i] = "F";
+			});
 		const { edges } = planarBoundary(planarGraph);
-		edges.forEach(e => { planarGraph.edges_assignment[e] = "B"; });
+		edges.forEach((e) => {
+			planarGraph.edges_assignment[e] = "B";
+		});
 	}
 	return {
 		file_spec,

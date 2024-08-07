@@ -1,35 +1,15 @@
 /**
  * Rabbit Ear (c) Kraft
  */
-import {
-	makeVerticesVertices,
-} from "./make/verticesVertices.js";
-import {
-	makeVerticesEdgesUnsorted,
-	makeVerticesEdges,
-} from "./make/verticesEdges.js";
-import {
-	makeVerticesFaces,
-} from "./make/verticesFaces.js";
-import {
-	makeEdgesFacesUnsorted,
-} from "./make/edgesFaces.js";
-import {
-	makeFacesFaces,
-} from "./make/facesFaces.js";
-import {
-	makeFacesEdgesFromVertices,
-} from "./make/facesEdges.js";
-import {
-	makeFacesVerticesFromEdges,
-} from "./make/facesVertices.js";
-import {
-	makePlanarFaces,
-} from "./make/faces.js";
-import {
-	edgeAssignmentToFoldAngle,
-	edgeFoldAngleToAssignment,
-} from "../fold/spec.js";
+import { makeVerticesVertices } from "./make/verticesVertices.js";
+import { makeVerticesEdgesUnsorted, makeVerticesEdges } from "./make/verticesEdges.js";
+import { makeVerticesFaces } from "./make/verticesFaces.js";
+import { makeEdgesFacesUnsorted } from "./make/edgesFaces.js";
+import { makeFacesFaces } from "./make/facesFaces.js";
+import { makeFacesEdgesFromVertices } from "./make/facesEdges.js";
+import { makeFacesVerticesFromEdges } from "./make/facesVertices.js";
+import { makePlanarFaces } from "./make/faces.js";
+import { edgeAssignmentToFoldAngle, edgeFoldAngleToAssignment } from "../fold/spec.js";
 
 /**
  * @description Ensure that both edges_assignment and edges_foldAngle both
@@ -38,21 +18,35 @@ import {
  * @param {FOLD} graph a FOLD object, modified in place
  */
 const buildAssignmentsIfNeeded = (graph) => {
-	if (!graph.edges_vertices) { return; }
+	if (!graph.edges_vertices) {
+		return;
+	}
 
-	if (!graph.edges_assignment) { graph.edges_assignment = []; }
-	if (!graph.edges_foldAngle) { graph.edges_foldAngle = []; }
+	if (!graph.edges_assignment) {
+		graph.edges_assignment = [];
+	}
+	if (!graph.edges_foldAngle) {
+		graph.edges_foldAngle = [];
+	}
 
 	// ensure that both arrays have the same length. This would be a strange
 	// instance if they were not equal, but in the case that they are not, we
 	// don't want to overwrite any data, even if it partially exists.
 	if (graph.edges_assignment.length > graph.edges_foldAngle.length) {
-		for (let i = graph.edges_foldAngle.length; i < graph.edges_assignment.length; i += 1) {
+		for (
+			let i = graph.edges_foldAngle.length;
+			i < graph.edges_assignment.length;
+			i += 1
+		) {
 			graph.edges_foldAngle[i] = edgeAssignmentToFoldAngle(graph.edges_assignment[i]);
 		}
 	}
 	if (graph.edges_foldAngle.length > graph.edges_assignment.length) {
-		for (let i = graph.edges_assignment.length; i < graph.edges_foldAngle.length; i += 1) {
+		for (
+			let i = graph.edges_assignment.length;
+			i < graph.edges_foldAngle.length;
+			i += 1
+		) {
 			graph.edges_assignment[i] = edgeFoldAngleToAssignment(graph.edges_foldAngle[i]);
 		}
 	}
@@ -97,8 +91,9 @@ const buildFacesIfNeeded = (graph, reface) => {
 	};
 
 	// check if a face exists, either array (and the array is not empty)
-	const facesExist = (graph.faces_vertices && graph.faces_vertices.length)
-		|| (graph.faces_edges && graph.faces_edges.length);
+	const facesExist =
+		(graph.faces_vertices && graph.faces_vertices.length) ||
+		(graph.faces_edges && graph.faces_edges.length);
 
 	// if the user requests to rebuild the faces, only if no faces exist, do it
 	if (!facesExist && reface && graph.vertices_coords) {
@@ -141,8 +136,12 @@ const buildFacesIfNeeded = (graph, reface) => {
  * @return {FOLD} graph the same input graph object
  */
 export const populate = (graph, options = {}) => {
-	if (typeof graph !== "object") { return graph; }
-	if (!graph.edges_vertices) { return graph; }
+	if (typeof graph !== "object") {
+		return graph;
+	}
+	if (!graph.edges_vertices) {
+		return graph;
+	}
 
 	// later in the method we need to react accordingly, whether or not certain
 	// component arrays were rebuilt (causing others to require be rebuild)
@@ -178,9 +177,11 @@ export const populate = (graph, options = {}) => {
 
 	// makeVerticesFaces dependencies are vertices_vertices and faces_vertices
 	// rebuild if a depenency was rebuilt as well
-	if (!graph.vertices_faces
-		|| didRebuild.vertices_vertices
-		|| didRebuild.faces_vertices) {
+	if (
+		!graph.vertices_faces ||
+		didRebuild.vertices_vertices ||
+		didRebuild.faces_vertices
+	) {
 		graph.vertices_faces = makeVerticesFaces(graph);
 	}
 

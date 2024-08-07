@@ -1,6 +1,6 @@
 /* SVG (c) Kraft */
-import init from './init.js';
-import methods from './methods.js';
+import init from "./init.js";
+import methods from "./methods.js";
 
 /**
  * Rabbit Ear (c) Kraft

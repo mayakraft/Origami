@@ -1,10 +1,17 @@
 /* SVG (c) Kraft */
-import { str_arrow, str_head, str_tail, str_boolean, str_object, str_function } from '../../../environment/strings.js';
-import { toCamel } from '../../../general/string.js';
-import { svgSemiFlattenArrays } from '../../../arguments/semiFlattenArrays.js';
-import makeCoordinates from '../../../arguments/makeCoordinates.js';
-import makeArrowPaths from './makeArrowPaths.js';
-import TransformMethods from '../shared/transforms.js';
+import {
+	str_arrow,
+	str_head,
+	str_tail,
+	str_boolean,
+	str_object,
+	str_function,
+} from "../../../environment/strings.js";
+import { toCamel } from "../../../general/string.js";
+import { svgSemiFlattenArrays } from "../../../arguments/semiFlattenArrays.js";
+import makeCoordinates from "../../../arguments/makeCoordinates.js";
+import makeArrowPaths from "./makeArrowPaths.js";
+import TransformMethods from "../shared/transforms.js";
 
 /**
  * Rabbit Ear (c) Kraft
@@ -26,14 +33,14 @@ const setArrowheadOptions = (element, options, which) => {
 
 const setArrowStyle = (element, options = {}, which = str_head) => {
 	const path = Array.from(element.childNodes)
-		.filter(el => el.getAttribute("class") === `${str_arrow}-${which}`)
+		.filter((el) => el.getAttribute("class") === `${str_arrow}-${which}`)
 		.shift();
 	// const path = element.getElementsByClassName(`${str_arrow}-${which}`)[0];
 	// find options which translate to object methods (el.stroke("red"))
 	Object.keys(options)
-		.map(key => ({ key, fn: path[toCamel(key)] }))
-		.filter(el => typeof el.fn === str_function && el.key !== "class")
-		.forEach(el => el.fn(options[el.key]));
+		.map((key) => ({ key, fn: path[toCamel(key)] }))
+		.filter((el) => typeof el.fn === str_function && el.key !== "class")
+		.forEach((el) => el.fn(options[el.key]));
 	// find options which don't work as methods, set as attributes
 	// Object.keys(options)
 	// 	.map(key => ({ key, fn: path[toCamel(key)] }))
@@ -42,28 +49,31 @@ const setArrowStyle = (element, options = {}, which = str_head) => {
 	//
 	// apply a class attribute (add, don't overwrite existing classes)
 	Object.keys(options)
-		.filter(key => key === "class")
-		.forEach(key => path.classList.add(options[key]));
+		.filter((key) => key === "class")
+		.forEach((key) => path.classList.add(options[key]));
 };
 
 const redraw = (element) => {
 	const paths = makeArrowPaths(element.options);
 	Object.keys(paths)
-		.map(path => ({
+		.map((path) => ({
 			path,
 			element: Array.from(element.childNodes)
-				.filter(el => el.getAttribute("class") === `${str_arrow}-${path}`)
+				.filter((el) => el.getAttribute("class") === `${str_arrow}-${path}`)
 				.shift(),
 		}))
-		.filter(el => el.element)
-		.map(el => { el.element.setAttribute("d", paths[el.path]); return el; })
-		.filter(el => element.options[el.path])
-		.forEach(el => el.element.setAttribute(
-			"visibility",
-			element.options[el.path].visible
-				? "visible"
-				: "hidden",
-		));
+		.filter((el) => el.element)
+		.map((el) => {
+			el.element.setAttribute("d", paths[el.path]);
+			return el;
+		})
+		.filter((el) => element.options[el.path])
+		.forEach((el) =>
+			el.element.setAttribute(
+				"visibility",
+				element.options[el.path].visible ? "visible" : "hidden",
+			),
+		);
 	return element;
 };
 
@@ -102,15 +112,18 @@ const tail = (element, options) => {
 // const getLine = element => element.getElementsByClassName(`${str_arrow}-line`)[0];
 // const getHead = element => element.getElementsByClassName(`${str_arrow}-${str_head}`)[0];
 // const getTail = element => element.getElementsByClassName(`${str_arrow}-${str_tail}`)[0];
-const getLine = element => Array.from(element.childNodes)
-	.filter(el => el.getAttribute("class") === `${str_arrow}-line`)
-	.shift();
-const getHead = element => Array.from(element.childNodes)
-	.filter(el => el.getAttribute("class") === `${str_arrow}-${str_head}`)
-	.shift();
-const getTail = element => Array.from(element.childNodes)
-	.filter(el => el.getAttribute("class") === `${str_arrow}-${str_tail}`)
-	.shift();
+const getLine = (element) =>
+	Array.from(element.childNodes)
+		.filter((el) => el.getAttribute("class") === `${str_arrow}-line`)
+		.shift();
+const getHead = (element) =>
+	Array.from(element.childNodes)
+		.filter((el) => el.getAttribute("class") === `${str_arrow}-${str_head}`)
+		.shift();
+const getTail = (element) =>
+	Array.from(element.childNodes)
+		.filter((el) => el.getAttribute("class") === `${str_arrow}-${str_tail}`)
+		.shift();
 
 const ArrowMethods = {
 	setPoints,

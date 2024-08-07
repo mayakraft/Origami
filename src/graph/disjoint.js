@@ -1,27 +1,13 @@
 /**
  * Rabbit Ear (c) Kraft
  */
-import {
-	filterKeysWithPrefix,
-} from "../fold/spec.js";
-import {
-	uniqueElements,
-} from "../general/array.js";
-import {
-	connectedComponents,
-} from "./connectedComponents.js";
-import {
-	makeVerticesVerticesUnsorted,
-} from "./make/verticesVertices.js";
-import {
-	makeVerticesEdgesUnsorted,
-} from "./make/verticesEdges.js";
-import {
-	makeVerticesFacesUnsorted,
-} from "./make/verticesFaces.js";
-import {
-	invertFlatToArrayMap,
-} from "./maps.js";
+import { filterKeysWithPrefix } from "../fold/spec.js";
+import { uniqueElements } from "../general/array.js";
+import { connectedComponents } from "./connectedComponents.js";
+import { makeVerticesVerticesUnsorted } from "./make/verticesVertices.js";
+import { makeVerticesEdgesUnsorted } from "./make/verticesEdges.js";
+import { makeVerticesFacesUnsorted } from "./make/verticesFaces.js";
+import { invertFlatToArrayMap } from "./maps.js";
 
 /**
  * @description In the case that your graph is a disjoint union
@@ -50,10 +36,10 @@ export const disjointGraphsIndices = (graph) => {
 	// vertices_vertices or faces_faces or whatever, we need to pick just one.
 	const vertices = invertFlatToArrayMap(connectedComponents(vertices_vertices));
 	const edges = vertices
-		.map(verts => verts.flatMap(v => vertices_edges[v]))
+		.map((verts) => verts.flatMap((v) => vertices_edges[v]))
 		.map(uniqueElements);
 	const faces = vertices
-		.map(verts => verts.flatMap(v => vertices_faces[v]))
+		.map((verts) => verts.flatMap((v) => vertices_faces[v]))
 		.map(uniqueElements);
 	return Array.from(Array(vertices.length)).map((_, i) => ({
 		vertices: vertices[i] || [],
@@ -89,17 +75,23 @@ export const disjointGraphs = (graph) => {
 	// and will not contain any spurious references in their value arrays
 	return graphs.map(({ vertices, edges, faces }) => {
 		const subgraph = {};
-		verticesKeys.forEach(key => {
+		verticesKeys.forEach((key) => {
 			subgraph[key] = [];
-			vertices.forEach(v => { subgraph[key][v] = graph[key][v]; });
+			vertices.forEach((v) => {
+				subgraph[key][v] = graph[key][v];
+			});
 		});
-		edgesKeys.forEach(key => {
+		edgesKeys.forEach((key) => {
 			subgraph[key] = [];
-			edges.forEach(v => { subgraph[key][v] = graph[key][v]; });
+			edges.forEach((v) => {
+				subgraph[key][v] = graph[key][v];
+			});
 		});
-		facesKeys.forEach(key => {
+		facesKeys.forEach((key) => {
 			subgraph[key] = [];
-			faces.forEach(v => { subgraph[key][v] = graph[key][v]; });
+			faces.forEach((v) => {
+				subgraph[key][v] = graph[key][v];
+			});
 		});
 		return subgraph;
 	});

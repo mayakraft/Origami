@@ -1,15 +1,14 @@
 /**
  * Rabbit Ear (c) Kraft
  */
-import {
-	epsilonEqualVectors,
-} from "../../math/compare.js";
-import {
-	parsePathCommandsWithEndpoints,
-} from "../../svg/general/path.js";
+import { epsilonEqualVectors } from "../../math/compare.js";
+import { parsePathCommandsWithEndpoints } from "../../svg/general/path.js";
 
 const straightPathLines = {
-	L: true, V: true, H: true, Z: true,
+	L: true,
+	V: true,
+	H: true,
+	Z: true,
 };
 
 /**
@@ -19,10 +18,11 @@ const straightPathLines = {
  * @param {string[]} attributes a list of names of element attributes
  * @returns {number[]} a list of numbers, one for every attribute
  */
-const getAttributesFloatValue = (element, attributes) => attributes
-	.map(attr => element.getAttribute(attr))
-	.map(str => (str == null ? 0 : str))
-	.map(parseFloat);
+const getAttributesFloatValue = (element, attributes) =>
+	attributes
+		.map((attr) => element.getAttribute(attr))
+		.map((str) => (str == null ? 0 : str))
+		.map(parseFloat);
 
 /**
  * @description convert an SVG path into segments
@@ -41,19 +41,19 @@ export const lineToSegments = (line) => {
  * @returns {[number, number, number, number][]} a list of segments
  * in the form of 4 numbers (x1, y1, x2, y2)
  */
-export const pathToSegments = (path) => (
+export const pathToSegments = (path) =>
 	parsePathCommandsWithEndpoints(path.getAttribute("d") || "")
-		.filter(command => straightPathLines[command.command.toUpperCase()])
-		.map(el => [el.start, el.end])
+		.filter((command) => straightPathLines[command.command.toUpperCase()])
+		.map((el) => [el.start, el.end])
 		.filter(([a, b]) => !epsilonEqualVectors(a, b))
-		.map(([a, b]) => [a[0], a[1], b[0], b[1]])
-);
+		.map(([a, b]) => [a[0], a[1], b[0], b[1]]);
 
-const pointsStringToArray = str => {
+const pointsStringToArray = (str) => {
 	const list = str.split(/[\s,]+/).map(parseFloat);
-	return Array
-		.from(Array(Math.floor(list.length / 2)))
-		.map((_, i) => [list[i * 2 + 0], list[i * 2 + 1]]);
+	return Array.from(Array(Math.floor(list.length / 2))).map((_, i) => [
+		list[i * 2 + 0],
+		list[i * 2 + 1],
+	]);
 };
 
 // export const pointStringToArray = function (str) {
@@ -69,15 +69,13 @@ const pointsStringToArray = str => {
  * @returns {[number, number, number, number][]} a list of segments
  * in the form of 4 numbers (x1, y1, x2, y2)
  */
-export const polygonToSegments = (polygon) => (
-	pointsStringToArray(polygon.getAttribute("points") || "")
-		.map((_, i, arr) => [
-			arr[i][0],
-			arr[i][1],
-			arr[(i + 1) % arr.length][0],
-			arr[(i + 1) % arr.length][1],
-		])
-);
+export const polygonToSegments = (polygon) =>
+	pointsStringToArray(polygon.getAttribute("points") || "").map((_, i, arr) => [
+		arr[i][0],
+		arr[i][1],
+		arr[(i + 1) % arr.length][0],
+		arr[(i + 1) % arr.length][1],
+	]);
 
 /**
  * @description convert an SVG polyline into segments
@@ -98,10 +96,7 @@ export const polylineToSegments = function (polyline) {
  * in the form of 4 numbers (x1, y1, x2, y2)
  */
 export const rectToSegments = function (rect) {
-	const [x, y, w, h] = getAttributesFloatValue(
-		rect,
-		["x", "y", "width", "height"],
-	);
+	const [x, y, w, h] = getAttributesFloatValue(rect, ["x", "y", "width", "height"]);
 	return [
 		[x, y, x + w, y],
 		[x + w, y, x + w, y + h],

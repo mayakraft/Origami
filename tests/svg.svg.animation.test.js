@@ -6,6 +6,6 @@ ear.svg.window = xmldom;
 
 test("animation", () => {
 	const svg = ear.svg();
-	svg.play = e => {};
+	svg.play = (e) => {};
 	svg.stop();
 });

@@ -2,16 +2,9 @@
  * Rabbit Ear (c) Kraft
  */
 import RabbitEarWindow from "../environment/window.js";
-import {
-	planarizeAllFaces,
-} from "../graph/planarize/planarize.js";
-import {
-	findEpsilonInObject,
-	invertVertical,
-} from "./general/options.js";
-import {
-	makeEdgesFoldAngle,
-} from "../graph/make/edgesFoldAngle.js";
+import { planarizeAllFaces } from "../graph/planarize/planarize.js";
+import { findEpsilonInObject, invertVertical } from "./general/options.js";
+import { makeEdgesFoldAngle } from "../graph/make/edgesFoldAngle.js";
 
 // there is probably a better way of coding this using XPath
 // although that requires an additional dependency
@@ -21,9 +14,8 @@ import {
  * @param {string} [mimeType="text/xml"]
  * @returns {Document}
  */
-const xmlStringToDocument = (input, mimeType = "text/xml") => (
-	(new (RabbitEarWindow().DOMParser)()).parseFromString(input, mimeType)
-);
+const xmlStringToDocument = (input, mimeType = "text/xml") =>
+	new (RabbitEarWindow().DOMParser)().parseFromString(input, mimeType);
 
 /**
  * @description given a parsed xml object, get the branch which
@@ -32,14 +24,18 @@ const xmlStringToDocument = (input, mimeType = "text/xml") => (
  * @param {string} value a value to match
  * @returns {Element} a child branch which contains this value
  */
-const getContainingValue = (oripa, value) => (oripa == null
-	? null
-	: Array.from(oripa.childNodes)
-		.filter(el => el.attributes && el.attributes.length)
-		.filter(el => Array.from(el.attributes)
-			.filter(attr => attr.nodeValue === value)
-			.shift() !== undefined)
-		.shift());
+const getContainingValue = (oripa, value) =>
+	oripa == null
+		? null
+		: Array.from(oripa.childNodes)
+				.filter((el) => el.attributes && el.attributes.length)
+				.filter(
+					(el) =>
+						Array.from(el.attributes)
+							.filter((attr) => attr.nodeValue === value)
+							.shift() !== undefined,
+				)
+				.shift();
 
 /**
  * @description For each ORIPA line, extract the coordinates
@@ -51,22 +47,28 @@ const getContainingValue = (oripa, value) => (oripa == null
  * @returns {number[][]} array of array of numbers, each inner
  * array describes one line.
  */
-const parseOriLineProxy = (oriLineProxy) => Array
-	.from(oriLineProxy.childNodes)
-	.filter(line => line.nodeName === "void")
-	.filter(line => line.childNodes)
-	.map(line => getContainingValue(line, "oripa.OriLineProxy"))
-	.filter(lineData => lineData)
-	.map(lineData => ["type", "x0", "x1", "y0", "y1"]
-		.map(key => getContainingValue(lineData, key))
-		.map(el => (el ? Array.from(el.childNodes) : []))
-		.map(children => children
-			.filter(child => child.nodeName === "double" || child.nodeName === "int")
-			.shift())
-		.map(node => (node && node.childNodes[0] && "data" in node.childNodes[0]
-			? node.childNodes[0].data
-			: "0"))
-		.map(parseFloat));
+const parseOriLineProxy = (oriLineProxy) =>
+	Array.from(oriLineProxy.childNodes)
+		.filter((line) => line.nodeName === "void")
+		.filter((line) => line.childNodes)
+		.map((line) => getContainingValue(line, "oripa.OriLineProxy"))
+		.filter((lineData) => lineData)
+		.map((lineData) =>
+			["type", "x0", "x1", "y0", "y1"]
+				.map((key) => getContainingValue(lineData, key))
+				.map((el) => (el ? Array.from(el.childNodes) : []))
+				.map((children) =>
+					children
+						.filter((child) => child.nodeName === "double" || child.nodeName === "int")
+						.shift(),
+				)
+				.map((node) =>
+					node && node.childNodes[0] && "data" in node.childNodes[0]
+						? node.childNodes[0].data
+						: "0",
+				)
+				.map(parseFloat),
+		);
 
 /**
  * @description For each ORIPA line, extract the coordinates
@@ -84,12 +86,12 @@ const parseFileMetadata = (parsed) => {
 	// 	"originalAuthorName", "traditional", "reference", "no references",
 	// 	"memo", "this is a square with one diagonal crease",
 	// ]
-	const strings = Array
-		.from(parsed.getElementsByTagName("string"))
-		.map(el => Array.from(el.childNodes)
-			.map(ch => ch.nodeValue)
-			.filter(str => str !== "")
-			.shift());
+	const strings = Array.from(parsed.getElementsByTagName("string")).map((el) =>
+		Array.from(el.childNodes)
+			.map((ch) => ch.nodeValue)
+			.filter((str) => str !== "")
+			.shift(),
+	);
 
 	const titleIndex = strings.indexOf("title");
 	const editorNameIndex = strings.indexOf("editorName");
@@ -144,11 +146,13 @@ const opxAssignment = ["F", "B", "M", "V", "U"];
  */
 const makeLineGraph = (lines) => {
 	/** @type {[number, number][]} */
-	const vertices_coords = lines
-		.flatMap(line => [[line[1], line[3]], [line[2], line[4]]]);
+	const vertices_coords = lines.flatMap((line) => [
+		[line[1], line[3]],
+		[line[2], line[4]],
+	]);
 	/** @type {[number, number][]} */
 	const edges_vertices = lines.map((_, i) => [i * 2, i * 2 + 1]);
-	const edges_assignment = lines.map(line => opxAssignment[line[0]]);
+	const edges_assignment = lines.map((line) => opxAssignment[line[0]]);
 	const edges_foldAngle = makeEdgesFoldAngle({ edges_assignment });
 	return {
 		vertices_coords,
@@ -163,9 +167,10 @@ const makeLineGraph = (lines) => {
  */
 export const opxEdgeGraph = (file) => {
 	const parsed = xmlStringToDocument(file, "text/xml");
-	const arrayOriLineProxy = Array
-		.from(parsed.getElementsByClassName("oripa.OriLineProxy"))
-		.filter(el => el.nodeName === "array" || el.tagName === "array")
+	const arrayOriLineProxy = Array.from(
+		parsed.getElementsByClassName("oripa.OriLineProxy"),
+	)
+		.filter((el) => el.nodeName === "array" || el.tagName === "array")
 		.shift();
 	const lines = parseOriLineProxy(arrayOriLineProxy);
 	return makeLineGraph(lines);
@@ -195,14 +200,14 @@ export const opxToFold = (file, options) => {
 	// this will match with one container element and many line elements
 	// inside of this container. get the container element only (nodeName "array")
 	// this will get us the <array class="oripa.OriLineProxy" length="28">
-	const arrayOriLineProxy = Array
-		.from(parsed.getElementsByClassName("oripa.OriLineProxy"))
-		.filter(el => el.nodeName === "array" || el.tagName === "array")
+	const arrayOriLineProxy = Array.from(
+		parsed.getElementsByClassName("oripa.OriLineProxy"),
+	)
+		.filter((el) => el.nodeName === "array" || el.tagName === "array")
 		.shift();
 
-	const firstDataSet = Array
-		.from(parsed.getElementsByClassName("oripa.DataSet"))
-		.filter(el => el.nodeName === "object" || el.tagName === "object")
+	const firstDataSet = Array.from(parsed.getElementsByClassName("oripa.DataSet"))
+		.filter((el) => el.nodeName === "object" || el.tagName === "object")
 		.shift();
 
 	if (firstDataSet === undefined || arrayOriLineProxy === undefined) {
@@ -213,10 +218,12 @@ export const opxToFold = (file, options) => {
 	const file_metadata = parseFileMetadata(parsed);
 	const graph = makeLineGraph(lines);
 
-	if (options
-		&& typeof options === "object"
-		&& options.invertVertical
-		&& graph.vertices_coords) {
+	if (
+		options &&
+		typeof options === "object" &&
+		options.invertVertical &&
+		graph.vertices_coords
+	) {
 		invertVertical(graph.vertices_coords);
 	}
 	// analysis on vertices_coords to find an appropriate epsilon

@@ -1,11 +1,7 @@
 /**
  * Rabbit Ear (c) Kraft
  */
-import {
-	magnitude3,
-	distance3,
-	scale3,
-} from "../math/vector.js";
+import { magnitude3, distance3, scale3 } from "../math/vector.js";
 
 /**
  * @description CSS named colors for a standard stroke color, intended
@@ -20,7 +16,7 @@ export const assignmentColor = {
 	C: "limegreen",
 	U: "orchid",
 };
-Object.keys(assignmentColor).forEach(key => {
+Object.keys(assignmentColor).forEach((key) => {
 	assignmentColor[key.toLowerCase()] = assignmentColor[key];
 });
 
@@ -72,7 +68,9 @@ export const rgbToAssignment = (red = 0, green = 0, blue = 0) => {
 
 	// if the distance to black is too small, it's difficult
 	// to infer any color information. the color implies "boundary".
-	if (blackDistance < 0.05) { return "B"; }
+	if (blackDistance < 0.05) {
+		return "B";
+	}
 
 	// the nearest grayscale value
 	const grayscale = color.reduce((a, b) => a + b, 0) / 3;
@@ -82,7 +80,7 @@ export const rgbToAssignment = (red = 0, green = 0, blue = 0) => {
 
 	// the nearest color from "colorMatchNormalized" to this color
 	const nearestColor = Object.keys(colorMatchNormalized)
-		.map(key => ({ key, dist: distance3(color, colorMatchNormalized[key]) }))
+		.map((key) => ({ key, dist: distance3(color, colorMatchNormalized[key]) }))
 		.sort((a, b) => a.dist - b.dist)
 		.shift();
 

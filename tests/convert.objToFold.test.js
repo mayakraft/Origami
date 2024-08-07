@@ -28,7 +28,6 @@ test("convert objToFold sphere with holes", () => {
 	expect(result.edges_vertices.length).toBe(102);
 	expect(result.faces_vertices.length).toBe(62);
 
-	const boundaries = result.edges_assignment
-		.filter(a => a === "B" || a === "b");
+	const boundaries = result.edges_assignment.filter((a) => a === "B" || a === "b");
 	expect(boundaries.length > 0 && boundaries.length < 102).toBe(true);
 });

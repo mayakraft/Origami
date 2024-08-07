@@ -4,8 +4,18 @@ import ear from "../src/index.js";
 
 test("edges-faces, triangle cut by edge", () => {
 	const graph = ear.graph.populate({
-		vertices_coords: [[0, 0], [0.5, 0.5], [0, 1], [-1, 0.5]],
-		edges_vertices: [[0, 1], [1, 2], [2, 0], [1, 3]],
+		vertices_coords: [
+			[0, 0],
+			[0.5, 0.5],
+			[0, 1],
+			[-1, 0.5],
+		],
+		edges_vertices: [
+			[0, 1],
+			[1, 2],
+			[2, 0],
+			[1, 3],
+		],
 		edges_assignment: Array.from("BBBB"),
 		faces_vertices: [[0, 1, 2]],
 	});
@@ -24,15 +34,38 @@ test("edges-faces, triangle cut by edge", () => {
 test("edges-faces, square cut by edge through vertex", () => {
 	// square cut by edge between two of its vertices
 	const graph1 = ear.graph.populate({
-		vertices_coords: [[0, 0], [1, 0], [1, 1], [0, 1]],
-		edges_vertices: [[0, 1], [1, 2], [2, 3], [3, 0], [0, 2]],
+		vertices_coords: [
+			[0, 0],
+			[1, 0],
+			[1, 1],
+			[0, 1],
+		],
+		edges_vertices: [
+			[0, 1],
+			[1, 2],
+			[2, 3],
+			[3, 0],
+			[0, 2],
+		],
 		edges_assignment: Array.from("BBBBB"),
 		faces_vertices: [[0, 1, 2, 3]],
 	});
 	// square cut by edge between one of its vertices, through another vertex
 	const graph2 = ear.graph.populate({
-		vertices_coords: [[0, 0], [1, 0], [1, 1], [0, 1], [2, 2]],
-		edges_vertices: [[0, 1], [1, 2], [2, 3], [3, 0], [0, 4]],
+		vertices_coords: [
+			[0, 0],
+			[1, 0],
+			[1, 1],
+			[0, 1],
+			[2, 2],
+		],
+		edges_vertices: [
+			[0, 1],
+			[1, 2],
+			[2, 3],
+			[3, 0],
+			[0, 4],
+		],
 		edges_assignment: Array.from("BBBBB"),
 		faces_vertices: [[0, 1, 2, 3]],
 	});
@@ -63,10 +96,24 @@ test("edges-faces, square cut by edge through vertex", () => {
 
 test("edges-faces all data, two adjacent faces one point overlap", () => {
 	const graph = ear.graph.populate({
-		vertices_coords: [[0, 0], [0.5, 0.5], [0, 1], [0, 1]],
-		edges_vertices: [[0, 3], [3, 1], [1, 2], [2, 0], [0, 1]],
+		vertices_coords: [
+			[0, 0],
+			[0.5, 0.5],
+			[0, 1],
+			[0, 1],
+		],
+		edges_vertices: [
+			[0, 3],
+			[3, 1],
+			[1, 2],
+			[2, 0],
+			[0, 1],
+		],
 		edges_assignment: Array.from("BBBBV"),
-		faces_vertices: [[0, 2, 1], [0, 1, 3]],
+		faces_vertices: [
+			[0, 2, 1],
+			[0, 1, 3],
+		],
 	});
 
 	expect(ear.graph.getFacesEdgesOverlap(graph)).toMatchObject([[], []]);
@@ -77,10 +124,24 @@ test("edges-faces all data, two adjacent faces one point overlap", () => {
 
 test("edges-faces all data, two adjacent faces no overlap points, two crossing edges", () => {
 	const graph = ear.graph.populate({
-		vertices_coords: [[0, 0], [0.5, 0.5], [0, 1], [-0.1, 0.9]],
-		edges_vertices: [[0, 3], [3, 1], [1, 2], [2, 0], [0, 1]],
+		vertices_coords: [
+			[0, 0],
+			[0.5, 0.5],
+			[0, 1],
+			[-0.1, 0.9],
+		],
+		edges_vertices: [
+			[0, 3],
+			[3, 1],
+			[1, 2],
+			[2, 0],
+			[0, 1],
+		],
 		edges_assignment: Array.from("BBBBV"),
-		faces_vertices: [[0, 2, 1], [0, 1, 3]],
+		faces_vertices: [
+			[0, 2, 1],
+			[0, 1, 3],
+		],
 	});
 
 	expect(ear.graph.getFacesEdgesOverlap(graph)).toMatchObject([[1], [3]]);
@@ -100,10 +161,27 @@ test("edges-faces all data, two adjacent faces no overlap points, two crossing e
 
 test("edges-faces all data, two separate faces, identical", () => {
 	const graph = ear.graph.populate({
-		vertices_coords: [[0, 0], [0.5, 0.5], [0, 1], [0, 0], [0.5, 0.5], [0, 1]],
-		edges_vertices: [[0, 1], [1, 2], [2, 0], [3, 4], [4, 5], [5, 3]],
+		vertices_coords: [
+			[0, 0],
+			[0.5, 0.5],
+			[0, 1],
+			[0, 0],
+			[0.5, 0.5],
+			[0, 1],
+		],
+		edges_vertices: [
+			[0, 1],
+			[1, 2],
+			[2, 0],
+			[3, 4],
+			[4, 5],
+			[5, 3],
+		],
 		edges_assignment: Array.from("BBBBBB"),
-		faces_vertices: [[0, 1, 2], [3, 4, 5]],
+		faces_vertices: [
+			[0, 1, 2],
+			[3, 4, 5],
+		],
 	});
 
 	expect(ear.graph.getFacesEdgesOverlap(graph)).toMatchObject([[], []]);
@@ -117,10 +195,27 @@ test("edges-faces all data, two separate faces, one point in common", () => {
 	// copy of other triangle, scaled shorter in the Y axis (point at origin)
 	// the second triangle's top line cuts through the other triangle's sides
 	const graph = ear.graph.populate({
-		vertices_coords: [[0, 0], [1, 1], [-1, 1], [0, 0], [1, 0.5], [-1, 0.5]],
-		edges_vertices: [[0, 1], [1, 2], [2, 0], [3, 4], [4, 5], [5, 3]],
+		vertices_coords: [
+			[0, 0],
+			[1, 1],
+			[-1, 1],
+			[0, 0],
+			[1, 0.5],
+			[-1, 0.5],
+		],
+		edges_vertices: [
+			[0, 1],
+			[1, 2],
+			[2, 0],
+			[3, 4],
+			[4, 5],
+			[5, 3],
+		],
 		edges_assignment: Array.from("BBBBBB"),
-		faces_vertices: [[0, 1, 2], [3, 4, 5]],
+		faces_vertices: [
+			[0, 1, 2],
+			[3, 4, 5],
+		],
 	});
 
 	expect(ear.graph.getFacesEdgesOverlap(graph)).toMatchObject([[4], [0, 2]]);
@@ -149,8 +244,7 @@ test("edges-faces kite base", () => {
 	};
 	ear.graph.populate(folded);
 
-	expect(ear.graph.getFacesEdgesOverlap(folded))
-		.toMatchObject([[], [1], [4], []]);
+	expect(ear.graph.getFacesEdgesOverlap(folded)).toMatchObject([[], [1], [4], []]);
 
 	// // edge 1 overlaps face 1
 	// // edge 4 overlaps face 2
@@ -205,9 +299,26 @@ test("edges-faces, bird base", () => {
 	ear.graph.populate(folded);
 
 	expect(ear.graph.getFacesEdgesOverlap(folded)).toMatchObject([
-		[], [], [], [], [], [], [16, 18, 28, 32], [16, 18, 28, 32],
-		[], [], [], [], [], [], [20, 22, 29, 33], [20, 22, 29, 33],
-		[], [], [], []
+		[],
+		[],
+		[],
+		[],
+		[],
+		[],
+		[16, 18, 28, 32],
+		[16, 18, 28, 32],
+		[],
+		[],
+		[],
+		[],
+		[],
+		[],
+		[20, 22, 29, 33],
+		[20, 22, 29, 33],
+		[],
+		[],
+		[],
+		[],
 	]);
 });
 
@@ -235,7 +346,7 @@ test("edges-faces kabuto", () => {
 		[0, 8, 10, 21, 22, 25, 28],
 		[1, 8, 9, 20, 23, 26, 35],
 		[0, 8, 10, 21, 22, 25, 28],
-		[1, 8, 9, 20, 23, 26, 35]
+		[1, 8, 9, 20, 23, 26, 35],
 	]);
 });
 
@@ -255,7 +366,10 @@ test("edges-faces four flaps", () => {
 });
 
 test("edges-faces randlett flapping bird", () => {
-	const foldfile = fs.readFileSync("./tests/files/fold/randlett-flapping-bird.fold", "utf-8");
+	const foldfile = fs.readFileSync(
+		"./tests/files/fold/randlett-flapping-bird.fold",
+		"utf-8",
+	);
 	const fold = JSON.parse(foldfile);
 	const folded = ear.graph.getFramesByClassName(fold, "foldedForm")[0];
 	ear.graph.populate(folded);
@@ -288,7 +402,7 @@ test("edges-faces randlett flapping bird", () => {
 		[],
 		[7, 28, 31, 43, 48],
 		[7, 28, 31, 43, 48],
-		[]
+		[],
 	]);
 });
 
@@ -298,7 +412,10 @@ test("edges-faces crane", () => {
 	const folded = ear.graph.getFramesByClassName(fold, "foldedForm")[0];
 	ear.graph.populate(folded);
 
-	const expectedJSON = fs.readFileSync("./tests/files/json/crane-faces-edges-overlap.json", "utf-8");
+	const expectedJSON = fs.readFileSync(
+		"./tests/files/json/crane-faces-edges-overlap.json",
+		"utf-8",
+	);
 	const expected = JSON.parse(expectedJSON);
 
 	const facesEdges = ear.graph.getFacesEdgesOverlap(folded);
@@ -313,7 +430,7 @@ test("edges-faces kraft bird", () => {
 	const folded = {
 		...fold,
 		vertices_coords: ear.graph.makeVerticesCoordsFlatFolded(fold),
-	}
+	};
 	ear.graph.populate(folded);
 
 	const start = performance.now();

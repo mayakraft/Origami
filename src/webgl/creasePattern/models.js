@@ -1,18 +1,14 @@
 /**
  * Rabbit Ear (c) Kraft
  */
-import {
-	createProgram,
-} from "../general/webgl.js";
+import { createProgram } from "../general/webgl.js";
 import {
 	makeCPEdgesVertexArrays,
 	makeCPEdgesElementArrays,
 	makeCPFacesVertexArrays,
 	makeCPFacesElementArrays,
 } from "./arrays.js";
-import {
-	makeUniforms,
-} from "./uniforms.js";
+import { makeUniforms } from "./uniforms.js";
 import {
 	cp_100_vert,
 	cp_100_frag,
@@ -101,10 +97,10 @@ export const cpEdgesV2 = (gl, graph = {}, options = undefined) => {
  */
 export const creasePattern = (gl, version = 1, graph = {}, options = undefined) => {
 	switch (version) {
-	case 1:
-		return [cpFacesV1(gl, graph, options), cpEdgesV1(gl, graph, options)];
-	case 2:
-	default:
-		return [cpFacesV2(gl, graph, options), cpEdgesV2(gl, graph, options)];
+		case 1:
+			return [cpFacesV1(gl, graph, options), cpEdgesV1(gl, graph, options)];
+		case 2:
+		default:
+			return [cpFacesV2(gl, graph, options), cpEdgesV2(gl, graph, options)];
 	}
 };

@@ -28,39 +28,35 @@ const safeAdd = (a, b) => a + (b || 0);
  * @param {number[]} v one vector, n-dimensions
  * @returns {number} one scalar
  */
-export const magnitude = v => Math.sqrt(v
-	.map(n => n * n)
-	.reduce(safeAdd, 0));
+export const magnitude = (v) => Math.sqrt(v.map((n) => n * n).reduce(safeAdd, 0));
 
 /**
  * @description compute the magnitude a 2D vector.
  * @param {[number, number] | [number, number, number]} v one 2D vector
  * @returns {number} one scalar
  */
-export const magnitude2 = v => Math.sqrt(v[0] * v[0] + v[1] * v[1]);
+export const magnitude2 = (v) => Math.sqrt(v[0] * v[0] + v[1] * v[1]);
 
 /**
  * @description compute the magnitude a 3D vector.
  * @param {[number, number, number]} v one 3D vector
  * @returns {number} one scalar
  */
-export const magnitude3 = v => Math.sqrt(v[0] * v[0] + v[1] * v[1] + v[2] * v[2]);
+export const magnitude3 = (v) => Math.sqrt(v[0] * v[0] + v[1] * v[1] + v[2] * v[2]);
 
 /**
  * @description compute the square-magnitude a 2D vector.
  * @param {[number, number] | [number, number, number]} v one 2D vector
  * @returns {number} one scalar
  */
-export const magSquared2 = v => v[0] * v[0] + v[1] * v[1];
+export const magSquared2 = (v) => v[0] * v[0] + v[1] * v[1];
 
 /**
  * @description compute the square-magnitude an n-dimensional vector.
  * @param {number[]} v one vector, n-dimensions
  * @returns {number} one scalar
  */
-export const magSquared = v => v
-	.map(n => n * n)
-	.reduce(safeAdd, 0);
+export const magSquared = (v) => v.map((n) => n * n).reduce(safeAdd, 0);
 
 /**
  * @description normalize the input vector and return a new vector as a copy.
@@ -69,7 +65,7 @@ export const magSquared = v => v
  */
 export const normalize = (v) => {
 	const m = magnitude(v);
-	return m === 0 ? v : v.map(c => c / m);
+	return m === 0 ? v : v.map((c) => c / m);
 };
 
 /**
@@ -98,7 +94,7 @@ export const normalize3 = (v) => {
  * @param {number} s one scalar
  * @returns {number[]} one vector
  */
-export const scale = (v, s) => v.map(n => n * s);
+export const scale = (v, s) => v.map((n) => n * s);
 
 /**
  * @description scale an input vector by one number, return a copy.
@@ -200,9 +196,7 @@ export const subtract3 = (v, u) => [v[0] - u[0], v[1] - u[1], v[2] - u[2]];
  * @param {number[]} u one vector, n-dimensions
  * @returns {number} one scalar
  */
-export const dot = (v, u) => v
-	.map((_, i) => v[i] * u[i])
-	.reduce(safeAdd, 0);
+export const dot = (v, u) => v.map((_, i) => v[i] * u[i]).reduce(safeAdd, 0);
 
 /**
  * @description compute the dot product of two 2D vectors.
@@ -251,13 +245,17 @@ export const midpoint3 = (v, u) => scale3(add3(v, u), 0.5);
  * @returns {number[]} one vector, dimension matching first parameter
  */
 export const average = (...args) => {
-	if (args.length === 0) { return undefined; }
-	const dimension = (args[0].length > 0) ? args[0].length : 0;
+	if (args.length === 0) {
+		return undefined;
+	}
+	const dimension = args[0].length > 0 ? args[0].length : 0;
 	const sum = Array(dimension).fill(0);
-	Array.from(args)
-		.forEach(vec => sum
-			.forEach((_, i) => { sum[i] += vec[i] || 0; }));
-	return sum.map(n => n / args.length);
+	Array.from(args).forEach((vec) =>
+		sum.forEach((_, i) => {
+			sum[i] += vec[i] || 0;
+		}),
+	);
+	return sum.map((n) => n / args.length);
 };
 
 /**
@@ -267,7 +265,9 @@ export const average = (...args) => {
  * @returns {[number, number]} one 2D vector
  */
 export const average2 = (...vectors) => {
-	if (!vectors || !vectors.length) { return undefined; }
+	if (!vectors || !vectors.length) {
+		return undefined;
+	}
 	const sum = vectors.reduce((a, b) => add2(a, b), [0, 0]);
 	return [sum[0] / vectors.length, sum[1] / vectors.length];
 };
@@ -279,13 +279,11 @@ export const average2 = (...vectors) => {
  * @returns {[number, number, number]} one 3D vector
  */
 export const average3 = (...vectors) => {
-	if (!vectors || !vectors.length) { return undefined; }
+	if (!vectors || !vectors.length) {
+		return undefined;
+	}
 	const sum = vectors.reduce((a, b) => add3(a, b), [0, 0, 0]);
-	return [
-		sum[0] / vectors.length,
-		sum[1] / vectors.length,
-		sum[2] / vectors.length,
-	];
+	return [sum[0] / vectors.length, sum[1] / vectors.length, sum[2] / vectors.length];
 };
 
 /**
@@ -328,9 +326,8 @@ export const cross3 = (v, u) => [
  * @param {number[]} u one vector, n-dimensions
  * @returns {number} one scalar
  */
-export const distance = (v, u) => Math.sqrt(v
-	.map((_, i) => (v[i] - u[i]) ** 2)
-	.reduce(safeAdd, 0));
+export const distance = (v, u) =>
+	Math.sqrt(v.map((_, i) => (v[i] - u[i]) ** 2).reduce(safeAdd, 0));
 
 /**
  * @description compute the distance between two 2D vectors
@@ -341,7 +338,7 @@ export const distance = (v, u) => Math.sqrt(v
 export const distance2 = (v, u) => {
 	const p = v[0] - u[0];
 	const q = v[1] - u[1];
-	return Math.sqrt((p * p) + (q * q));
+	return Math.sqrt(p * p + q * q);
 };
 
 /**
@@ -354,7 +351,7 @@ export const distance3 = (v, u) => {
 	const a = v[0] - u[0];
 	const b = v[1] - u[1];
 	const c = v[2] - u[2];
-	return Math.sqrt((a * a) + (b * b) + (c * c));
+	return Math.sqrt(a * a + b * b + c * c);
 };
 
 /**
@@ -363,7 +360,7 @@ export const distance3 = (v, u) => {
  * @param {number[]} v one vector, n-dimensions
  * @returns {number[]} one vector, dimensions matching input parameter
  */
-export const flip = v => v.map(n => -n);
+export const flip = (v) => v.map((n) => -n);
 
 /**
  * @description return a copy of the input vector where
@@ -371,7 +368,7 @@ export const flip = v => v.map(n => -n);
  * @param {[number, number] | [number, number, number]} v one 2D vector
  * @returns {[number, number]} one 2D vector
  */
-export const flip2 = v => [-v[0], -v[1]];
+export const flip2 = (v) => [-v[0], -v[1]];
 
 /**
  * @description return a copy of the input vector where
@@ -379,7 +376,7 @@ export const flip2 = v => [-v[0], -v[1]];
  * @param {[number, number, number]} v one 3D vector
  * @returns {[number, number, number]} one 3D vector
  */
-export const flip3 = v => [-v[0], -v[1], -v[2]];
+export const flip3 = (v) => [-v[0], -v[1], -v[2]];
 
 /**
  * @description return a copy of the input vector rotated
@@ -387,7 +384,7 @@ export const flip3 = v => [-v[0], -v[1], -v[2]];
  * @param {[number, number] | [number, number, number]} v one 2D vector
  * @returns {[number, number]} one 2D vector
  */
-export const rotate90 = v => [-v[1], v[0]];
+export const rotate90 = (v) => [-v[1], v[0]];
 
 /**
  * @description return a copy of the input vector rotated
@@ -395,7 +392,7 @@ export const rotate90 = v => [-v[1], v[0]];
  * @param {[number, number] | [number, number, number]} v one 2D vector
  * @returns {[number, number]} one 2D vector
  */
-export const rotate270 = v => [v[1], -v[0]];
+export const rotate270 = (v) => [v[1], -v[0]];
 
 /**
  * @description check if a vector is degenerate, meaning its
@@ -404,9 +401,8 @@ export const rotate270 = v => [v[1], -v[0]];
  * @param {number} [epsilon=1e-6] an optional epsilon with a default value of 1e-6
  * @returns {boolean} is the magnitude of the vector smaller than the epsilon?
  */
-export const degenerate = (v, epsilon = EPSILON) => v
-	.map(n => Math.abs(n))
-	.reduce(safeAdd, 0) < epsilon;
+export const degenerate = (v, epsilon = EPSILON) =>
+	v.map((n) => Math.abs(n)).reduce(safeAdd, 0) < epsilon;
 
 /**
  * @description check if two already normalized vectors are parallel
@@ -417,8 +413,8 @@ export const degenerate = (v, epsilon = EPSILON) => v
  * @param {number} [epsilon=1e-6] an optional epsilon with a default value of 1e-6
  * @returns {boolean} are the two vectors parallel within an epsilon?
  */
-export const parallelNormalized = (v, u, epsilon = EPSILON) => 1 - Math
-	.abs(dot(v, u)) < epsilon;
+export const parallelNormalized = (v, u, epsilon = EPSILON) =>
+	1 - Math.abs(dot(v, u)) < epsilon;
 
 /**
  * @description check if two vectors are parallel to each other,
@@ -429,11 +425,8 @@ export const parallelNormalized = (v, u, epsilon = EPSILON) => 1 - Math
  * @param {number} [epsilon=1e-6] an optional epsilon with a default value of 1e-6
  * @returns {boolean} are the two vectors parallel within an epsilon?
  */
-export const parallel = (v, u, epsilon = EPSILON) => parallelNormalized(
-	normalize(v),
-	normalize(u),
-	epsilon,
-);
+export const parallel = (v, u, epsilon = EPSILON) =>
+	parallelNormalized(normalize(v), normalize(u), epsilon);
 
 /**
  * @description check if two 2D vectors are parallel to each other within an epsilon
@@ -442,8 +435,7 @@ export const parallel = (v, u, epsilon = EPSILON) => parallelNormalized(
  * @param {number} [epsilon=1e-6] an optional epsilon with a default value of 1e-6
  * @returns {boolean} are the two vectors parallel within an epsilon?
  */
-export const parallel2 = (v, u, epsilon = EPSILON) => Math
-	.abs(cross2(v, u)) < epsilon;
+export const parallel2 = (v, u, epsilon = EPSILON) => Math.abs(cross2(v, u)) < epsilon;
 
 /**
  * @description check if two 3D vectors are parallel to each other within an epsilon
@@ -452,9 +444,7 @@ export const parallel2 = (v, u, epsilon = EPSILON) => Math
  * @param {number} [epsilon=1e-6] an optional epsilon with a default value of 1e-6
  * @returns {boolean} are the two vectors parallel within an epsilon?
  */
-export const parallel3 = (v, u, epsilon = EPSILON) => (
-	(magnitude3(cross3(v, u))) < epsilon
-);
+export const parallel3 = (v, u, epsilon = EPSILON) => magnitude3(cross3(v, u)) < epsilon;
 
 /**
  * @description Resize a vector to a particular length (duplicating it
@@ -464,9 +454,12 @@ export const parallel3 = (v, u, epsilon = EPSILON) => (
  * @param {number[]} vector the vector to resize
  * @returns {number[]} a copy of the vector resized to the desired length.
  */
-export const resize = (dimension, vector) => (vector.length === dimension
-	? vector
-	: Array(dimension).fill(0).map((z, i) => (vector[i] ? vector[i] : z)));
+export const resize = (dimension, vector) =>
+	vector.length === dimension
+		? vector
+		: Array(dimension)
+				.fill(0)
+				.map((z, i) => (vector[i] ? vector[i] : z));
 
 /**
  * @description Resize a vector to 2D, filling any missing values with 0.
@@ -490,8 +483,8 @@ export const resize3 = (vector) => [vector[0] || 0, vector[1] || 0, vector[2] ||
  * @returns {number[][]} an array containing two vectors, a copy of
  * each of the input parameters.
  */
-export const resizeUp = (a, b) => [a, b]
-	.map(v => resize(Math.max(a.length, b.length), v));
+export const resizeUp = (a, b) =>
+	[a, b].map((v) => resize(Math.max(a.length, b.length), v));
 
 /**
  * @description Make the two vectors match in dimension by clamping the
@@ -528,8 +521,12 @@ export const basisVectors3 = (vector = [1, 0, 0]) => {
 
 	// find a good candidate for a second basis vector
 	/** @type {[number, number, number][]} */
-	const candidates = [[1, 0, 0], [0, 1, 0], [0, 0, 1]];
-	const crosses = candidates.map(v => cross3(v, normalized));
+	const candidates = [
+		[1, 0, 0],
+		[0, 1, 0],
+		[0, 0, 1],
+	];
+	const crosses = candidates.map((v) => cross3(v, normalized));
 
 	// before normalizing the cross products, find the result with
 	// the largest magnitude, use this for the second basis vector
@@ -537,7 +534,7 @@ export const basisVectors3 = (vector = [1, 0, 0]) => {
 		.map(magnitude3)
 		.map((n, i) => ({ n, i }))
 		.sort((a, b) => b.n - a.n)
-		.map(el => el.i)
+		.map((el) => el.i)
 		.shift();
 
 	// normalize the second basis vector
@@ -555,7 +552,7 @@ export const basisVectors3 = (vector = [1, 0, 0]) => {
  * @param {number[]} vector a 2D or 3D vector
  * @returns {number[][]} an array of basis vectors
  */
-export const basisVectors = (vector) => (vector.length === 2
-	? basisVectors2([vector[0], vector[1]])
-	: basisVectors3([vector[0], vector[1], vector[2]])
-);
+export const basisVectors = (vector) =>
+	vector.length === 2
+		? basisVectors2([vector[0], vector[1]])
+		: basisVectors3([vector[0], vector[1], vector[2]]);

@@ -1,6 +1,6 @@
 /* SVG (c) Kraft */
-import { capitalized } from '../../../general/string.js';
-import { convertToViewBox } from '../../../general/viewBox.js';
+import { capitalized } from "../../../general/string.js";
+import { convertToViewBox } from "../../../general/viewBox.js";
 
 /**
  * Rabbit Ear (c) Kraft
@@ -13,16 +13,16 @@ const eventNameCategories = {
 	leave: ["mouseleave", "touchcancel"],
 };
 
-const off = (el, handlers) => Object.values(eventNameCategories)
-	.flat()
-	.forEach((handlerName) => {
-		handlers[handlerName].forEach(func => el
-			.removeEventListener(handlerName, func));
-		handlers[handlerName] = [];
-	});
+const off = (el, handlers) =>
+	Object.values(eventNameCategories)
+		.flat()
+		.forEach((handlerName) => {
+			handlers[handlerName].forEach((func) => el.removeEventListener(handlerName, func));
+			handlers[handlerName] = [];
+		});
 
-const defineGetter = (obj, prop, value) => Object
-	.defineProperty(obj, prop, {
+const defineGetter = (obj, prop, value) =>
+	Object.defineProperty(obj, prop, {
 		get: () => value,
 		enumerable: true,
 		configurable: true,
@@ -38,22 +38,27 @@ const TouchEvents = function (element) {
 		});
 	});
 
-	const removeHandler = category => eventNameCategories[category]
-		.forEach(handlerName => handlers[handlerName]
-			.forEach(func => element.removeEventListener(handlerName, func)));
+	const removeHandler = (category) =>
+		eventNameCategories[category].forEach((handlerName) =>
+			handlers[handlerName].forEach((func) =>
+				element.removeEventListener(handlerName, func),
+			),
+		);
 
 	// assign handlers for onMove, onPress, onRelease, onLeave
 	Object.keys(eventNameCategories).forEach((category) => {
 		Object.defineProperty(element, `on${capitalized(category)}`, {
 			set: (handler) => {
-				if (!element.addEventListener) { return; }
+				if (!element.addEventListener) {
+					return;
+				}
 				if (handler == null) {
 					removeHandler(category);
 					return;
 				}
 				eventNameCategories[category].forEach((handlerName) => {
 					const handlerFunc = (e) => {
-						const pointer = (e.touches != null ? e.touches[0] : e);
+						const pointer = e.touches != null ? e.touches[0] : e;
 						// for onRelease, pointer will be undefined
 						if (pointer !== undefined) {
 							const { clientX, clientY } = pointer;

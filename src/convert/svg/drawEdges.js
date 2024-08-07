@@ -9,22 +9,12 @@ import {
 	edgesAssignmentValues,
 	sortEdgesByAssignment,
 } from "../../fold/spec.js";
-import {
-	assignmentColor,
-} from "../../fold/colors.js";
-import {
-	makeEdgesCoords,
-} from "../../graph/make/edges.js";
-import {
-	addClass,
-} from "../../svg/general/dom.js";
+import { assignmentColor } from "../../fold/colors.js";
+import { makeEdgesCoords } from "../../graph/make/edges.js";
+import { addClass } from "../../svg/general/dom.js";
 import SVG from "../../svg/index.js";
-import {
-	clone,
-} from "../../general/clone.js";
-import {
-	setKeysAndValues,
-} from "../general/svg.js";
+import { clone } from "../../general/clone.js";
+import { setKeysAndValues } from "../general/svg.js";
 
 /**
  * @description default style to be applied to the group <g> element
@@ -42,7 +32,7 @@ const EDGE_STYLE = {
 	creasePattern: {}, // this will be filled below
 };
 
-Object.keys(assignmentColor).forEach(key => {
+Object.keys(assignmentColor).forEach((key) => {
 	EDGE_STYLE.creasePattern[key] = { stroke: assignmentColor[key] };
 });
 
@@ -59,7 +49,7 @@ const setDataValue = (el, key, value) => el.setAttribute(`data-${key}`, value);
  * @param {number[][]} s a segment as an array of two points
  * @returns {string} an SVG path definition for the line segment.
  */
-const segmentToPath = s => `M${s[0][0]} ${s[0][1]}L${s[1][0]} ${s[1][1]}`;
+const segmentToPath = (s) => `M${s[0][0]} ${s[0][1]}L${s[1][0]} ${s[1][1]}`;
 
 /**
  * @description convert a line segment (array of two points) into an
@@ -67,11 +57,12 @@ const segmentToPath = s => `M${s[0][0]} ${s[0][1]}L${s[1][0]} ${s[1][1]}`;
  * @param {FOLD} graph a FOLD object
  * @returns {string} an SVG path definition for all of the edges
  */
-const edgesPathData = (graph) => (
+const edgesPathData = (graph) =>
 	graph.vertices_coords && graph.edges_vertices
-		? makeEdgesCoords(graph).map(segment => segmentToPath(segment)).join("")
-		: ""
-);
+		? makeEdgesCoords(graph)
+				.map((segment) => segmentToPath(segment))
+				.join("")
+		: "";
 
 /**
  * @description Group edges by similar assignments and create a single
@@ -82,31 +73,39 @@ const edgesPathData = (graph) => (
  * SVG path which renders all edges that are this assignment.
  */
 const edgesPathsByAssignment = ({
-	vertices_coords, edges_vertices, edges_assignment,
+	vertices_coords,
+	edges_vertices,
+	edges_assignment,
 }) => {
-	if (!vertices_coords || !edges_vertices) { return {}; }
+	if (!vertices_coords || !edges_vertices) {
+		return {};
+	}
 	if (!edges_assignment) {
 		return { U: edgesPathData({ vertices_coords, edges_vertices }) };
 	}
 
 	// a dictionary with key: assignment, and value: array of edge indices
 	const assignmentEdges = sortEdgesByAssignment({
-		vertices_coords, edges_vertices, edges_assignment,
+		vertices_coords,
+		edges_vertices,
+		edges_assignment,
 	});
 
 	// if an assignment has no edges (empty array), delete the assignment
-	Object.keys(assignmentEdges).forEach(key => {
-		if (!assignmentEdges[key].length) { delete assignmentEdges[key]; }
+	Object.keys(assignmentEdges).forEach((key) => {
+		if (!assignmentEdges[key].length) {
+			delete assignmentEdges[key];
+		}
 	});
 
 	// convert assignmentEdges which contains array of indices [1, 2, 3...]
 	// into one SVG path that traces out all edges with that assignment
 	const assignmentPaths = {};
-	Object.keys(assignmentEdges).forEach(assignment => {
+	Object.keys(assignmentEdges).forEach((assignment) => {
 		// create the path "d" attribute as a string.
 		const pathString = edgesPathData({
 			vertices_coords,
-			edges_vertices: assignmentEdges[assignment].map(i => edges_vertices[i]),
+			edges_vertices: assignmentEdges[assignment].map((i) => edges_vertices[i]),
 		});
 
 		// create an SVG path
@@ -123,8 +122,8 @@ const edgesPathsByAssignment = ({
 const nonAssignmentObject = (object) => {
 	const copy = clone(object);
 	Object.keys(copy)
-		.filter(key => edgesAssignmentNames[key] !== undefined)
-		.forEach(key => delete copy[key]);
+		.filter((key) => edgesAssignmentNames[key] !== undefined)
+		.forEach((key) => delete copy[key]);
 	return copy;
 };
 
@@ -138,8 +137,8 @@ const objectWithPrimitiveValues = (object) => {
 	const copy = clone(object);
 	Object.keys(copy)
 		// filter the keys which are not primitive types, delete these from the obj
-		.filter(key => !valid[typeof copy[key]])
-		.forEach(key => delete copy[key]);
+		.filter((key) => !valid[typeof copy[key]])
+		.forEach((key) => delete copy[key]);
 	return copy;
 };
 
@@ -171,7 +170,7 @@ const getStyles = (graph, options) => {
 
 	// update the group styles, and each assignment's path style dictionaries
 	Object.assign(groupStyle, override);
-	edgesAssignmentValues.forEach(key => {
+	edgesAssignmentValues.forEach((key) => {
 		edgeStyle[key] = { ...edgeStyle[key], ...override };
 	});
 
@@ -191,18 +190,17 @@ const getStyles = (graph, options) => {
  */
 export const edgesPaths = (graph, options = {}) => {
 	const group = SVG.g();
-	if (!graph) { return group; }
+	if (!graph) {
+		return group;
+	}
 
-	const {
-		groupStyle,
-		edgeStyle,
-	} = getStyles(graph, options);
+	const { groupStyle, edgeStyle } = getStyles(graph, options);
 
 	// create the path objects, stored under assignment keys
 	const paths = edgesPathsByAssignment(graph);
 
 	// apply the styles to the path elements, based on their assignment
-	Object.keys(paths).forEach(key => {
+	Object.keys(paths).forEach((key) => {
 		// add the class name, and any default styles according to the assignment
 		addClass(paths[key], edgesAssignmentNames[key]);
 		setKeysAndValues(paths[key], edgeStyle[key]);
@@ -217,13 +215,15 @@ export const edgesPaths = (graph, options = {}) => {
 	setKeysAndValues(group, groupStyle);
 
 	// add paths as children to the group
-	Object.keys(paths).forEach(key => group.appendChild(paths[key]));
+	Object.keys(paths).forEach((key) => group.appendChild(paths[key]));
 
 	// set data values to contain the FOLD file data
-	Object.keys(paths)
-		.forEach(assign => setDataValue(paths[assign], "assignment", assign));
-	Object.keys(paths)
-		.forEach(assign => setDataValue(paths[assign], "foldAngle", assignmentFlatFoldAngle[assign]));
+	Object.keys(paths).forEach((assign) =>
+		setDataValue(paths[assign], "assignment", assign),
+	);
+	Object.keys(paths).forEach((assign) =>
+		setDataValue(paths[assign], "foldAngle", assignmentFlatFoldAngle[assign]),
+	);
 
 	return group;
 };
@@ -243,20 +243,19 @@ const angleToOpacity = (foldAngle) => String(Math.abs(foldAngle) / 180);
  */
 export const edgesLines = (graph, options = {}) => {
 	const group = SVG.g();
-	if (!graph) { return group; }
+	if (!graph) {
+		return group;
+	}
 
-	const {
-		groupStyle,
-		edgeStyle,
-	} = getStyles(graph, options);
+	const { groupStyle, edgeStyle } = getStyles(graph, options);
 
 	// a dictionary with assignment keys, and SVG groups as values
 	const groupsByAssignment = {};
 
 	// set line styles according to assignment
 	// array in the form ["B", "M", "V", "F"...]
-	Array.from(new Set(edgesAssignmentValues.map(s => s.toUpperCase())))
-		.forEach(assign => {
+	Array.from(new Set(edgesAssignmentValues.map((s) => s.toUpperCase()))).forEach(
+		(assign) => {
 			const assignmentGroup = SVG.g();
 
 			// add the class name, and any default styles according to the assignment
@@ -269,30 +268,38 @@ export const edgesLines = (graph, options = {}) => {
 			setKeysAndValues(assignmentGroup, options[edgesAssignmentNames[assign]]);
 
 			groupsByAssignment[assign] = assignmentGroup;
-		});
+		},
+	);
 
 	// for every edge, create an SVG line element
-	const lines = makeEdgesCoords(graph)
-		.map(s => SVG.line(s[0][0], s[0][1], s[1][0], s[1][1]));
+	const lines = makeEdgesCoords(graph).map((s) =>
+		SVG.line(s[0][0], s[0][1], s[1][0], s[1][1]),
+	);
 
 	// set data value attributes for fold angle and assignment
 	if (graph.edges_foldAngle) {
-		graph.edges_foldAngle
-			.forEach((angle, i) => setDataValue(lines[i], "foldAngle", angle));
+		graph.edges_foldAngle.forEach((angle, i) =>
+			setDataValue(lines[i], "foldAngle", angle),
+		);
 	}
 	if (graph.edges_assignment) {
-		graph.edges_assignment
-			.forEach((assign, i) => setDataValue(lines[i], "assignment", assign));
+		graph.edges_assignment.forEach((assign, i) =>
+			setDataValue(lines[i], "assignment", assign),
+		);
 	}
 
 	if (graph.edges_foldAngle) {
 		lines.forEach((line, i) => {
 			const angle = graph.edges_foldAngle[i];
-			if (angle === undefined
-				|| angle === null
-				|| angle === 0
-				|| angle === 180
-				|| angle === -180) { return; }
+			if (
+				angle === undefined ||
+				angle === null ||
+				angle === 0 ||
+				angle === 180 ||
+				angle === -180
+			) {
+				return;
+			}
 			line.setAttributeNS(null, "opacity", angleToOpacity(angle));
 		});
 	}
@@ -305,13 +312,13 @@ export const edgesLines = (graph, options = {}) => {
 		});
 	} else {
 		// add all lines to the "unassigned" group if no assignments exist
-		lines.forEach(line => groupsByAssignment.U.appendChild(line));
+		lines.forEach((line) => groupsByAssignment.U.appendChild(line));
 	}
 
 	// add the assignmentGroup to the main group, if it contains children
 	Object.keys(groupsByAssignment)
-		.filter(key => groupsByAssignment[key].childNodes.length)
-		.forEach(key => group.appendChild(groupsByAssignment[key]));
+		.filter((key) => groupsByAssignment[key].childNodes.length)
+		.forEach((key) => group.appendChild(groupsByAssignment[key]));
 
 	// top level group style
 	setKeysAndValues(group, groupStyle);
@@ -330,8 +337,7 @@ export const edgesLines = (graph, options = {}) => {
  * @param {object} options
  * @returns {SVGElement} an SVG <g> group element
  */
-export const drawEdges = (graph, options) => (
+export const drawEdges = (graph, options) =>
 	edgesFoldAngleAreAllFlat(graph)
 		? edgesPaths(graph, options)
-		: edgesLines(graph, options)
-);
+		: edgesLines(graph, options);

@@ -10,9 +10,10 @@ import { remove } from "../remove.js";
  * @param {FOLD} graph a FOLD object
  * @returns {number[]} array of indices of circular edges. empty if none.
  */
-export const circularEdges = ({ edges_vertices = [] }) => edges_vertices
-	.map((vertices, i) => (vertices[0] === vertices[1] ? i : undefined))
-	.filter(a => a !== undefined);
+export const circularEdges = ({ edges_vertices = [] }) =>
+	edges_vertices
+		.map((vertices, i) => (vertices[0] === vertices[1] ? i : undefined))
+		.filter((a) => a !== undefined);
 
 /**
  * @description Given a set of graph geometry (vertices/edges/faces) indices,
@@ -27,17 +28,21 @@ export const circularEdges = ({ edges_vertices = [] }) => edges_vertices
  */
 const spliceRemoveValuesFromSuffixes = (graph, suffix, remove_indices) => {
 	const remove_map = {};
-	remove_indices.forEach(n => { remove_map[n] = true; });
-	filterKeysWithSuffix(graph, suffix)
-		.forEach(sKey => graph[sKey] // faces_edges or vertices_edges...
-			.forEach((elem, i) => { // faces_edges[0], faces_edges[1], ...
+	remove_indices.forEach((n) => {
+		remove_map[n] = true;
+	});
+	filterKeysWithSuffix(graph, suffix).forEach((sKey) =>
+		graph[sKey] // faces_edges or vertices_edges...
+			.forEach((elem, i) => {
+				// faces_edges[0], faces_edges[1], ...
 				// reverse iterate through array, remove elements with splice
 				for (let j = elem.length - 1; j >= 0; j -= 1) {
 					if (remove_map[elem[j]] === true) {
 						graph[sKey][i].splice(j, 1);
 					}
 				}
-			}));
+			}),
+	);
 };
 
 /**

@@ -13,13 +13,15 @@ import { setKeysAndValues } from "../general/svg.js";
  */
 export const drawVertices = (graph, options = {}) => {
 	const g = SVG.g();
-	if (!graph || !graph.vertices_coords) { return g; }
+	if (!graph || !graph.vertices_coords) {
+		return g;
+	}
 
 	// radius will be overwritten inside render(), in applyTopLevelOptions()
 	// leave a default radius here in case this method is called directly
 	graph.vertices_coords
-		.map(v => SVG.circle(v[0], v[1], 0.01))
-		.forEach(v => g.appendChild(v));
+		.map((v) => SVG.circle(v[0], v[1], 0.01))
+		.forEach((v) => g.appendChild(v));
 
 	// any user-specified style will be applied to the group
 	setKeysAndValues(g, options);

@@ -4,8 +4,21 @@ import ear from "../src/index.js";
 
 test("duplicate edges", () => {
 	const graph = {
-		vertices_coords: [[0, 0], [1, 0], [1, 1], [0, 1], [0.5, 0.5]],
-		edges_vertices: [[0, 1], [1, 2], [2, 4], [4, 2], [2, 3], [3, 0]],
+		vertices_coords: [
+			[0, 0],
+			[1, 0],
+			[1, 1],
+			[0, 1],
+			[0.5, 0.5],
+		],
+		edges_vertices: [
+			[0, 1],
+			[1, 2],
+			[2, 4],
+			[4, 2],
+			[2, 3],
+			[3, 0],
+		],
 		edges_assignment: ["B", "B", "B", "B", "B", "B"],
 		faces_vertices: [[0, 1, 2, 4, 2, 3]],
 		faces_edges: [[0, 1, 2, 3, 4, 5]],
@@ -13,7 +26,7 @@ test("duplicate edges", () => {
 	ear.graph.populate(graph);
 
 	const duplicates = ear.graph.duplicateEdges(graph);
-	expect(JSON.stringify(duplicates)).toBe(JSON.stringify([,,, 2]));
+	expect(JSON.stringify(duplicates)).toBe(JSON.stringify([, , , 2]));
 
 	ear.graph.removeDuplicateEdges(graph);
 
@@ -49,7 +62,7 @@ test("duplicate edges", () => {
 	expect(result[4]).toBe(3);
 	expect(result[7]).toBe(5);
 	expect(result[12]).toBe(8);
-	expect(JSON.stringify(result)).toBe(JSON.stringify([,,,, 3,,, 5,,,,, 8]));
+	expect(JSON.stringify(result)).toBe(JSON.stringify([, , , , 3, , , 5, , , , , 8]));
 });
 
 test("invalid edges", () => {
@@ -78,47 +91,58 @@ test("invalid edges", () => {
 	expect(result2[2]).toBe(0);
 });
 
-test("duplicate edges, invalid input 1", () => new Promise(done => {
-	try {
-		ear.graph.duplicateEdges();
-	} catch (error) {
-		expect(error).not.toBe(undefined);
-		done();
-	}
-}));
+test("duplicate edges, invalid input 1", () =>
+	new Promise((done) => {
+		try {
+			ear.graph.duplicateEdges();
+		} catch (error) {
+			expect(error).not.toBe(undefined);
+			done();
+		}
+	}));
 
 test("duplicate edges, invalid input 2", () => {
 	const result = ear.graph.duplicateEdges({});
 	expect(result.length).toBe(0);
 });
 
-test("duplicate edges, with undefined", () => new Promise(done => {
-	try {
-		ear.graph.duplicateEdges({
-			edges_vertices: [
-				[0, 1],
-				undefined,
-				[1, 0],
-			],
-		});
-	} catch (error) {
-		expect(error).not.toBe(undefined);
-		done();
-	}
-}));
+test("duplicate edges, with undefined", () =>
+	new Promise((done) => {
+		try {
+			ear.graph.duplicateEdges({
+				edges_vertices: [[0, 1], undefined, [1, 0]],
+			});
+		} catch (error) {
+			expect(error).not.toBe(undefined);
+			done();
+		}
+	}));
 
 test("duplicate edges", () => {
 	const graph = {
-		vertices_coords: [[0, 0], [1, 0], [1, 1], [0, 1], [0.5, 0.5]],
-		edges_vertices: [[0, 1], [1, 2], [2, 4], [4, 2], [2, 3], [3, 0]],
+		vertices_coords: [
+			[0, 0],
+			[1, 0],
+			[1, 1],
+			[0, 1],
+			[0.5, 0.5],
+		],
+		edges_vertices: [
+			[0, 1],
+			[1, 2],
+			[2, 4],
+			[4, 2],
+			[2, 3],
+			[3, 0],
+		],
 		edges_assignment: ["B", "B", "B", "B", "B", "B"],
 		faces_vertices: [[0, 1, 2, 4, 2, 3]],
 		faces_edges: [[0, 1, 2, 3, 4, 5]],
 	};
 	ear.graph.populate(graph);
-	expect(graph.faces_faces).toMatchObject([[
-		undefined, undefined, undefined, undefined, undefined, undefined
-	]]);
+	expect(graph.faces_faces).toMatchObject([
+		[undefined, undefined, undefined, undefined, undefined, undefined],
+	]);
 });
 
 test("similar edges bird base", () => {
@@ -190,6 +214,6 @@ test("similar edges crane", () => {
 		[72],
 		[71, 75],
 		[7, 21],
-		[82]
-	])
+		[82],
+	]);
 });

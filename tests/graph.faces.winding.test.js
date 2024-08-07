@@ -10,12 +10,11 @@ test("makeFacesWinding", () => {
 		...graph,
 		vertices_coords,
 	};
-	ear.graph.makeFacesWinding(graph)
-		.forEach(side => expect(side).toBe(true));
+	ear.graph.makeFacesWinding(graph).forEach((side) => expect(side).toBe(true));
 	const foldedWinding = ear.graph.makeFacesWinding(folded);
 	// difference between up and flipped should be 1. (at least less than 5)
-	const up = foldedWinding.filter(a => a).length;
-	const down = foldedWinding.filter(a => !a).length;
+	const up = foldedWinding.filter((a) => a).length;
+	const down = foldedWinding.filter((a) => !a).length;
 	expect(Math.abs(up - down) < 5).toBe(true);
 });
 
@@ -50,8 +49,7 @@ test("makeFacesWinding", () => {
 		...graph,
 		vertices_coords,
 	};
-	ear.graph.makeFacesWinding(graph)
-		.forEach(side => expect(side).toBe(true));
+	ear.graph.makeFacesWinding(graph).forEach((side) => expect(side).toBe(true));
 	const foldedWinding = ear.graph.makeFacesWinding(folded);
 	expect(foldedWinding[0]).toBe(true);
 	expect(foldedWinding[1]).toBe(false);

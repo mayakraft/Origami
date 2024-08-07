@@ -1,17 +1,9 @@
 /**
  * Rabbit Ear (c) Kraft
  */
-import {
-	dot2,
-	normalize2,
-	subtract2,
-} from "../math/vector.js";
-import {
-	assignmentCanBeFolded,
-} from "../fold/spec.js";
-import {
-	makeVerticesEdgesUnsorted,
-} from "../graph/make/verticesEdges.js";
+import { dot2, normalize2, subtract2 } from "../math/vector.js";
+import { assignmentCanBeFolded } from "../fold/spec.js";
+import { makeVerticesEdgesUnsorted } from "../graph/make/verticesEdges.js";
 import {
 	counterClockwiseOrder2,
 	counterClockwiseAngleRadians,
@@ -24,10 +16,10 @@ import {
  * @param {number[]} numbers one list of numbers
  * @returns {number[]} one array of two sums, even and odd indices
  */
-export const alternatingSum = (numbers) => [0, 1]
-	.map(even_odd => numbers
-		.filter((_, i) => i % 2 === even_odd)
-		.reduce((a, b) => a + b, 0));
+export const alternatingSum = (numbers) =>
+	[0, 1].map((even_odd) =>
+		numbers.filter((_, i) => i % 2 === even_odd).reduce((a, b) => a + b, 0),
+	);
 
 /**
  * @description Separate out a list of numbers by their indices,
@@ -40,7 +32,7 @@ export const alternatingSum = (numbers) => [0, 1]
  */
 export const alternatingSumDifference = (sectors) => {
 	const halfsum = sectors.reduce((a, b) => a + b, 0) / 2;
-	return alternatingSum(sectors).map(s => s - halfsum);
+	return alternatingSum(sectors).map((s) => s - halfsum);
 };
 
 /**
@@ -53,28 +45,27 @@ export const alternatingSumDifference = (sectors) => {
  * @returns {number[]} for every sector either one vector (as an angle in radians)
  * or undefined if that sector contains no solution.
  */
-export const kawasakiSolutionsRadians = (radians) => radians
-	// counter clockwise angle between this index and the next
-	.map((v, i, arr) => [v, arr[(i + 1) % arr.length]])
-	.map(([a, b]) => counterClockwiseAngleRadians(a, b))
+export const kawasakiSolutionsRadians = (radians) =>
+	radians
+		// counter clockwise angle between this index and the next
+		.map((v, i, arr) => [v, arr[(i + 1) % arr.length]])
+		.map(([a, b]) => counterClockwiseAngleRadians(a, b))
 
-	// for every sector, make an array of all the OTHER sectors
-	.map((_, i, arr) => arr.slice(i + 1, arr.length).concat(arr.slice(0, i)))
+		// for every sector, make an array of all the OTHER sectors
+		.map((_, i, arr) => arr.slice(i + 1, arr.length).concat(arr.slice(0, i)))
 
-	// for every sector, use the sector score from the OTHERS two to split it
-	.map(opposite_sectors => alternatingSum(opposite_sectors).map(s => Math.PI - s))
+		// for every sector, use the sector score from the OTHERS two to split it
+		.map((opposite_sectors) => alternatingSum(opposite_sectors).map((s) => Math.PI - s))
 
-	// add the deviation to the edge to get the absolute position
-	.map((kawasakis, i) => radians[i] + kawasakis[0])
+		// add the deviation to the edge to get the absolute position
+		.map((kawasakis, i) => radians[i] + kawasakis[0])
 
-	// sometimes this results in a solution OUTSIDE the sector. ignore these
-	.map((angle, i) => (isCounterClockwiseBetween(
-		angle,
-		radians[i],
-		radians[(i + 1) % radians.length],
-	)
-		? angle
-		: undefined));
+		// sometimes this results in a solution OUTSIDE the sector. ignore these
+		.map((angle, i) =>
+			isCounterClockwiseBetween(angle, radians[i], radians[(i + 1) % radians.length])
+				? angle
+				: undefined,
+		);
 
 // or should we remove the indices so the array reports [ empty x2, ...]
 /**
@@ -86,12 +77,10 @@ export const kawasakiSolutionsRadians = (radians) => radians
  * @returns {[number, number][]} for every sector either one vector
  * or undefined if that sector contains no solution.
  */
-export const kawasakiSolutionsVectors = (vectors) => (
-	kawasakiSolutionsRadians(vectors.map(v => Math.atan2(v[1], v[0])))
-		.map(a => (a === undefined
-			? undefined
-			: [Math.cos(a), Math.sin(a)]))
-);
+export const kawasakiSolutionsVectors = (vectors) =>
+	kawasakiSolutionsRadians(vectors.map((v) => Math.atan2(v[1], v[0]))).map((a) =>
+		a === undefined ? undefined : [Math.cos(a), Math.sin(a)],
+	);
 
 // todo: this is doing too much work in preparation
 /**
@@ -118,27 +107,35 @@ export const kawasakiSolutions = (
 	// get the edge's vertices, order them such that
 	// the vertex is in spot 0, the other is spot 1.
 	const edges = edges_assignment
-		? vertices_edges[vertex]
-			.filter(e => assignmentCanBeFolded[edges_assignment[e]])
+		? vertices_edges[vertex].filter((e) => assignmentCanBeFolded[edges_assignment[e]])
 		: vertices_edges[vertex];
-	if (edges.length % 2 === 0) { return []; }
-	const vert_edges_vertices = edges
-		.map(edge => (edges_vertices[edge][0] === vertex
+	if (edges.length % 2 === 0) {
+		return [];
+	}
+	const vert_edges_vertices = edges.map((edge) =>
+		edges_vertices[edge][0] === vertex
 			? edges_vertices[edge]
-			: [edges_vertices[edge][1], edges_vertices[edge][0]]));
-	const vert_edges_coords = vert_edges_vertices
-		.map(ev => ev.map(v => vertices_coords[v]));
-	const vert_edges_vector = vert_edges_coords
-		.map(coords => subtract2(coords[1], coords[0]));
-	const sortedVectors = counterClockwiseOrder2(vert_edges_vector)
-		.map(i => vert_edges_vector[i]);
+			: [edges_vertices[edge][1], edges_vertices[edge][0]],
+	);
+	const vert_edges_coords = vert_edges_vertices.map((ev) =>
+		ev.map((v) => vertices_coords[v]),
+	);
+	const vert_edges_vector = vert_edges_coords.map((coords) =>
+		subtract2(coords[1], coords[0]),
+	);
+	const sortedVectors = counterClockwiseOrder2(vert_edges_vector).map(
+		(i) => vert_edges_vector[i],
+	);
 	const result = kawasakiSolutionsVectors(sortedVectors);
 	const normals = sortedVectors.map(normalize2);
 	const filteredResults = result
-		.filter(a => a !== undefined)
-		.filter(vector => !normals
-			.map(v => dot2(vector, v))
-			.map(d => Math.abs(1 - d) < 1e-3)
-			.reduce((a, b) => a || b, false));
+		.filter((a) => a !== undefined)
+		.filter(
+			(vector) =>
+				!normals
+					.map((v) => dot2(vector, v))
+					.map((d) => Math.abs(1 - d) < 1e-3)
+					.reduce((a, b) => a || b, false),
+		);
 	return filteredResults;
 };

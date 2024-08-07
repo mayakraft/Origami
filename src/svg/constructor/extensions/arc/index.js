@@ -1,7 +1,7 @@
 /* SVG (c) Kraft */
-import arcPath from '../shared/makeArcPath.js';
-import { str_path } from '../../../environment/strings.js';
-import TransformMethods from '../shared/transforms.js';
+import arcPath from "../shared/makeArcPath.js";
+import { str_path } from "../../../environment/strings.js";
+import TransformMethods from "../shared/transforms.js";
 
 /**
  * Rabbit Ear (c) Kraft

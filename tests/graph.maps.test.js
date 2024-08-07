@@ -16,10 +16,20 @@ test("merge simple next map", () => {
 });
 
 test("merge nextmap", () => {
-	const map1 = [[0, 1, 2], [3, 4, 5, 6], [7, 8], [9, 10]];
+	const map1 = [
+		[0, 1, 2],
+		[3, 4, 5, 6],
+		[7, 8],
+		[9, 10],
+	];
 	const map2 = [0, 1, 2, 3, [4, 5, 6, 7], 8, 9, 10, 11, 12, 13];
 	const res = ear.graph.mergeNextmaps(map1, map2);
-	objMatch(res, [[0, 1, 2], [3, 4, 5, 6, 7, 8, 9], [10, 11], [12, 13]]);
+	objMatch(res, [
+		[0, 1, 2],
+		[3, 4, 5, 6, 7, 8, 9],
+		[10, 11],
+		[12, 13],
+	]);
 });
 
 test("merge simple backmap", () => {

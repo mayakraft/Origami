@@ -1,34 +1,18 @@
 /**
  * Rabbit Ear (c) Kraft
  */
-import {
-	boundingBox as BoundingBox,
-} from "../math/polygon.js";
-import {
-	assignmentIsBoundary,
-} from "../fold/spec.js";
-import {
-	uniqueElements,
-} from "../general/array.js";
-import {
-	disjointGraphs,
-} from "./disjoint.js";
-import {
-	invertFlatToArrayMap,
-} from "./maps.js";
-import {
-	makeVerticesEdgesUnsorted,
-} from "./make/verticesEdges.js";
+import { boundingBox as BoundingBox } from "../math/polygon.js";
+import { assignmentIsBoundary } from "../fold/spec.js";
+import { uniqueElements } from "../general/array.js";
+import { disjointGraphs } from "./disjoint.js";
+import { invertFlatToArrayMap } from "./maps.js";
+import { makeVerticesEdgesUnsorted } from "./make/verticesEdges.js";
 import {
 	makeVerticesVertices2D,
 	makeVerticesVerticesUnsorted,
 } from "./make/verticesVertices.js";
-import {
-	makeVerticesToEdge,
-} from "./make/lookup.js";
-import {
-	connectedComponents,
-} from "./connectedComponents.js";
+import { makeVerticesToEdge } from "./make/lookup.js";
+import { connectedComponents } from "./connectedComponents.js";
 
 /**
  * @description Make an axis-aligned bounding box that encloses the vertices of
@@ -41,9 +25,8 @@ import {
  * @returns {Box?} dimensions stored as "span" "min" and "max".
  * "undefined" if no vertices exist in the graph.
  */
-export const boundingBox = ({ vertices_coords }, padding) => (
-	BoundingBox(vertices_coords, padding)
-);
+export const boundingBox = ({ vertices_coords }, padding) =>
+	BoundingBox(vertices_coords, padding);
 
 /**
  * @description A vertex is a boundary vertex if it is a member of a boundary
@@ -53,10 +36,10 @@ export const boundingBox = ({ vertices_coords }, padding) => (
  * @param {FOLD} graph a FOLD object
  * @returns {number[]} unsorted list of vertex indices which lie along the boundary.
  */
-export const boundaryVertices = ({ edges_vertices, edges_assignment = [] }) => (
-	uniqueElements(edges_vertices
-		.filter((_, i) => assignmentIsBoundary[edges_assignment[i]])
-		.flat()));
+export const boundaryVertices = ({ edges_vertices, edges_assignment = [] }) =>
+	uniqueElements(
+		edges_vertices.filter((_, i) => assignmentIsBoundary[edges_assignment[i]]).flat(),
+	);
 
 /**
  * @description return value for "boundary" method.
@@ -76,13 +59,15 @@ const emptyBoundaryObject = () => ({ vertices: [], edges: [] });
  * }} with "vertices" and "edges", each arrays of indices.
  */
 export const boundary = ({ vertices_edges, edges_vertices, edges_assignment }) => {
-	if (!edges_assignment || !edges_vertices) { return emptyBoundaryObject(); }
+	if (!edges_assignment || !edges_vertices) {
+		return emptyBoundaryObject();
+	}
 	if (!vertices_edges) {
 		vertices_edges = makeVerticesEdgesUnsorted({ edges_vertices });
 	}
 	// true or false if an edge is a boundary edge, additionally,
 	// turn a true into a false once we use the edge
-	const edgesBoundary = edges_assignment.map(a => a === "B" || a === "b");
+	const edgesBoundary = edges_assignment.map((a) => a === "B" || a === "b");
 
 	// inverse of "edgesBoundary", every time we visit a vertex, mark it true.
 	const usedVertices = {};
@@ -94,9 +79,11 @@ export const boundary = ({ vertices_edges, edges_vertices, edges_assignment }) =
 	// get the first available edge index that is a boundary
 	let edgeIndex = edgesBoundary
 		.map((isBoundary, e) => (isBoundary ? e : undefined))
-		.filter(a => a !== undefined)
+		.filter((a) => a !== undefined)
 		.shift();
-	if (edgeIndex === undefined) { return emptyBoundaryObject(); }
+	if (edgeIndex === undefined) {
+		return emptyBoundaryObject();
+	}
 
 	// add the first edge and remove it from the available edge list
 	edgesBoundary[edgeIndex] = false;
@@ -116,12 +103,12 @@ export const boundary = ({ vertices_edges, edges_vertices, edges_assignment }) =
 
 		// find the next edge index by consulting the nextVertex's adjacent edges,
 		// filtering out the first one that has not yet been visited.
-		edgeIndex = vertices_edges[nextVertex]
-			.filter(v => edgesBoundary[v])
-			.shift();
+		edgeIndex = vertices_edges[nextVertex].filter((v) => edgesBoundary[v]).shift();
 
 		// the boundary is not a nice, neat cycle.
-		if (edgeIndex === undefined) { return emptyBoundaryObject(); }
+		if (edgeIndex === undefined) {
+			return emptyBoundaryObject();
+		}
 
 		// advance nextVertex, look at our current edge and select the
 		// other vertex that isn't the current "nextVertex".
@@ -163,10 +150,11 @@ export const boundaries = ({ vertices_edges, edges_vertices, edges_assignment })
 	const edges_verticesBoundary = [...edges_vertices];
 
 	// delete the non-boundary edges
-	edges_assignment.map(a => a === "B" || a === "b")
+	edges_assignment
+		.map((a) => a === "B" || a === "b")
 		.map((isBoundary, e) => (!isBoundary ? e : undefined))
-		.filter(e => e !== undefined)
-		.forEach(e => delete edges_verticesBoundary[e]);
+		.filter((e) => e !== undefined)
+		.forEach((e) => delete edges_verticesBoundary[e]);
 
 	// a copy of vertices_edges, but only includes boundary edges
 	const vertices_edgesBoundary = makeVerticesEdgesUnsorted({
@@ -185,8 +173,9 @@ export const boundaries = ({ vertices_edges, edges_vertices, edges_assignment })
 
 	// using the connected components, create a list of groups where, each group
 	// is a list of vertices, then, for each group, take just one vertex.
-	const groupsVertex = invertFlatToArrayMap(connectedVertices)
-		.map(vertices => vertices[0]);
+	const groupsVertex = invertFlatToArrayMap(connectedVertices).map(
+		(vertices) => vertices[0],
+	);
 
 	// given a start vertex and the list of verticesVertices, walk through
 	// the adjacent vertex list, modifying the verticesVertices object as we go
@@ -202,12 +191,13 @@ export const boundaries = ({ vertices_edges, edges_vertices, edges_assignment })
 			// in an ideal situation, the current verticesVertices array will have
 			// the vertex from which we just came, and the one to head to next.
 			// remove the vertex from which we just came, and set the next vertex.
-			verticesVertices[currVertex] = verticesVertices[currVertex]
-				.filter(filterFunc);
+			verticesVertices[currVertex] = verticesVertices[currVertex].filter(filterFunc);
 			nextVertex = verticesVertices[currVertex].shift();
 
 			// if the array was empty, there is nowhere else to go. we're done.
-			if (nextVertex === undefined) { return result; }
+			if (nextVertex === undefined) {
+				return result;
+			}
 
 			// add the current vertex to the result list, then increment the walk.
 			result.push(currVertex);
@@ -218,8 +208,7 @@ export const boundaries = ({ vertices_edges, edges_vertices, edges_assignment })
 
 	// for each group of connected vertices, using the first vertex from
 	// the group, walk the connected vertices and get back a list of vertices.
-	const boundariesVertices = groupsVertex
-		.map(vertex => walkVerticesVertices(vertex));
+	const boundariesVertices = groupsVertex.map((vertex) => walkVerticesVertices(vertex));
 
 	// backwards lookup, which edge is made of a pair of vertices.
 	// we only need to use the boundary edges, should be a little faster.
@@ -228,10 +217,11 @@ export const boundaries = ({ vertices_edges, edges_vertices, edges_assignment })
 	});
 
 	// group vertices into pairs, find the edge that connects each pair.
-	const boundariesEdges = boundariesVertices
-		.map(vertices => vertices
+	const boundariesEdges = boundariesVertices.map((vertices) =>
+		vertices
 			.map((v, i, arr) => [v, arr[(i + 1) % arr.length]])
-			.map(pair => edgeMap[pair.join(" ")]));
+			.map((pair) => edgeMap[pair.join(" ")]),
+	);
 
 	return boundariesVertices.map((vertices, i) => ({
 		vertices,
@@ -246,11 +236,14 @@ export const boundaries = ({ vertices_edges, edges_vertices, edges_assignment })
  * @returns {([number, number]|[number, number, number])[][]} array of polygons
  */
 export const boundaryPolygons = ({
-	vertices_coords, vertices_edges, edges_vertices, edges_assignment,
-}) => (
-	boundaries({ vertices_edges, edges_vertices, edges_assignment })
-		.map(({ vertices }) => vertices.map(v => vertices_coords[v]))
-);
+	vertices_coords,
+	vertices_edges,
+	edges_vertices,
+	edges_assignment,
+}) =>
+	boundaries({ vertices_edges, edges_vertices, edges_assignment }).map(({ vertices }) =>
+		vertices.map((v) => vertices_coords[v]),
+	);
 
 /**
  * @description Get a FOLD object's boundary as a list of points. Use this
@@ -259,12 +252,14 @@ export const boundaryPolygons = ({
  * @returns {([number, number]|[number, number, number])[]} a polygon
  */
 export const boundaryPolygon = ({
-	vertices_coords, vertices_edges, edges_vertices, edges_assignment,
-}) => (
-	boundary({ vertices_edges, edges_vertices, edges_assignment })
-		.vertices
-		.map(v => vertices_coords[v])
-);
+	vertices_coords,
+	vertices_edges,
+	edges_vertices,
+	edges_assignment,
+}) =>
+	boundary({ vertices_edges, edges_vertices, edges_assignment }).vertices.map(
+		(v) => vertices_coords[v],
+	);
 
 /**
  * @description Use this method when you know there is only one connected
@@ -285,11 +280,16 @@ export const boundaryPolygon = ({
  * @usage call populate() before to ensure this works.
  */
 export const planarBoundary = ({
-	vertices_coords, vertices_edges, vertices_vertices, edges_vertices,
+	vertices_coords,
+	vertices_edges,
+	vertices_vertices,
+	edges_vertices,
 }) => {
 	if (!vertices_vertices) {
 		vertices_vertices = makeVerticesVertices2D({
-			vertices_coords, vertices_edges, edges_vertices,
+			vertices_coords,
+			vertices_edges,
+			edges_vertices,
 		});
 	}
 	const edge_map = makeVerticesToEdge({ edges_vertices });
@@ -309,26 +309,30 @@ export const planarBoundary = ({
 		}
 	});
 
-	if (first_vertex_i === -1) { return walk; }
+	if (first_vertex_i === -1) {
+		return walk;
+	}
 	vertex_walk.push(first_vertex_i);
 	const first_vc = vertices_coords[first_vertex_i];
 	const first_neighbors = vertices_vertices[first_vertex_i];
-	if (!first_neighbors) { return walk; }
+	if (!first_neighbors) {
+		return walk;
+	}
 	// sort adjacent vertices by next most clockwise vertex;
 	const counter_clock_first_i = first_neighbors
-		.map(i => vertices_coords[i])
-		.map(vc => [vc[0] - first_vc[0], vc[1] - first_vc[1]])
-		.map(vec => Math.atan2(vec[1], vec[0]))
-		.map(angle => (angle < 0 ? angle + Math.PI * 2 : angle))
+		.map((i) => vertices_coords[i])
+		.map((vc) => [vc[0] - first_vc[0], vc[1] - first_vc[1]])
+		.map((vec) => Math.atan2(vec[1], vec[0]))
+		.map((angle) => (angle < 0 ? angle + Math.PI * 2 : angle))
 		.map((a, i) => ({ a, i }))
 		.sort((a, b) => a.a - b.a)
-		.shift()
-		.i;
+		.shift().i;
 	const second_vertex_i = first_neighbors[counter_clock_first_i];
 	// find this edge that connects these 2 vertices
-	const first_edge_lookup = first_vertex_i < second_vertex_i
-		? `${first_vertex_i} ${second_vertex_i}`
-		: `${second_vertex_i} ${first_vertex_i}`;
+	const first_edge_lookup =
+		first_vertex_i < second_vertex_i
+			? `${first_vertex_i} ${second_vertex_i}`
+			: `${second_vertex_i} ${first_vertex_i}`;
 	const first_edge = edge_map[first_edge_lookup];
 	// vertex_walk.push(second_vertex_i);
 	edge_walk.push(first_edge);
@@ -348,9 +352,10 @@ export const planarBoundary = ({
 		const from_neighbor_i = next_neighbors.indexOf(prev_vertex_i);
 		const next_neighbor_i = (from_neighbor_i + 1) % next_neighbors.length;
 		const next_vertex_i = next_neighbors[next_neighbor_i];
-		const next_edge_lookup = this_vertex_i < next_vertex_i
-			? `${this_vertex_i} ${next_vertex_i}`
-			: `${next_vertex_i} ${this_vertex_i}`;
+		const next_edge_lookup =
+			this_vertex_i < next_vertex_i
+				? `${this_vertex_i} ${next_vertex_i}`
+				: `${next_vertex_i} ${this_vertex_i}`;
 		const next_edge_i = edge_map[next_edge_lookup];
 		// exit loop condition
 		if (visitedVertexPairs[`${this_vertex_i} ${next_vertex_i}`]) {
@@ -361,7 +366,9 @@ export const planarBoundary = ({
 			// todo: we can get rid of this message if we modify the structure
 			// of the return object so that it traverses the circular part only,
 			// or, includes a there-and-back traversal of the branch(es).
-			if (next_edge_i !== edge_walk[0]) { console.warn("bad boundary"); }
+			if (next_edge_i !== edge_walk[0]) {
+				console.warn("bad boundary");
+			}
 			return walk;
 		}
 		visitedVertexPairs[`${this_vertex_i} ${next_vertex_i}`] = true;
@@ -389,14 +396,21 @@ export const planarBoundary = ({
  * @usage call populate() before to ensure this works.
  */
 export const planarBoundaries = ({
-	vertices_coords, vertices_edges, vertices_vertices, edges_vertices,
+	vertices_coords,
+	vertices_edges,
+	vertices_vertices,
+	edges_vertices,
 }) => {
 	if (!vertices_vertices) {
 		vertices_vertices = makeVerticesVertices2D({
-			vertices_coords, vertices_edges, edges_vertices,
+			vertices_coords,
+			vertices_edges,
+			edges_vertices,
 		});
 	}
 	return disjointGraphs({
-		vertices_coords, vertices_vertices, edges_vertices,
+		vertices_coords,
+		vertices_vertices,
+		edges_vertices,
 	}).map(planarBoundary);
 };

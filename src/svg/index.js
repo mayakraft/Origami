@@ -1,12 +1,12 @@
 /* SVG (c) Kraft */
-import { setWindow } from './environment/window.js';
-import NS from './spec/namespace.js';
-import nodes_attributes from './spec/nodes_attributes.js';
-import nodes_children from './spec/nodes_children.js';
-import colors from './colors/index.js';
-import general from './general/index.js';
-import extensions from './constructor/extensions/index.js';
-import { constructors, svg } from './constructor/elements.js';
+import { setWindow } from "./environment/window.js";
+import NS from "./spec/namespace.js";
+import nodes_attributes from "./spec/nodes_attributes.js";
+import nodes_children from "./spec/nodes_children.js";
+import colors from "./colors/index.js";
+import general from "./general/index.js";
+import extensions from "./constructor/extensions/index.js";
+import { constructors, svg } from "./constructor/elements.js";
 
 /**
  * Rabbit Ear (c) Kraft

@@ -40,16 +40,22 @@ test("document methods", () => {
 
 	const documentMethods = [
 		// "documentURI",
-		"ownerDocument", "implementation", "childNodes", "doctype",
-		"firstChild", "lastChild", "_inc", "documentElement",
+		"ownerDocument",
+		"implementation",
+		"childNodes",
+		"doctype",
+		"firstChild",
+		"lastChild",
+		"_inc",
+		"documentElement",
 	];
 
-	documentProtoMethods.forEach(name => {
+	documentProtoMethods.forEach((name) => {
 		expect(typeof window().document[name]).toBe("function");
 		expect(window().document[name]).toBeDefined();
 	});
 
-	documentMethods.forEach(name => {
+	documentMethods.forEach((name) => {
 		expect(window().document[name]).toBeDefined();
 	});
 
@@ -75,12 +81,7 @@ test("window, svg mini library", () => {
  */
 test("window, svg library", () => {
 	const svg = ear.svg();
-	const p = svg.path()
-		.Move(1, 2)
-		.Line(3, 4)
-		.Line(-5, 6)
-		.close()
-		.stroke("red");
+	const p = svg.path().Move(1, 2).Line(3, 4).Line(-5, 6).close().stroke("red");
 	expect(p.getAttribute("d")).toBe("M1 2L3 4L-5 6z");
 	expect(p.getAttribute("stroke")).toBe("red");
 });

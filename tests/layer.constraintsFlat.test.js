@@ -9,12 +9,7 @@ test("makeSolverConstraintsFlat, four panel square", () => {
 	ear.graph.populate(folded);
 
 	const {
-		constraints: {
-			taco_taco,
-			taco_tortilla,
-			tortilla_tortilla,
-			transitivity,
-		},
+		constraints: { taco_taco, taco_tortilla, tortilla_tortilla, transitivity },
 	} = ear.layer.makeSolverConstraintsFlat(folded);
 
 	// only two taco-tacos, one on the top and one bottom
@@ -41,7 +36,6 @@ test("makeSolverConstraintsFlat, four panel square", () => {
 	expect(transitivity).toMatchObject([]);
 });
 
-
 test("makeSolverConstraintsFlat, strip weave", () => {
 	const foldfile = fs.readFileSync("./tests/files/fold/strip-weave.fold", "utf-8");
 	const fold = JSON.parse(foldfile);
@@ -49,12 +43,7 @@ test("makeSolverConstraintsFlat, strip weave", () => {
 	ear.graph.populate(folded);
 
 	const {
-		constraints: {
-			taco_taco,
-			taco_tortilla,
-			tortilla_tortilla,
-			transitivity,
-		},
+		constraints: { taco_taco, taco_tortilla, tortilla_tortilla, transitivity },
 		faces_winding,
 	} = ear.layer.makeSolverConstraintsFlat(folded);
 
@@ -75,12 +64,7 @@ test("makeSolverConstraintsFlat, zig-zag panels", () => {
 	ear.graph.populate(folded);
 
 	const {
-		constraints: {
-			taco_taco,
-			taco_tortilla,
-			tortilla_tortilla,
-			transitivity,
-		},
+		constraints: { taco_taco, taco_tortilla, tortilla_tortilla, transitivity },
 	} = ear.layer.makeSolverConstraintsFlat(folded);
 
 	expect(taco_taco).toMatchObject([
@@ -142,12 +126,7 @@ test("makeSolverConstraintsFlat, triangle strip", () => {
 	expect(res1.constraints.transitivity.length).toBe(0);
 
 	const {
-		constraints: {
-			taco_taco,
-			taco_tortilla,
-			tortilla_tortilla,
-			transitivity,
-		},
+		constraints: { taco_taco, taco_tortilla, tortilla_tortilla, transitivity },
 	} = ear.layer.makeSolverConstraintsFlat(folded2);
 
 	expect(taco_taco).toMatchObject([
@@ -180,7 +159,10 @@ test("makeSolverConstraintsFlat, triangle strip", () => {
 		[22, 23, 13, 10],
 	]);
 
-	expect(transitivity).toMatchObject([[2, 3, 14], [18, 19, 20]]);
+	expect(transitivity).toMatchObject([
+		[2, 3, 14],
+		[18, 19, 20],
+	]);
 });
 
 test("makeSolverConstraintsFlat, bird base", () => {
@@ -195,12 +177,7 @@ test("makeSolverConstraintsFlat, bird base", () => {
 	expect(ear.graph.getEdgesFacesOverlap(folded).flat().length).toBe(16);
 
 	const {
-		constraints: {
-			taco_taco,
-			taco_tortilla,
-			tortilla_tortilla,
-			transitivity,
-		},
+		constraints: { taco_taco, taco_tortilla, tortilla_tortilla, transitivity },
 	} = ear.layer.makeSolverConstraintsFlat(folded);
 
 	expect(taco_taco).toMatchObject([
@@ -275,14 +252,50 @@ test("makeSolverConstraintsFlat, bird base", () => {
 	]);
 
 	expect(transitivity).toMatchObject([
-		[0, 5, 7], [0, 5, 11], [0, 6, 7], [0, 6, 8], [0, 6, 11], [0, 7, 8],
-		[0, 7, 11], [1, 4, 5], [1, 4, 6], [1, 4, 8], [1, 4, 11], [1, 5, 7],
-		[1, 5, 11], [1, 6, 8], [1, 6, 11], [1, 7, 8], [1, 7, 11], [2, 9, 13],
-		[2, 9, 14], [2, 9, 15], [2, 10, 12], [2, 10, 13], [2, 10, 14], [2, 10, 15],
-		[2, 12, 13], [2, 12, 14], [2, 13, 15], [3, 9, 14], [3, 9, 15], [3, 10, 12],
-		[3, 10, 14], [3, 10, 15], [3, 12, 14], [3, 14, 15], [4, 5, 11], [4, 6, 8],
-		[4, 6, 11], [5, 7, 11], [6, 7, 8], [9, 13, 15], [9, 14, 15], [10, 12, 13],
-		[10, 12, 14], [10, 13, 15],
+		[0, 5, 7],
+		[0, 5, 11],
+		[0, 6, 7],
+		[0, 6, 8],
+		[0, 6, 11],
+		[0, 7, 8],
+		[0, 7, 11],
+		[1, 4, 5],
+		[1, 4, 6],
+		[1, 4, 8],
+		[1, 4, 11],
+		[1, 5, 7],
+		[1, 5, 11],
+		[1, 6, 8],
+		[1, 6, 11],
+		[1, 7, 8],
+		[1, 7, 11],
+		[2, 9, 13],
+		[2, 9, 14],
+		[2, 9, 15],
+		[2, 10, 12],
+		[2, 10, 13],
+		[2, 10, 14],
+		[2, 10, 15],
+		[2, 12, 13],
+		[2, 12, 14],
+		[2, 13, 15],
+		[3, 9, 14],
+		[3, 9, 15],
+		[3, 10, 12],
+		[3, 10, 14],
+		[3, 10, 15],
+		[3, 12, 14],
+		[3, 14, 15],
+		[4, 5, 11],
+		[4, 6, 8],
+		[4, 6, 11],
+		[5, 7, 11],
+		[6, 7, 8],
+		[9, 13, 15],
+		[9, 14, 15],
+		[10, 12, 13],
+		[10, 12, 14],
+		[10, 13, 15],
 	]);
 });
 
@@ -295,11 +308,7 @@ test("makeSolverConstraintsFlat, kabuto", () => {
 	// remove existing solution from FOLD file
 	delete folded.faceOrders;
 
-	const {
-		constraints,
-		facePairs,
-		orders,
-	} = ear.layer.makeSolverConstraintsFlat(folded);
+	const { constraints, facePairs, orders } = ear.layer.makeSolverConstraintsFlat(folded);
 
 	const expectedJSON = fs.readFileSync(
 		"./tests/files/json/kabuto-constraints.json",
@@ -332,17 +341,14 @@ test("makeSolverConstraintsFlat, crane", () => {
 	const epsilon = 1e-4;
 
 	const {
-		constraints: {
-			taco_taco,
-			taco_tortilla,
-			tortilla_tortilla,
-			transitivity,
-		},
+		constraints: { taco_taco, taco_tortilla, tortilla_tortilla, transitivity },
 		facePairs,
 		orders,
 	} = ear.layer.makeSolverConstraintsFlat(folded, epsilon);
 
-	expect(ear.graph.getEdgesEdgesCollinearOverlap(folded, epsilon).flat().length).toBe(554);
+	expect(ear.graph.getEdgesEdgesCollinearOverlap(folded, epsilon).flat().length).toBe(
+		554,
+	);
 	expect(ear.graph.getFacesEdgesOverlap(folded, epsilon).flat().length).toBe(1167);
 	expect(taco_taco.length).toMatchObject(196);
 	expect(taco_tortilla.length).toMatchObject(1049);
@@ -353,7 +359,10 @@ test("makeSolverConstraintsFlat, crane", () => {
 });
 
 test("makeSolverConstraintsFlat, flapping bird", () => {
-	const foldfile = fs.readFileSync("./tests/files/fold/randlett-flapping-bird.fold", "utf-8");
+	const foldfile = fs.readFileSync(
+		"./tests/files/fold/randlett-flapping-bird.fold",
+		"utf-8",
+	);
 	const fold = JSON.parse(foldfile);
 	const folded = ear.graph.getFramesByClassName(fold, "foldedForm")[0];
 	ear.graph.populate(folded);
@@ -365,12 +374,7 @@ test("makeSolverConstraintsFlat, flapping bird", () => {
 	expect(ear.graph.getEdgesFacesOverlap(folded).flat().length).toBe(110);
 
 	const {
-		constraints: {
-			taco_taco,
-			taco_tortilla,
-			tortilla_tortilla,
-			transitivity,
-		},
+		constraints: { taco_taco, taco_tortilla, tortilla_tortilla, transitivity },
 		facePairs,
 		orders,
 	} = ear.layer.makeSolverConstraintsFlat(folded);
@@ -396,12 +400,7 @@ test("layer bird", () => {
 	expect(ear.graph.getEdgesFacesOverlap(folded).flat().length).toBe(7544);
 
 	const {
-		constraints: {
-			taco_taco,
-			taco_tortilla,
-			tortilla_tortilla,
-			transitivity,
-		},
+		constraints: { taco_taco, taco_tortilla, tortilla_tortilla, transitivity },
 		facePairs,
 		orders,
 	} = ear.layer.makeSolverConstraintsFlat(folded, 1e-6);

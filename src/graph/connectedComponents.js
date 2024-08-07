@@ -22,14 +22,16 @@ export const connectedComponents = (array_array) => {
 		// for each row, meaning, if this row has already been set at time of the
 		// first call, then no components have this group index, so, use this group
 		// index for the next component and next recursion.
-		if (components[index] !== undefined) { return 0; }
+		if (components[index] !== undefined) {
+			return 0;
+		}
 
 		// set this component to be a member of the current group, and recurse
 		// through all of its adjacent components, setting every adjacent
 		// component to be a member of this group. in this case do nothing with
 		// the return value of recurse().
 		components[index] = currentGroup;
-		array_array[index].forEach(i => recurse(i, currentGroup));
+		array_array[index].forEach((i) => recurse(i, currentGroup));
 
 		// this group number has been applied to one or more components,
 		// return and tell the main loop to use the next group index for the
@@ -41,7 +43,9 @@ export const connectedComponents = (array_array) => {
 	// components were set to this group, so we don't skip any numbers.
 	for (let row = 0, group = 0; row < array_array.length; row += 1) {
 		// allow arrays with holes
-		if (!(row in array_array)) { continue; }
+		if (!(row in array_array)) {
+			continue;
+		}
 		group += recurse(row, group);
 	}
 	return components;
@@ -62,16 +66,20 @@ export const connectedComponentsPairs = (array_array) => {
 	// if a component's index is self-adjacent, this functions as a hash
 	// lookup to ensure that the reference appears only once.
 	const circular = [];
-	array_array.forEach((arr, i) => arr.forEach(j => {
-		// assuming that i exists in j's adjacent, and visa versa, we will visit
-		// every permutation twice. only include the one where i < j.
-		if (i < j) { pairs.push([i, j]); }
+	array_array.forEach((arr, i) =>
+		arr.forEach((j) => {
+			// assuming that i exists in j's adjacent, and visa versa, we will visit
+			// every permutation twice. only include the one where i < j.
+			if (i < j) {
+				pairs.push([i, j]);
+			}
 
-		// if an index is self-referential, ensure that it is only added once
-		if (i === j && !circular[i]) {
-			circular[i] = true;
-			pairs.push([i, j]);
-		}
-	}));
+			// if an index is self-referential, ensure that it is only added once
+			if (i === j && !circular[i]) {
+				circular[i] = true;
+				pairs.push([i, j]);
+			}
+		}),
+	);
 	return pairs;
 };

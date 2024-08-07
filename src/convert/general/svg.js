@@ -16,18 +16,16 @@ const unitBounds = { min: [0, 0], span: [1, 1] };
  * @param {object} attributes an object with keys and values, intended that
  * the values be simple primitives (boolean, number, string)
  */
-export const setKeysAndValues = (el, attributes = {}) => Object
-	.keys(attributes)
-	.forEach(key => el.setAttributeNS(null, key, attributes[key]));
+export const setKeysAndValues = (el, attributes = {}) =>
+	Object.keys(attributes).forEach((key) => el.setAttributeNS(null, key, attributes[key]));
 
 /**
  * @description Convert a bounding box type into a viewbox string
  * @param {Box?} box an object with "min" and "span" as two points
  * @returns {string} an SVG viewBox string
  */
-export const boundingBoxToViewBox = (box) => [box.min, box.span]
-	.flatMap(p => [p[0], p[1]])
-	.join(" ");
+export const boundingBoxToViewBox = (box) =>
+	[box.min, box.span].flatMap((p) => [p[0], p[1]]).join(" ");
 
 /**
  * @description Given a FOLD graph, get the 2D viewbox that
@@ -58,19 +56,16 @@ export const getNthPercentileEdgeLength = (
 	{ vertices_coords, edges_vertices, edges_length },
 	n = 0.1,
 ) => {
-	if (!vertices_coords || !edges_vertices) { return undefined; }
+	if (!vertices_coords || !edges_vertices) {
+		return undefined;
+	}
 	if (!edges_length) {
 		edges_length = makeEdgesLength({ vertices_coords, edges_vertices });
 	}
-	const sortedLengths = edges_length
-		.slice()
-		.sort((a, b) => a - b);
+	const sortedLengths = edges_length.slice().sort((a, b) => a - b);
 	const index_tenth_percent = Math.max(
 		0,
-		Math.min(
-			Math.floor(sortedLengths.length * n),
-			sortedLengths.length - 1,
-		),
+		Math.min(Math.floor(sortedLengths.length * n), sortedLengths.length - 1),
 	);
 	return sortedLengths[index_tenth_percent];
 };
@@ -84,11 +79,8 @@ export const getNthPercentileEdgeLength = (
  * @returns {number} a suitable value for a stroke-width
  */
 export const getStrokeWidth = (graph, vmax) => {
-	const v_max = (vmax === undefined
-		? Math.max(...(boundingBox(graph) || unitBounds).span)
-		: vmax);
+	const v_max =
+		vmax === undefined ? Math.max(...(boundingBox(graph) || unitBounds).span) : vmax;
 	const edgeTenthPercent = getNthPercentileEdgeLength(graph, 0.1);
-	return edgeTenthPercent
-		? edgeTenthPercent * 0.1
-		: v_max * 0.01;
+	return edgeTenthPercent ? edgeTenthPercent * 0.1 : v_max * 0.01;
 };

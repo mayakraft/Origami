@@ -1,9 +1,7 @@
 /**
  * Rabbit Ear (c) Kraft
  */
-import {
-	remove,
-} from "../remove.js";
+import { remove } from "../remove.js";
 
 /**
  * @description Get the indices of all vertices which make no appearance in any edge.
@@ -11,18 +9,18 @@ import {
  * @returns {number[]} the indices of the isolated vertices
  */
 export const edgeIsolatedVertices = ({ vertices_coords, edges_vertices }) => {
-	if (!vertices_coords || !edges_vertices) { return []; }
+	if (!vertices_coords || !edges_vertices) {
+		return [];
+	}
 	let count = vertices_coords.length;
 	const seen = Array(count).fill(false);
 	edges_vertices.forEach((ev) => {
-		ev.filter(v => !seen[v]).forEach((v) => {
+		ev.filter((v) => !seen[v]).forEach((v) => {
 			seen[v] = true;
 			count -= 1;
 		});
 	});
-	return seen
-		.map((s, i) => (s ? undefined : i))
-		.filter(a => a !== undefined);
+	return seen.map((s, i) => (s ? undefined : i)).filter((a) => a !== undefined);
 };
 
 /**
@@ -31,18 +29,18 @@ export const edgeIsolatedVertices = ({ vertices_coords, edges_vertices }) => {
  * @returns {number[]} the indices of the isolated vertices
  */
 export const faceIsolatedVertices = ({ vertices_coords, faces_vertices }) => {
-	if (!vertices_coords || !faces_vertices) { return []; }
+	if (!vertices_coords || !faces_vertices) {
+		return [];
+	}
 	let count = vertices_coords.length;
 	const seen = Array(count).fill(false);
 	faces_vertices.forEach((fv) => {
-		fv.filter(v => !seen[v]).forEach((v) => {
+		fv.filter((v) => !seen[v]).forEach((v) => {
 			seen[v] = true;
 			count -= 1;
 		});
 	});
-	return seen
-		.map((s, i) => (s ? undefined : i))
-		.filter(a => a !== undefined);
+	return seen.map((s, i) => (s ? undefined : i)).filter((a) => a !== undefined);
 };
 
 // todo this could be improved. for loop instead of forEach + filter.
@@ -53,12 +51,14 @@ export const faceIsolatedVertices = ({ vertices_coords, faces_vertices }) => {
  * @returns {number[]} the indices of the isolated vertices
  */
 export const isolatedVertices = ({ vertices_coords, edges_vertices, faces_vertices }) => {
-	if (!vertices_coords) { return []; }
+	if (!vertices_coords) {
+		return [];
+	}
 	let count = vertices_coords.length;
 	const seen = Array(count).fill(false);
 	if (edges_vertices) {
 		edges_vertices.forEach((ev) => {
-			ev.filter(v => !seen[v]).forEach((v) => {
+			ev.filter((v) => !seen[v]).forEach((v) => {
 				seen[v] = true;
 				count -= 1;
 			});
@@ -66,15 +66,13 @@ export const isolatedVertices = ({ vertices_coords, edges_vertices, faces_vertic
 	}
 	if (faces_vertices) {
 		faces_vertices.forEach((fv) => {
-			fv.filter(v => !seen[v]).forEach((v) => {
+			fv.filter((v) => !seen[v]).forEach((v) => {
 				seen[v] = true;
 				count -= 1;
 			});
 		});
 	}
-	return seen
-		.map((s, i) => (s ? undefined : i))
-		.filter(a => a !== undefined);
+	return seen.map((s, i) => (s ? undefined : i)).filter((a) => a !== undefined);
 };
 
 /**

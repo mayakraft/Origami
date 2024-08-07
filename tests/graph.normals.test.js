@@ -7,8 +7,8 @@ test("makeFacesNormal crease pattern", () => {
 	const FOLD = JSON.parse(foldfile);
 	const faceNormals = ear.graph.makeFacesNormal(FOLD);
 	faceNormals
-		.map(normal => ear.math.dot(normal, [0, 0, 1]))
-		.forEach(dot => expect(dot).toBeCloseTo(1));
+		.map((normal) => ear.math.dot(normal, [0, 0, 1]))
+		.forEach((dot) => expect(dot).toBeCloseTo(1));
 });
 
 test("makeVerticesNormal crease pattern", () => {
@@ -16,12 +16,15 @@ test("makeVerticesNormal crease pattern", () => {
 	const FOLD = JSON.parse(foldfile);
 	const verticesNormal = ear.graph.makeVerticesNormal(FOLD);
 	verticesNormal
-		.map(normal => ear.math.dot(normal, [0, 0, 1]))
-		.forEach(dot => expect(dot).toBeCloseTo(1));
+		.map((normal) => ear.math.dot(normal, [0, 0, 1]))
+		.forEach((dot) => expect(dot).toBeCloseTo(1));
 });
 
 test("makeFacesNormal flat folded form", () => {
-	const foldfile = fs.readFileSync("./tests/files/fold/preliminary-offset-cp.fold", "utf-8");
+	const foldfile = fs.readFileSync(
+		"./tests/files/fold/preliminary-offset-cp.fold",
+		"utf-8",
+	);
 	const graph = JSON.parse(foldfile);
 	const vertices_coords = ear.graph.makeVerticesCoordsFlatFolded(graph);
 	const folded = { ...graph, vertices_coords };
@@ -38,12 +41,12 @@ test("makeFacesNormal 3d form", () => {
 	const sphere = fs.readFileSync("./tests/files/obj/sphere-with-holes.obj", "utf-8");
 	const FOLD = ear.convert.objToFold(sphere);
 	const facesNormals = ear.graph.makeFacesNormal(FOLD);
-	const m1 = facesNormals.filter(normal => ear.math.dot(normal, [1, 0, 0]) > 0.999);
-	const m2 = facesNormals.filter(normal => ear.math.dot(normal, [-1, 0, 0]) > 0.999);
-	const m3 = facesNormals.filter(normal => ear.math.dot(normal, [0, 1, 0]) > 0.999);
-	const m4 = facesNormals.filter(normal => ear.math.dot(normal, [0, -1, 0]) > 0.999);
-	const m5 = facesNormals.filter(normal => ear.math.dot(normal, [0, 0, 1]) > 0.999);
-	const m6 = facesNormals.filter(normal => ear.math.dot(normal, [0, 0, -1]) > 0.999);
+	const m1 = facesNormals.filter((normal) => ear.math.dot(normal, [1, 0, 0]) > 0.999);
+	const m2 = facesNormals.filter((normal) => ear.math.dot(normal, [-1, 0, 0]) > 0.999);
+	const m3 = facesNormals.filter((normal) => ear.math.dot(normal, [0, 1, 0]) > 0.999);
+	const m4 = facesNormals.filter((normal) => ear.math.dot(normal, [0, -1, 0]) > 0.999);
+	const m5 = facesNormals.filter((normal) => ear.math.dot(normal, [0, 0, 1]) > 0.999);
+	const m6 = facesNormals.filter((normal) => ear.math.dot(normal, [0, 0, -1]) > 0.999);
 	expect(m1.length).toBe(0);
 	expect(m2.length).toBe(0);
 	expect(m3.length).toBe(0);
@@ -57,9 +60,9 @@ test("makeVerticesNormal 3d form", () => {
 	const FOLD = ear.convert.objToFold(sphere);
 	const verticesNormal = ear.graph.makeVerticesNormal(FOLD);
 
-	const m1 = verticesNormal.filter(normal => ear.math.dot(normal, [0, 1, 0]) > 0.999);
-	const m2 = verticesNormal.filter(normal => ear.math.dot(normal, [0, -1, 0]) > 0.999);
-	const m3 = verticesNormal.filter(normal => ear.math.dot(normal, [0, 0, -1]) > 0.999);
+	const m1 = verticesNormal.filter((normal) => ear.math.dot(normal, [0, 1, 0]) > 0.999);
+	const m2 = verticesNormal.filter((normal) => ear.math.dot(normal, [0, -1, 0]) > 0.999);
+	const m3 = verticesNormal.filter((normal) => ear.math.dot(normal, [0, 0, -1]) > 0.999);
 	expect(m1.length).toBe(1);
 	expect(m2.length).toBe(1);
 	expect(m3.length).toBe(1);
@@ -89,7 +92,7 @@ test("normals 3D many planes", () => {
 		[0, 0, 1],
 		[0, -1, 0],
 	];
-	normals
-		.forEach((normal, i) => normal
-			.forEach((n, j) => expect(faces_normal[i][j]).toBeCloseTo(n)));
+	normals.forEach((normal, i) =>
+		normal.forEach((n, j) => expect(faces_normal[i][j]).toBeCloseTo(n)),
+	);
 });

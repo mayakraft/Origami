@@ -20,9 +20,8 @@ export const epsilonEqual = (a, b, epsilon = EPSILON) => Math.abs(a - b) < epsil
  * @param {number} [epsilon=1e-6] an optional epsilon
  * @returns {number} -1, 0, +1
  */
-export const epsilonCompare = (a, b, epsilon = EPSILON) => (
-	epsilonEqual(a, b, epsilon) ? 0 : Math.sign(a - b)
-);
+export const epsilonCompare = (a, b, epsilon = EPSILON) =>
+	epsilonEqual(a, b, epsilon) ? 0 : Math.sign(a - b);
 
 /**
  * @description are two vectors equal to each other within an epsilon.
@@ -37,7 +36,9 @@ export const epsilonCompare = (a, b, epsilon = EPSILON) => (
  */
 export const epsilonEqualVectors = (a, b, epsilon = EPSILON) => {
 	for (let i = 0; i < Math.max(a.length, b.length); i += 1) {
-		if (!epsilonEqual(a[i] || 0, b[i] || 0, epsilon)) { return false; }
+		if (!epsilonEqual(a[i] || 0, b[i] || 0, epsilon)) {
+			return false;
+		}
 	}
 	return true;
 };

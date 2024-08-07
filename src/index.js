@@ -48,7 +48,9 @@ svgLink.ear = ear;
 const earExport = ear;
 Object.defineProperty(earExport, "window", {
 	enumerable: false,
-	set: value => { svg.window = setWindow(value); },
+	set: (value) => {
+		svg.window = setWindow(value);
+	},
 });
 
 export default ear;

@@ -35,7 +35,7 @@ const path_commands = [
 test("path init from args", () => {
 	const pathString = "M20 40V60l10 10";
 	expect(ear.svg.path(pathString).getAttribute("d")).toBe(pathString);
-//  expect(ear.svg.path({command:"M", values: [20, 40]}).getAttribute("d")).toBe("M20 40");
+	//  expect(ear.svg.path({command:"M", values: [20, 40]}).getAttribute("d")).toBe("M20 40");
 });
 
 test("path commands", () => {
@@ -53,8 +53,7 @@ test("path commands", () => {
 	];
 	expected.forEach((el, i) => {
 		expect(commands[i].command).toBe(expected[i].command);
-		expect(JSON.stringify(commands[i].values))
-			.toBe(JSON.stringify(expected[i].values));
+		expect(JSON.stringify(commands[i].values)).toBe(JSON.stringify(expected[i].values));
 	});
 
 	// path.add("H20V60");

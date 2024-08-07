@@ -1,16 +1,9 @@
 /**
  * Rabbit Ear (c) Kraft
  */
-import {
-	EPSILON,
-} from "../math/constant.js";
-import {
-	vecLineToUniqueLine,
-	uniqueLineToVecLine,
-} from "../math/convert.js";
-import {
-	includeL,
-} from "../math/compare.js";
+import { EPSILON } from "../math/constant.js";
+import { vecLineToUniqueLine, uniqueLineToVecLine } from "../math/convert.js";
+import { includeL } from "../math/compare.js";
 import {
 	normalize2,
 	distance2,
@@ -22,16 +15,9 @@ import {
 	midpoint2,
 	rotate90,
 } from "../math/vector.js";
-import {
-	bisectLines2,
-} from "../math/line.js";
-import {
-	intersectLineLine,
-	intersectCircleLine,
-} from "../math/intersect.js";
-import {
-	polynomialSolver,
-} from "../math/polynomial.js";
+import { bisectLines2 } from "../math/line.js";
+import { intersectLineLine, intersectCircleLine } from "../math/intersect.js";
+import { polynomialSolver } from "../math/polynomial.js";
 
 /*           _                       _              _
 						(_)                     (_)            (_)
@@ -51,10 +37,12 @@ import {
  */
 export const normalAxiom1 = (point1, point2) => {
 	const normal = normalize2(rotate90(subtract2(point2, point1)));
-	return [{
-		normal,
-		distance: dot2(add2(point1, point2), normal) / 2.0,
-	}];
+	return [
+		{
+			normal,
+			distance: dot2(add2(point1, point2), normal) / 2.0,
+		},
+	];
 };
 
 /**
@@ -63,10 +51,12 @@ export const normalAxiom1 = (point1, point2) => {
  * @param {[number, number]} point2 one 2D point
  * @returns {[VecLine2]} an array of one solution line in {vector, origin} form
  */
-export const axiom1 = (point1, point2) => [{
-	vector: normalize2(subtract2(point2, point1)),
-	origin: point1,
-}];
+export const axiom1 = (point1, point2) => [
+	{
+		vector: normalize2(subtract2(point2, point1)),
+		origin: point1,
+	},
+];
 
 /**
  * @description origami axiom 2: form a perpendicular bisector between the given points
@@ -76,10 +66,12 @@ export const axiom1 = (point1, point2) => [{
  */
 export const normalAxiom2 = (point1, point2) => {
 	const normal = normalize2(subtract2(point2, point1));
-	return [{
-		normal,
-		distance: dot2(add2(point1, point2), normal) / 2.0,
-	}];
+	return [
+		{
+			normal,
+			distance: dot2(add2(point1, point2), normal) / 2.0,
+		},
+	];
 };
 
 /**
@@ -88,10 +80,12 @@ export const normalAxiom2 = (point1, point2) => {
  * @param {[number, number]} point2 one 2D point
  * @returns {[VecLine2]} an array of one solution line in {vector, origin} form
  */
-export const axiom2 = (point1, point2) => [{
-	vector: normalize2(rotate90(subtract2(point2, point1))),
-	origin: midpoint2(point1, point2),
-}];
+export const axiom2 = (point1, point2) => [
+	{
+		vector: normalize2(rotate90(subtract2(point2, point1))),
+		origin: midpoint2(point1, point2),
+	},
+];
 
 /**
  * @description origami axiom 3: form two lines that make the two angular bisectors between
@@ -105,10 +99,13 @@ export const normalAxiom3 = (line1, line2) => {
 
 	// lines are parallel, only one solution exists
 	if (Math.abs(determ) < EPSILON) {
-		return [{
-			normal: line1.normal,
-			distance: (line1.distance + line2.distance * dot2(line1.normal, line2.normal)) / 2,
-		}];
+		return [
+			{
+				normal: line1.normal,
+				distance:
+					(line1.distance + line2.distance * dot2(line1.normal, line2.normal)) / 2,
+			},
+		];
 	}
 	const x = line1.distance * line2.normal[1] - line2.distance * line1.normal[1];
 	const y = line2.distance * line1.normal[0] - line1.distance * line2.normal[0];
@@ -116,8 +113,8 @@ export const normalAxiom3 = (line1, line2) => {
 	const intersect = [x / determ, y / determ];
 
 	const [resultA, resultB] = [add2, subtract2]
-		.map(f => normalize2(f(line1.normal, line2.normal)))
-		.map(normal => ({ normal, distance: dot2(intersect, normal) }));
+		.map((f) => normalize2(f(line1.normal, line2.normal)))
+		.map((normal) => ({ normal, distance: dot2(intersect, normal) }));
 	return [resultA, resultB];
 };
 
@@ -150,10 +147,12 @@ export const normalAxiom4 = (line, point) => {
  * @param {[number, number]} point one 2D point
  * @returns {[VecLine2]} the line in {vector, origin} form
  */
-export const axiom4 = ({ vector }, point) => [{
-	vector: rotate90(normalize2(vector)),
-	origin: point,
-}];
+export const axiom4 = ({ vector }, point) => [
+	{
+		vector: rotate90(normalize2(vector)),
+		origin: point,
+	},
+];
 
 /**
  * @description origami axiom 5: form up to two lines that pass through a point that also
@@ -167,18 +166,21 @@ export const normalAxiom5 = (line, point1, point2) => {
 	const p1base = dot2(point1, line.normal);
 	const a = line.distance - p1base;
 	const c = distance2(point1, point2);
-	if (a > c) { return []; }
+	if (a > c) {
+		return [];
+	}
 	const b = Math.sqrt(c * c - a * a);
 	const a_vec = scale2(line.normal, a);
 	const base_center = add2(point1, a_vec);
 	const base_vector = scale2(rotate90(line.normal), b);
 	// if b is near 0 we have one solution, otherwise two
-	const mirrors = b < EPSILON
-		? [base_center]
-		: [add2(base_center, base_vector), subtract2(base_center, base_vector)];
+	const mirrors =
+		b < EPSILON
+			? [base_center]
+			: [add2(base_center, base_vector), subtract2(base_center, base_vector)];
 	const [resultA, resultB] = mirrors
-		.map(pt => normalize2(subtract2(point2, pt)))
-		.map(normal => ({ normal, distance: dot2(point1, normal) }));
+		.map((pt) => normalize2(subtract2(point2, pt)))
+		.map((normal) => ({ normal, distance: dot2(point1, normal) }));
 	return [resultA, resultB];
 };
 
@@ -190,14 +192,13 @@ export const normalAxiom5 = (line, point1, point2) => {
  * @param {[number, number]} point2 one 2D point, the point that is being brought onto the line
  * @returns {VecLine2[]} an array of lines in {vector, origin} form
  */
-export const axiom5 = (line, point1, point2) => (
-	intersectCircleLine(
-		{ radius: distance2(point1, point2), origin: point1 },
-		line,
-	) || []).map(sect => ({
-	vector: normalize2(rotate90(subtract2(sect, point2))),
-	origin: midpoint2(point2, sect),
-}));
+export const axiom5 = (line, point1, point2) =>
+	(
+		intersectCircleLine({ radius: distance2(point1, point2), origin: point1 }, line) || []
+	).map((sect) => ({
+		vector: normalize2(rotate90(subtract2(sect, point2))),
+		origin: midpoint2(point2, sect),
+	}));
 
 /**
  * @description origami axiom 6: form up to three lines that are made by bringing
@@ -214,7 +215,9 @@ export const axiom5 = (line, point1, point2) => (
 export const normalAxiom6 = (line1, line2, point1, point2) => {
 	// at least pointA must not be on lineA
 	// for some reason this epsilon is much higher than 1e-6
-	if (Math.abs(1 - (dot2(line1.normal, point1) / line1.distance)) < 0.02) { return []; }
+	if (Math.abs(1 - dot2(line1.normal, point1) / line1.distance) < 0.02) {
+		return [];
+	}
 
 	// line vec is the first line's vector, along the line, not the normal
 	const line_vec = rotate90(line1.normal);
@@ -246,12 +249,9 @@ export const normalAxiom6 = (line1, line2, point1, point2) => {
 		coefficients = [a, b];
 	}
 	return polynomialSolver(coefficients)
-		.map(n => add2(
-			scale2(line1.normal, line1.distance),
-			scale2(line_vec, n),
-		))
-		.map(p => ({ p, normal: normalize2(subtract2(p, point1)) }))
-		.map(el => ({
+		.map((n) => add2(scale2(line1.normal, line1.distance), scale2(line_vec, n)))
+		.map((p) => ({ p, normal: normalize2(subtract2(p, point1)) }))
+		.map((el) => ({
 			normal: el.normal,
 			distance: dot2(el.normal, midpoint2(el.p, point1)),
 		}));
@@ -266,12 +266,13 @@ export const normalAxiom6 = (line1, line2, point1, point2) => {
  * @param {[number, number]} point2 the point to bring to the second line
  * @returns {VecLine2[]} an array of lines in {vector, origin} form
  */
-export const axiom6 = (line1, line2, point1, point2) => normalAxiom6(
-	vecLineToUniqueLine(line1),
-	vecLineToUniqueLine(line2),
-	point1,
-	point2,
-).map(uniqueLineToVecLine);
+export const axiom6 = (line1, line2, point1, point2) =>
+	normalAxiom6(
+		vecLineToUniqueLine(line1),
+		vecLineToUniqueLine(line2),
+		point1,
+		point2,
+	).map(uniqueLineToVecLine);
 
 /**
  * @description origami axiom 7: form a line by bringing a point onto a given line
@@ -287,7 +288,9 @@ export const normalAxiom7 = (line1, line2, point) => {
 	const normal = rotate90(line1.normal);
 	const norm_norm = dot2(normal, line2.normal);
 	// if norm_norm is close to 0, the two input lines are parallel, no solution
-	if (Math.abs(norm_norm) < EPSILON) { return undefined; }
+	if (Math.abs(norm_norm) < EPSILON) {
+		return undefined;
+	}
 	const a = dot2(point, normal);
 	const b = dot2(point, line2.normal);
 	const distance = (line2.distance + 2.0 * a * norm_norm - b) / (2.0 * norm_norm);
@@ -314,12 +317,14 @@ export const axiom7 = (line1, line2, point) => {
 	).point;
 	return intersect === undefined
 		? []
-		: [{
-			// todo: switch this out, but test it as you do
-			vector: normalize2(rotate90(subtract2(intersect, point))),
-			// vector: normalize2(rotate90(line2.vector)),
-			origin: midpoint2(point, intersect),
-		}];
+		: [
+				{
+					// todo: switch this out, but test it as you do
+					vector: normalize2(rotate90(subtract2(intersect, point))),
+					// vector: normalize2(rotate90(line2.vector)),
+					origin: midpoint2(point, intersect),
+				},
+			];
 };
 
 /**

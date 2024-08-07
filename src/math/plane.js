@@ -1,13 +1,7 @@
 /**
  * Rabbit Ear (c) Kraft
  */
-import {
-	normalize3,
-	dot3,
-	scale3,
-	subtract3,
-	resize3,
-} from "./vector.js";
+import { normalize3, dot3, scale3, subtract3, resize3 } from "./vector.js";
 
 /**
  * @description Project a point onto a plane in 3D.

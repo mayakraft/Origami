@@ -1,9 +1,7 @@
 /**
  * Rabbit Ear (c) Kraft
  */
-import {
-	EPSILON,
-} from "./constant.js";
+import { EPSILON } from "./constant.js";
 import {
 	magnitude2,
 	magnitude3,
@@ -38,11 +36,11 @@ export const trilateration2 = (pts, radii) => {
 	const i = dot2(ex, subtract2(pts[2], pts[0]));
 	const exi = scale2(ex, i);
 	const p2p0exi = subtract2(subtract2(pts[2], pts[0]), exi);
-	const ey = scale2(p2p0exi, (1 / magnitude2(p2p0exi)));
+	const ey = scale2(p2p0exi, 1 / magnitude2(p2p0exi));
 	const d = distance2(pts[1], pts[0]);
 	const j = dot2(ey, subtract2(pts[2], pts[0]));
-	const x = ((radii[0] ** 2) - (radii[1] ** 2) + (d ** 2)) / (2 * d);
-	const y = ((radii[0] ** 2) - (radii[2] ** 2) + (i ** 2) + (j ** 2)) / (2 * j) - ((i * x) / j);
+	const x = (radii[0] ** 2 - radii[1] ** 2 + d ** 2) / (2 * d);
+	const y = (radii[0] ** 2 - radii[2] ** 2 + i ** 2 + j ** 2) / (2 * j) - (i * x) / j;
 	return add2(add2(pts[0], scale2(ex, x)), scale2(ey, y));
 };
 
@@ -65,11 +63,11 @@ export const trilateration3 = (pts, radii) => {
 	const i = dot3(ex, subtract3(pts[2], pts[0]));
 	const exi = scale3(ex, i);
 	const p2p0exi = subtract3(subtract3(pts[2], pts[0]), exi);
-	const ey = scale3(p2p0exi, (1 / magnitude3(p2p0exi)));
+	const ey = scale3(p2p0exi, 1 / magnitude3(p2p0exi));
 	const d = distance3(pts[1], pts[0]);
 	const j = dot3(ey, subtract3(pts[2], pts[0]));
-	const x = ((radii[0] ** 2) - (radii[1] ** 2) + (d ** 2)) / (2 * d);
-	const y = ((radii[0] ** 2) - (radii[2] ** 2) + (i ** 2) + (j ** 2)) / (2 * j) - ((i * x) / j);
+	const x = (radii[0] ** 2 - radii[1] ** 2 + d ** 2) / (2 * d);
+	const y = (radii[0] ** 2 - radii[2] ** 2 + i ** 2 + j ** 2) / (2 * j) - (i * x) / j;
 	return add3(add3(pts[0], scale3(ex, x)), scale3(ey, y));
 };
 

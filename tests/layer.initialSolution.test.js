@@ -4,36 +4,54 @@ import ear from "../src/index.js";
 
 test("solveFlatAdjacentEdges, different axes", () => {
 	// shortcut methods
-	const solveFlatAdjacentEdges = (graph) => (
-		ear.layer.solveFlatAdjacentEdges(
-			graph,
-			ear.graph.makeFacesWinding(graph),
-		));
-	const solverOrdersToFaceOrders = (graph) => (
+	const solveFlatAdjacentEdges = (graph) =>
+		ear.layer.solveFlatAdjacentEdges(graph, ear.graph.makeFacesWinding(graph));
+	const solverOrdersToFaceOrders = (graph) =>
 		ear.layer.solverOrdersToFaceOrders(
-			ear.layer.solveFlatAdjacentEdges(
-				graph,
-				ear.graph.makeFacesWinding(graph),
-			),
+			ear.layer.solveFlatAdjacentEdges(graph, ear.graph.makeFacesWinding(graph)),
 			ear.graph.makeFacesWinding(graph),
-		)
-	);
+		);
 
 	// two squares joined at an edge, folded to lie exactly on top of each other
 	// A: 0, 1, 2, 3 (counter)
 	// B: 5, 4, 1, 0 (clock)
 	const base = {
-		edges_vertices: [[0, 1], [1, 2], [2, 3], [3, 0], [1, 4], [4, 5], [5, 0]],
+		edges_vertices: [
+			[0, 1],
+			[1, 2],
+			[2, 3],
+			[3, 0],
+			[1, 4],
+			[4, 5],
+			[5, 0],
+		],
 		edges_assignment: ["V", "B", "B", "B", "B", "B", "B"],
-		faces_vertices: [[0, 1, 2, 3], [5, 4, 1, 0]],
-	}
+		faces_vertices: [
+			[0, 1, 2, 3],
+			[5, 4, 1, 0],
+		],
+	};
 	const graphXYUp = ear.graph.populate({
 		...base,
-		vertices_coords: [[0, 0], [1, 0], [1, 1], [0, 1], [1, 1], [0, 1]],
+		vertices_coords: [
+			[0, 0],
+			[1, 0],
+			[1, 1],
+			[0, 1],
+			[1, 1],
+			[0, 1],
+		],
 	});
 	const graphXYDown = ear.graph.populate({
 		...base,
-		vertices_coords: [[0, 0], [0, 1], [1, 1], [1, 0], [1, 1], [1, 0]],
+		vertices_coords: [
+			[0, 0],
+			[0, 1],
+			[1, 1],
+			[1, 0],
+			[1, 1],
+			[1, 0],
+		],
 	});
 
 	// XY up
@@ -63,14 +81,26 @@ test("solveFlatAdjacentEdges, four panel square", () => {
 
 	// only two taco-tacos, one on the top and one bottom
 	expect(faces_winding).toMatchObject([
-		true, false, true, false, true, false, true, false,
+		true,
+		false,
+		true,
+		false,
+		true,
+		false,
+		true,
+		false,
 	]);
 	// 0 is below 1 (V)
 	// 1 is above 2 (V)
 	// 2 is above 3 (M)
 	// same with every face N+4
 	expect(adjacentOrders).toMatchObject({
-		"0 1": 2, "1 2": 1, "2 3": 1, "4 5": 2, "5 6": 1, "6 7": 1,
+		"0 1": 2,
+		"1 2": 1,
+		"2 3": 1,
+		"4 5": 2,
+		"5 6": 1,
+		"6 7": 1,
 	});
 });
 
@@ -83,11 +113,14 @@ test("solveFlatAdjacentEdges, strip weave", () => {
 	const faces_winding = ear.graph.makeFacesWinding(folded);
 	const adjacentOrders = ear.layer.solveFlatAdjacentEdges(folded, faces_winding);
 
-	expect(faces_winding).toMatchObject([
-		true, false, true, false, false, true, false,
-	]);
+	expect(faces_winding).toMatchObject([true, false, true, false, false, true, false]);
 	expect(adjacentOrders).toMatchObject({
-		"0 1": 2, "0 4": 2, "1 2": 1, "2 3": 2, "4 5": 1, "5 6": 2,
+		"0 1": 2,
+		"0 4": 2,
+		"1 2": 1,
+		"2 3": 2,
+		"4 5": 1,
+		"5 6": 2,
 	});
 });
 
@@ -102,7 +135,10 @@ test("solveFlatAdjacentEdges, zig-zag panels", () => {
 
 	expect(faces_winding).toMatchObject([true, true, false, true, false]);
 	expect(adjacentOrders).toMatchObject({
-		"0 4": 2, "1 2": 1, "2 3": 1, "3 4": 1,
+		"0 4": 2,
+		"1 2": 1,
+		"2 3": 1,
+		"3 4": 1,
 	});
 });
 
@@ -122,18 +158,75 @@ test("solveFlatAdjacentEdges, triangle strip", () => {
 	const adjacentOrders2 = ear.layer.solveFlatAdjacentEdges(folded2, faces_winding2);
 
 	expect(faces_winding1).toMatchObject([
-		true, false, false, true, true, false, false, true, true, false, false, true, true, false,
+		true,
+		false,
+		false,
+		true,
+		true,
+		false,
+		false,
+		true,
+		true,
+		false,
+		false,
+		true,
+		true,
+		false,
 	]);
 	expect(adjacentOrders1).toMatchObject({
-		"0 1": 2, "10 11": 2, "12 13": 2, "2 3": 2, "4 5": 2, "6 7": 2, "8 9": 2,
+		"0 1": 2,
+		"10 11": 2,
+		"12 13": 2,
+		"2 3": 2,
+		"4 5": 2,
+		"6 7": 2,
+		"8 9": 2,
 	});
 	expect(faces_winding2).toMatchObject([
-		true, false, false, true, true, false, false, true, true, false,
-		false, true, true, false, false, false, true, true, true, false,
-		true, true, false, false, true, true, false, false,
+		true,
+		false,
+		false,
+		true,
+		true,
+		false,
+		false,
+		true,
+		true,
+		false,
+		false,
+		true,
+		true,
+		false,
+		false,
+		false,
+		true,
+		true,
+		true,
+		false,
+		true,
+		true,
+		false,
+		false,
+		true,
+		true,
+		false,
+		false,
 	]);
 	expect(adjacentOrders2).toMatchObject({
-		"0 1": 2, "10 11": 2, "12 13": 2, "15 16": 1, "17 27": 1, "18 19": 2, "19 20": 2, "2 3": 2, "21 22": 2, "23 24": 2, "25 26": 2, "4 5": 2, "6 7": 2, "8 9": 2,
+		"0 1": 2,
+		"10 11": 2,
+		"12 13": 2,
+		"15 16": 1,
+		"17 27": 1,
+		"18 19": 2,
+		"19 20": 2,
+		"2 3": 2,
+		"21 22": 2,
+		"23 24": 2,
+		"25 26": 2,
+		"4 5": 2,
+		"6 7": 2,
+		"8 9": 2,
 	});
 });
 
@@ -149,11 +242,46 @@ test("solveFlatAdjacentEdges, bird base", () => {
 	const adjacentOrders = ear.layer.solveFlatAdjacentEdges(folded, faces_winding);
 
 	expect(faces_winding).toMatchObject([
-		true, false, false, true, false, true, false, true, false, false,
-		true, true, true, false, true, false, true, true, false, false,
+		true,
+		false,
+		false,
+		true,
+		false,
+		true,
+		false,
+		true,
+		false,
+		false,
+		true,
+		true,
+		true,
+		false,
+		true,
+		false,
+		true,
+		true,
+		false,
+		false,
 	]);
 	expect(adjacentOrders).toMatchObject({
-		"0 1": 2, "0 4": 1, "12 15": 2, "13 14": 1, "14 15": 1, "14 18": 2, "15 17": 1, "2 3": 1, "3 13": 1, "4 7": 1, "5 6": 2, "5 8": 1, "6 16": 1, "6 7": 2, "7 19": 2, "8 11": 1, "9 10": 1, "9 12": 2,
+		"0 1": 2,
+		"0 4": 1,
+		"12 15": 2,
+		"13 14": 1,
+		"14 15": 1,
+		"14 18": 2,
+		"15 17": 1,
+		"2 3": 1,
+		"3 13": 1,
+		"4 7": 1,
+		"5 6": 2,
+		"5 8": 1,
+		"6 16": 1,
+		"6 7": 2,
+		"7 19": 2,
+		"8 11": 1,
+		"9 10": 1,
+		"9 12": 2,
 	});
 });
 
@@ -167,8 +295,24 @@ test("solveFlatAdjacentEdges, kabuto", () => {
 	const adjacentOrders = ear.layer.solveFlatAdjacentEdges(folded, faces_winding);
 
 	expect(faces_winding).toMatchObject([
-		true, false, true, false, true, false, true, true, false,
-		false, true, true, false, false, true, true, false, false,
+		true,
+		false,
+		true,
+		false,
+		true,
+		false,
+		true,
+		true,
+		false,
+		false,
+		true,
+		true,
+		false,
+		false,
+		true,
+		true,
+		false,
+		false,
 	]);
 	expect(adjacentOrders).toMatchObject({
 		"0 3": 2,
@@ -208,7 +352,10 @@ test("solveFlatAdjacentEdges, crane", () => {
 });
 
 test("solveFlatAdjacentEdges, flapping bird", () => {
-	const foldfile = fs.readFileSync("./tests/files/fold/randlett-flapping-bird.fold", "utf-8");
+	const foldfile = fs.readFileSync(
+		"./tests/files/fold/randlett-flapping-bird.fold",
+		"utf-8",
+	);
 	const fold = JSON.parse(foldfile);
 	const folded = ear.graph.getFramesByClassName(fold, "foldedForm")[0];
 	ear.graph.populate(folded);
@@ -237,10 +384,7 @@ test("solveFlatAdjacentEdges, bird", () => {
 });
 
 test("solveFlatAdjacentEdges, 3D cube-octagon", () => {
-	const foldfile = fs.readFileSync(
-		"./tests/files/fold/cube-octagon.fold",
-		"utf-8",
-	);
+	const foldfile = fs.readFileSync("./tests/files/fold/cube-octagon.fold", "utf-8");
 	const fold = JSON.parse(foldfile);
 	// the second folded frame is the one without the flat assignments
 	const folded = ear.graph.getFramesByClassName(fold, "foldedForm")[1];
@@ -289,8 +433,9 @@ test("solveFlatAdjacentEdges, 3D cube-octagon", () => {
 	// as we are simply projecting 3D down into 2D creating degenerate faces)
 	expect(faces_winding).toMatchObject(faces_winding2);
 	const noTransformWinding = ear.graph.makeFacesWinding(folded);
-	planes_faces[3]
-		.forEach(f => expect(faces_winding[f]).not.toEqual(noTransformWinding[f]));
+	planes_faces[3].forEach((f) =>
+		expect(faces_winding[f]).not.toEqual(noTransformWinding[f]),
+	);
 
 	// it just so happens that in this example all planes match clusters
 	// making planes and clusters synonymous
@@ -298,23 +443,83 @@ test("solveFlatAdjacentEdges, 3D cube-octagon", () => {
 
 	// the vertices coords of the folded form
 	expect(folded.vertices_coords).toMatchObject([
-		[2, 2, 0], [2, 2, -1], [2, 1, -1], [3, 1, -1], [3, 2, -1], [3, 2, 0],
-		[2, 3, 0], [2, 3, -1], [1, 3, -1], [1, 2, -1], [2, 2, -1], [3, 3, 0],
-		[4, 3, -1], [3, 3, 0], [2, 2, 0], [1, 2, -1], [2, 2, -1], [1.5, 1.5, -1],
-		[3, 3, -1], [3.5, 3.5, -1], [3, 3, -1], [2, 3, -1], [2, 4, -1], [3, 2, -1],
-		[3, 1, -1], [3, 2, -1], [2, 3, 0], [2, 3, -1], [3, 2, 0], [1.5, 3.5, -1],
-		[2, 4, -1], [4, 2, -1], [3.5, 1.5, -1], [3, 3, -1], [4, 3, -1], [3, 4, -1],
+		[2, 2, 0],
+		[2, 2, -1],
+		[2, 1, -1],
+		[3, 1, -1],
+		[3, 2, -1],
+		[3, 2, 0],
+		[2, 3, 0],
+		[2, 3, -1],
+		[1, 3, -1],
+		[1, 2, -1],
+		[2, 2, -1],
+		[3, 3, 0],
+		[4, 3, -1],
+		[3, 3, 0],
+		[2, 2, 0],
+		[1, 2, -1],
+		[2, 2, -1],
+		[1.5, 1.5, -1],
+		[3, 3, -1],
+		[3.5, 3.5, -1],
+		[3, 3, -1],
+		[2, 3, -1],
+		[2, 4, -1],
+		[3, 2, -1],
+		[3, 1, -1],
+		[3, 2, -1],
+		[2, 3, 0],
+		[2, 3, -1],
+		[3, 2, 0],
+		[1.5, 3.5, -1],
+		[2, 4, -1],
+		[4, 2, -1],
+		[3.5, 1.5, -1],
+		[3, 3, -1],
+		[4, 3, -1],
+		[3, 4, -1],
 	]);
 
 	// the vertices coords from the big flat plane (3), this plane has been flipped,
 	// the normal is [0, 0, -1] so we should see the vertices appearing flipped.
 	expect(clusters_graph[3].vertices_coords).toMatchObject([
-		, [2, -2], [2, -1], [3, -1], [3, -2], ,
-		, [2, -3], [1, -3], [1, -2], [2, -2], ,
-		[4, -3], , , [1, -2], [2, -2], [1.5, -1.5],
-		[3, -3], [3.5, -3.5], [3, -3], [2, -3], [2, -4], [3, -2],
-		[3, -1], [3, -2], , [2, -3], , [1.5, -3.5],
-		[2, -4], [4, -2], [3.5, -1.5], [3, -3], [4, -3], [3, -4],
+		,
+		[2, -2],
+		[2, -1],
+		[3, -1],
+		[3, -2],
+		,
+		,
+		[2, -3],
+		[1, -3],
+		[1, -2],
+		[2, -2],
+		,
+		[4, -3],
+		,
+		,
+		[1, -2],
+		[2, -2],
+		[1.5, -1.5],
+		[3, -3],
+		[3.5, -3.5],
+		[3, -3],
+		[2, -3],
+		[2, -4],
+		[3, -2],
+		[3, -1],
+		[3, -2],
+		,
+		[2, -3],
+		,
+		[1.5, -3.5],
+		[2, -4],
+		[4, -2],
+		[3.5, -1.5],
+		[3, -3],
+		[4, -3],
+		[3, -4],
 	]);
 
 	// four tortillas in the big flat plane (#3): 3, 11, 17, 28
@@ -329,26 +534,44 @@ test("solveFlatAdjacentEdges, 3D cube-octagon", () => {
 	// let's focus on the relationship between faces 2 and 3 for a moment
 
 	// cluster 3, faces 2 and 3 as polygons
-	const foldedPolygon2 = folded.faces_vertices[2]
-		.map(v => folded.vertices_coords[v]);
-	const foldedPolygon3 = folded.faces_vertices[3]
-		.map(v => folded.vertices_coords[v]);
-	const clusterGraphPolygon2 = clusters_graph[3].faces_vertices[2]
-		.map(v => clusters_graph[3].vertices_coords[v]);
-	const clusterGraphPolygon3 = clusters_graph[3].faces_vertices[3]
-		.map(v => clusters_graph[3].vertices_coords[v]);
+	const foldedPolygon2 = folded.faces_vertices[2].map((v) => folded.vertices_coords[v]);
+	const foldedPolygon3 = folded.faces_vertices[3].map((v) => folded.vertices_coords[v]);
+	const clusterGraphPolygon2 = clusters_graph[3].faces_vertices[2].map(
+		(v) => clusters_graph[3].vertices_coords[v],
+	);
+	const clusterGraphPolygon3 = clusters_graph[3].faces_vertices[3].map(
+		(v) => clusters_graph[3].vertices_coords[v],
+	);
 
 	// folded face 2 appears to wind clockwise
-	expect(foldedPolygon2).toMatchObject([[2, 2, -1], [2, 1, -1], [1, 2, -1]]);
+	expect(foldedPolygon2).toMatchObject([
+		[2, 2, -1],
+		[2, 1, -1],
+		[1, 2, -1],
+	]);
 	// folded face 3 appears to wind counter-clockwise
-	expect(foldedPolygon3)
-		.toMatchObject([[2, 1, -1], [3, 1, -1], [3.5, 1.5, -1], [3, 2, -1], [1, 2, -1]]);
+	expect(foldedPolygon3).toMatchObject([
+		[2, 1, -1],
+		[3, 1, -1],
+		[3.5, 1.5, -1],
+		[3, 2, -1],
+		[1, 2, -1],
+	]);
 
 	// folded face 2 appears to wind counter-clockwise
-	expect(clusterGraphPolygon2).toMatchObject([[2, -2], [2, -1], [1, -2]]);
+	expect(clusterGraphPolygon2).toMatchObject([
+		[2, -2],
+		[2, -1],
+		[1, -2],
+	]);
 	// folded face 3 appears to wind clockwise
-	expect(clusterGraphPolygon3)
-		.toMatchObject([[2, -1], [3, -1], [3.5, -1.5], [3, -2], [1, -2]]);
+	expect(clusterGraphPolygon3).toMatchObject([
+		[2, -1],
+		[3, -1],
+		[3.5, -1.5],
+		[3, -2],
+		[1, -2],
+	]);
 
 	// the cluster graph's winding direction is the one reflected
 	// in the faces_winding array.
@@ -360,8 +583,9 @@ test("solveFlatAdjacentEdges, 3D cube-octagon", () => {
 
 	// solveFlatAdjacentEdges does not bother with vertices_coords, these two graphs
 	// will have the same result
-	expect(ear.layer.solveFlatAdjacentEdges(folded, faces_winding))
-		.toMatchObject(ear.layer.solveFlatAdjacentEdges(clusters_graph[3], faces_winding));
+	expect(ear.layer.solveFlatAdjacentEdges(folded, faces_winding)).toMatchObject(
+		ear.layer.solveFlatAdjacentEdges(clusters_graph[3], faces_winding),
+	);
 
 	// face 2 is upright, face 3 is flipped
 	// if faces 3 is flipped, a valley fold from face 3 to 2 places 2 BELOW face 3

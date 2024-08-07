@@ -6,15 +6,34 @@ import ear from "../src/index.js";
 // tell if a point is inside the polygon.
 
 const nonPlanarShape = () => ({
-	vertices_coords: [[1, 0], [3, 2], [0, 4], [-3, 3], [-1, 2], [-2, -2], [4, -1]],
-	edges_vertices: [[0, 1], [2, 0], [3, 4], [4, 5], [6, 5], [1, 6], [2, 3]],
+	vertices_coords: [
+		[1, 0],
+		[3, 2],
+		[0, 4],
+		[-3, 3],
+		[-1, 2],
+		[-2, -2],
+		[4, -1],
+	],
+	edges_vertices: [
+		[0, 1],
+		[2, 0],
+		[3, 4],
+		[4, 5],
+		[6, 5],
+		[1, 6],
+		[2, 3],
+	],
 	edges_assignment: ["B", "B", "B", "B", "B", "B", "B"],
-	faces_vertices: [[0, 2, 3, 4, 5, 6, 1]]
+	faces_vertices: [[0, 2, 3, 4, 5, 6, 1]],
 });
 
 test("validate axiom 1, nonconvex, no line of sight", () => {
 	const graph = nonPlanarShape();
-	const params = [[-1, 3], [3, 0]];
+	const params = [
+		[-1, 3],
+		[3, 0],
+	];
 	expect(ear.axiom.validateAxiom1(graph, ...params)).toMatchObject([false]);
 });
 

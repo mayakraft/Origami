@@ -1,15 +1,8 @@
 /**
  * Rabbit Ear (c) Kraft
  */
-import {
-	dot,
-	cross3,
-	magnitude,
-	normalize,
-} from "./vector.js";
-import {
-	multiplyMatrices4,
-} from "./matrix4.js";
+import { dot, cross3, magnitude, normalize } from "./vector.js";
+import { multiplyMatrices4 } from "./matrix4.js";
 
 /**
  * Quaternions encoded as an array of numbers
@@ -37,14 +30,42 @@ export const quaternionFromTwoVectors = (u, v) => {
  * @param {[number, number, number, number]} q a quaternion
  * @returns {number[]} a 4x4 matrix (array of 16 numbers)
  */
-export const matrix4FromQuaternion = (q) => multiplyMatrices4([
-	+q[3], +q[2], -q[1], +q[0],
-	-q[2], +q[3], +q[0], +q[1],
-	+q[1], -q[0], +q[3], +q[2],
-	-q[0], -q[1], -q[2], +q[3],
-], [
-	+q[3], +q[2], -q[1], -q[0],
-	-q[2], +q[3], +q[0], -q[1],
-	+q[1], -q[0], +q[3], -q[2],
-	+q[0], +q[1], +q[2], +q[3],
-]);
+export const matrix4FromQuaternion = (q) =>
+	multiplyMatrices4(
+		[
+			+q[3],
+			+q[2],
+			-q[1],
+			+q[0],
+			-q[2],
+			+q[3],
+			+q[0],
+			+q[1],
+			+q[1],
+			-q[0],
+			+q[3],
+			+q[2],
+			-q[0],
+			-q[1],
+			-q[2],
+			+q[3],
+		],
+		[
+			+q[3],
+			+q[2],
+			-q[1],
+			-q[0],
+			-q[2],
+			+q[3],
+			+q[0],
+			-q[1],
+			+q[1],
+			-q[0],
+			+q[3],
+			-q[2],
+			+q[0],
+			+q[1],
+			+q[2],
+			+q[3],
+		],
+	);

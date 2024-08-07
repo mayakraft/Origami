@@ -1,9 +1,7 @@
 /**
  * Rabbit Ear (c) Kraft
  */
-import {
-	resize3,
-} from "../math/vector.js";
+import { resize3 } from "../math/vector.js";
 
 /**
  * @description if they exist, get any title, author, or description
@@ -12,16 +10,18 @@ import {
  * @param {FOLD} graph a FOLD object
  * @returns {string} a string of comments containing metadata
  */
-const getTitleAuthorDescription = (graph) => [
-	"file_title",
-	"file_author",
-	"file_description",
-	"frame_title",
-	"frame_author",
-	"frame_description",
-].filter(key => graph[key])
-	.map(key => `# ${key.split("_")[1]}: ${graph[key]}`)
-	.join("\n");
+const getTitleAuthorDescription = (graph) =>
+	[
+		"file_title",
+		"file_author",
+		"file_description",
+		"frame_title",
+		"frame_author",
+		"frame_description",
+	]
+		.filter((key) => graph[key])
+		.map((key) => `# ${key.split("_")[1]}: ${graph[key]}`)
+		.join("\n");
 
 // todo:
 // should we add
@@ -58,20 +58,18 @@ export const foldToObj = (file) => {
 	// a list of vertices in the form of "v _ _ _" where _ are floats
 	const vertices = (graph.vertices_coords || [])
 		.map(resize3)
-		.map(coords => coords.join(" "))
-		.map(str => `v ${str}`)
+		.map((coords) => coords.join(" "))
+		.map((str) => `v ${str}`)
 		.join("\n");
 
 	// a list of faces in the form of "f _ _ _" where _ are integers
 	// obj vertex indices begin from 1 not 0
 	const faces = (graph.faces_vertices || [])
-		.map(verts => verts.map(v => v + 1).join(" "))
-		.map(str => `f ${str}`)
+		.map((verts) => verts.map((v) => v + 1).join(" "))
+		.map((str) => `f ${str}`)
 		.join("\n");
 
 	// join everything together, adding a final newline at the file's end
-	const fileString = [metadata, vertices, faces]
-		.filter(s => s !== "")
-		.join("\n");
+	const fileString = [metadata, vertices, faces].filter((s) => s !== "").join("\n");
 	return `${fileString}\n`;
 };

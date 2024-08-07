@@ -1,6 +1,6 @@
 /* SVG (c) Kraft */
-import { str_function } from '../../../environment/strings.js';
-import { getViewBox } from '../../../general/viewBox.js';
+import { str_function } from "../../../environment/strings.js";
+import { getViewBox } from "../../../general/viewBox.js";
 
 /**
  * Rabbit Ear (c) Kraft

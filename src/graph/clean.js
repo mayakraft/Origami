@@ -1,22 +1,11 @@
 /**
  * Rabbit Ear (c) Kraft
  */
-import {
-	removeDuplicateVertices,
-} from "./vertices/duplicate.js";
-import {
-	removeIsolatedVertices,
-} from "./vertices/isolated.js";
-import {
-	removeDuplicateEdges,
-} from "./edges/duplicate.js";
-import {
-	removeCircularEdges,
-} from "./edges/circular.js";
-import {
-	mergeFlatNextmaps,
-	invertFlatMap,
-} from "./maps.js";
+import { removeDuplicateVertices } from "./vertices/duplicate.js";
+import { removeIsolatedVertices } from "./vertices/isolated.js";
+import { removeDuplicateEdges } from "./edges/duplicate.js";
+import { removeCircularEdges } from "./edges/circular.js";
+import { mergeFlatNextmaps, invertFlatMap } from "./maps.js";
 
 /**
  * @description This method will remove bad graph data. this includes:
@@ -40,9 +29,9 @@ export const clean = (graph, epsilon) => {
 	// use the maps to update the removed indices from the second step
 	// to their previous index before change 1 occurred.
 	const change_v1_backmap = invertFlatMap(change_v1.map);
-	const change_v2_remove = change_v2.remove.map(e => change_v1_backmap[e]);
+	const change_v2_remove = change_v2.remove.map((e) => change_v1_backmap[e]);
 	const change_e1_backmap = invertFlatMap(change_e1.map);
-	const change_e2_remove = change_e2.remove.map(e => change_e1_backmap[e]);
+	const change_e2_remove = change_e2.remove.map((e) => change_e1_backmap[e]);
 	return {
 		vertices: {
 			map: mergeFlatNextmaps(change_v1.map, change_v2.map),
